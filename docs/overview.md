@@ -58,12 +58,11 @@ Hệ thống quản lý 4 nhóm vai trò độc lập (RBAC):
 
 ### 4.2. Database & Cloud Infrastructure (Chạy thực tế 24/7)
 
-- **Backend Cloud Hosting:** `Koyeb (Serverless Container Platform)`
-  - **Môi trường:** Đóng gói ứng dụng Backend thông qua **Docker (Containerization)**.
-  - **Khả năng vận hành:** Chạy liên tục **24/7 không ngủ đông** ở gói miễn phí, tốc độ phản hồi tức thì (0s cold start).
-  - **Vị trí Server:** Khu vực Singapore / Tokyo (tối ưu hóa độ trễ thấp nhất cho người dùng tại Việt Nam).
-  - **CI/CD:** Tự động kết nối và triển khai từ kho lưu trữ GitHub mỗi khi đẩy mã nguồn mới.
-  - **Bảo mật mạng:** Tích hợp sẵn chứng chỉ bảo mật HTTPS (SSL/TLS) tự động cho toàn bộ API Endpoints.
+- **Backend Cloud Hosting:** `Hugging Face Spaces (Docker SDK)`
+  - **Tài nguyên miễn phí:** 16 GB RAM + 2 vCPU.
+  - **Khả năng vận hành:** Chạy liên tục **24/7 không ngủ đông** (0s Cold Start, phản hồi tức thì).
+  - **Môi trường:** Đóng gói độc lập qua `Dockerfile` (Chạy trên cổng tiêu chuẩn `7860`).
+  - **Bảo mật & Tên miền:** Cung cấp sẵn chứng chỉ bảo mật HTTPS và API Direct URL công khai cho Frontend gọi vào.
 - **Database Engine & Cloud Hosting:** `Supabase (Managed PostgreSQL)`
   - Đảm bảo cơ sở dữ liệu hoạt động trực tuyến 24/7 trên Cloud.
   - Sử dụng **Transaction Pooler (Port 6543)** để tối ưu hóa kết nối, đảm bảo chịu tải 100–300 người dùng đồng thời.
