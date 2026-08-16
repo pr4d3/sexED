@@ -1,6 +1,6 @@
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://sex-education-api.onrender.com/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://sex-education-api.onrender.com/api/v1";
 
 export const api = {
     getToken: (options?: any) => {
