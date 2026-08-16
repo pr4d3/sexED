@@ -8,12 +8,12 @@ ENV HOME=/home/user \
 
 WORKDIR $HOME/app
 
-# Copy requirements and install
-COPY --chown=user requirements.txt $HOME/app/requirements.txt
+# Copy requirements from backend
+COPY --chown=user backend/requirements.txt $HOME/app/requirements.txt
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Copy application files
-COPY --chown=user . $HOME/app
+# Copy backend files
+COPY --chown=user backend/ $HOME/app/
 
 # Expose default Hugging Face Spaces port
 EXPOSE 7860
