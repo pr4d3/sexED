@@ -1,0 +1,38 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+    const token = request.cookies.get('access_token')?.value;
+    const role = request.cookies.get('user_role')?.value;
+    const { pathname } = request.nextUrl;
+
+    if (token) {
+        if (pathname === '/login' || pathname === '/register') {
+            return NextResponse.redirect(new URL('/', request.url));
+        }
+    }
+
+    if (!token) {
+        if (pathname.startsWith('/profile') || pathname.startsWith('/dashboard') || pathname.includes('/learn')) {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+    }
+
+    if (token && pathname.startsWith('/dashboard')) {
+        if (role !== 'ADMIN' && role !== 'INSTRUCTOR') {
+            return NextResponse.redirect(new URL('/', request.url));
+        }
+    }
+
+    return NextResponse.next();
+}
+
+export const config = {
+    matcher: [
+        '/login',
+        '/register',
+        '/profile/:path*',
+        '/dashboard/:path*',
+        '/courses/:path*/learn',
+    ],
+};
