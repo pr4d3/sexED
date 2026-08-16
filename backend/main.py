@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core.database import engine
+from core.config import settings
 from routers import auth_router, user_router, course_router, forum_router, dashboard_router, general_router
 
 # Khởi tạo logging
@@ -26,9 +27,10 @@ app = FastAPI(
 )
 
 # Cấu hình CORS
+origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Thay đổi trong môi trường production
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
