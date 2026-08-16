@@ -58,11 +58,11 @@ Hệ thống quản lý 4 nhóm vai trò độc lập (RBAC):
 
 ### 4.2. Database & Cloud Infrastructure (Chạy thực tế 24/7)
 
-- **Backend Cloud Hosting:** `Hugging Face Spaces (Docker SDK)`
-  - **Tài nguyên miễn phí:** 16 GB RAM + 2 vCPU.
-  - **Khả năng vận hành:** Chạy liên tục **24/7 không ngủ đông** (0s Cold Start, phản hồi tức thì).
-  - **Môi trường:** Đóng gói độc lập qua `Dockerfile` (Chạy trên cổng tiêu chuẩn `7860`).
-  - **Bảo mật & Tên miền:** Cung cấp sẵn chứng chỉ bảo mật HTTPS và API Direct URL công khai cho Frontend gọi vào.
+- **Backend Cloud Hosting:** `Render (Web Service - Managed Cloud)`
+  - **Môi trường:** Triển khai trực tiếp từ GitHub Repository (chọn Root Directory: `backend/`).
+  - **Khả năng vận hành:** Gói miễn phí 750 giờ/tháng, tự động khởi động lại khi có request mới.
+  - **CI/CD:** Tự động Build và Deploy mỗi khi đẩy code lên nhánh `main` của GitHub.
+  - **Bảo mật & Tên miền:** Cung cấp sẵn chứng chỉ bảo mật HTTPS (SSL) tự động: `https://[ten-app].onrender.com`.
 - **Database Engine & Cloud Hosting:** `Supabase (Managed PostgreSQL)`
   - Đảm bảo cơ sở dữ liệu hoạt động trực tuyến 24/7 trên Cloud.
   - Sử dụng **Transaction Pooler (Port 6543)** để tối ưu hóa kết nối, đảm bảo chịu tải 100–300 người dùng đồng thời.
