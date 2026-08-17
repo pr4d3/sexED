@@ -7,7 +7,16 @@ from uuid import UUID
 from datetime import datetime, timezone
 
 async def get_forum_categories(db: AsyncSession):
-    return await forum_repository.get_categories(db)
+    categories = await forum_repository.get_categories(db)
+    return [
+        {
+            "id": c.id,
+            "name": c.name,
+            "slug": c.slug,
+            "description": c.description
+        }
+        for c in categories
+    ]
 
 async def get_forum_feed(db: AsyncSession, category_id: int = None, search: str = None, include_hidden_deleted: bool = False):
     posts = await forum_repository.get_posts(db, category_id, search, include_hidden_deleted)
