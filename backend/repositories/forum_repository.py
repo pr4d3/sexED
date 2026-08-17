@@ -18,6 +18,7 @@ async def get_posts(db: AsyncSession, category_id: int = None, search: str = Non
         select(ForumPost)
         .options(
             joinedload(ForumPost.category),
+            joinedload(ForumPost.author).joinedload(User.role),
             joinedload(ForumPost.author).joinedload(User.profile)
         )
         .order_by(ForumPost.created_at.desc())
@@ -52,6 +53,7 @@ async def get_post_by_id(db: AsyncSession, post_id: UUID) -> ForumPost:
         select(ForumPost)
         .options(
             joinedload(ForumPost.category),
+            joinedload(ForumPost.author).joinedload(User.role),
             joinedload(ForumPost.author).joinedload(User.profile)
         )
         .where(ForumPost.id == post_id)
@@ -73,7 +75,10 @@ async def update_post(db: AsyncSession, post: ForumPost) -> ForumPost:
 async def get_post_comments(db: AsyncSession, post_id: UUID, include_hidden_deleted: bool = False) -> list[ForumComment]:
     query = (
         select(ForumComment)
-        .options(joinedload(ForumComment.author).joinedload(User.profile))
+        .options(
+            joinedload(ForumComment.author).joinedload(User.role),
+            joinedload(ForumComment.author).joinedload(User.profile)
+        )
         .where(ForumComment.post_id == post_id)
         .order_by(ForumComment.created_at.asc())
     )

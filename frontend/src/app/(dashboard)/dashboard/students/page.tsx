@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import { Users, Filter } from 'lucide-react';
 
 interface ManagedCourse {
     course_id: string;
@@ -70,20 +69,20 @@ export default function DashboardStudentsPage() {
     return (
         <div className="space-y-10">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-white/10 pb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-outline-variant/30 pb-6">
                 <div>
-                    <h1 className="text-2xl font-extrabold text-white">Theo Dõi Học Viên</h1>
-                    <p className="text-xs text-slate-400 mt-1">Đánh giá tiến trình học tập phục vụ nghiên cứu khoa học</p>
+                    <h1 className="text-xl md:text-2xl font-extrabold text-on-surface">Theo Dõi Học Viên</h1>
+                    <p className="text-xs text-on-surface-variant font-light mt-1">Đánh giá tiến trình học tập phục vụ nghiên cứu khoa học</p>
                 </div>
 
                 {/* Course Selector Dropdown */}
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <Filter className="h-4 w-4 text-slate-400 shrink-0" />
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">filter_list</span>
                     {coursesLoading ? (
-                        <span className="text-xs text-slate-500">Đang tải danh sách...</span>
+                        <span className="text-xs text-on-surface-variant animate-pulse">Đang tải danh sách...</span>
                     ) : (
                         <select
-                            className="w-full sm:w-64 rounded-md border border-white/10 bg-[#0E1322] px-4 py-2.5 text-xs text-white focus:border-primary focus:outline-none"
+                            className="w-full sm:w-64 bg-white/80 border border-outline-variant/30 rounded-full px-5 py-2.5 text-xs text-on-surface font-semibold focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                             value={selectedCourseId}
                             onChange={(e) => setSelectedCourseId(e.target.value)}
                         >
@@ -99,71 +98,71 @@ export default function DashboardStudentsPage() {
                 </div>
             </div>
 
-            {/* Students Progress Table */}
-            <div className="glass-panel p-6 rounded-2xl space-y-6">
+            {/* Students Progress Table Wrapper */}
+            <div className="bg-white/80 backdrop-blur-md p-8 rounded-3xl border border-white/60 shadow-sm space-y-6">
                 {studentsLoading ? (
-                    <div className="text-slate-400 py-12 text-center text-xs">Đang tải tiến trình chi tiết của học viên...</div>
+                    <div className="text-on-surface-variant text-xs font-semibold py-12 text-center animate-pulse">Đang tải tiến trình chi tiết của học viên...</div>
                 ) : !selectedCourseId ? (
-                    <div className="text-slate-500 py-12 text-center text-xs">Vui lòng chọn hoặc tạo mới khóa học để theo dõi.</div>
+                    <div className="text-on-surface-variant/80 py-12 text-center text-sm font-light">Vui lòng chọn hoặc tạo mới khóa học để theo dõi.</div>
                 ) : students.length === 0 ? (
-                    <div className="text-slate-500 py-12 text-center text-xs">Chưa có học viên nào đăng ký tham gia khóa học này.</div>
+                    <div className="text-on-surface-variant/80 py-12 text-center text-sm font-light">Chưa có học viên nào đăng ký tham gia khóa học này.</div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="border-b border-white/10 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                                    <th className="py-3.5 px-4 bg-white/[0.01]">Học viên</th>
-                                    <th className="py-3.5 px-4 bg-white/[0.01]">Vai trò</th>
-                                    <th className="py-3.5 px-4 bg-white/[0.01]">Ngày tham gia</th>
-                                    <th className="py-3.5 px-4 bg-white/[0.01]">Tiến độ</th>
-                                    <th className="py-3.5 px-4 bg-white/[0.01]">Trạng thái</th>
+                                <tr className="border-b border-outline-variant/30 text-on-surface-variant font-bold uppercase tracking-wider text-[9px]">
+                                    <th className="py-4 px-4 bg-white/20">Học viên</th>
+                                    <th className="py-4 px-4 bg-white/20">Vai trò</th>
+                                    <th className="py-4 px-4 bg-white/20">Ngày tham gia</th>
+                                    <th className="py-4 px-4 bg-white/20">Tiến độ</th>
+                                    <th className="py-4 px-4 bg-white/20">Trạng thái</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-outline-variant/10">
                                 {students.map((student) => {
                                     const isParent = student.role === 'STUDENT_PARENT';
-                                    const roleText = isParent ? 'Phụ huynh' : 'Trẻ nhỏ';
+                                    const roleText = isParent ? 'Phụ huynh' : 'Học sinh';
                                     const roleClass = isParent 
-                                        ? 'border-orange-500/20 bg-orange-500/10 text-accent' 
-                                        : 'border-violet-500/20 bg-violet-500/10 text-primary';
+                                        ? 'border-secondary-container/20 bg-secondary-container/10 text-secondary-container' 
+                                        : 'border-primary/20 bg-primary/10 text-primary';
 
                                     const isCompleted = student.status === 'COMPLETED';
                                     
                                     return (
-                                        <tr key={student.student_id} className="border-b border-white/5 hover:bg-white/[0.01] transition-all">
+                                        <tr key={student.student_id} className="hover:bg-white/40 transition-colors">
                                             <td className="py-4 px-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-8 w-8 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center font-bold text-slate-300">
+                                                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">
                                                         {student.full_name.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <strong className="text-white text-xs block leading-tight">{student.full_name}</strong>
-                                                        <span className="text-[10px] text-slate-500 mt-1 block">{student.email}</span>
+                                                        <strong className="text-on-surface text-xs block leading-tight font-bold">{student.full_name}</strong>
+                                                        <span className="text-[10px] text-on-surface-variant mt-0.5 block">{student.email}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="py-4 px-4">
-                                                <span className={`px-2 py-0.5 rounded border text-[9px] font-bold uppercase ${roleClass}`}>
+                                                <span className={`px-2.5 py-0.5 rounded-full border text-[9px] font-bold uppercase ${roleClass}`}>
                                                     {roleText}
                                                 </span>
                                             </td>
-                                            <td className="py-4 px-4 text-slate-400">
+                                            <td className="py-4 px-4 text-on-surface-variant font-medium">
                                                 {new Date(student.enrolled_at).toLocaleDateString('vi-VN')}
                                             </td>
                                             <td className="py-4 px-4 space-y-1.5 w-60">
-                                                <div className="flex justify-between font-bold text-slate-300 text-[10px]">
+                                                <div className="flex justify-between font-bold text-on-surface text-[10px]">
                                                     <span>Đã học: {student.completed_lessons_count} bài</span>
                                                     <span>{student.progress_percentage}%</span>
                                                 </div>
-                                                <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                                                    <div className="bg-success h-full transition-all duration-300" style={{ width: `${student.progress_percentage}%` }} />
+                                                <div className="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+                                                    <div className="bg-primary h-full transition-all duration-300 rounded-full" style={{ width: `${student.progress_percentage}%` }} />
                                                 </div>
                                             </td>
                                             <td className="py-4 px-4">
-                                                <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                                                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
                                                     isCompleted 
-                                                        ? 'bg-green-500/10 text-green-500' 
-                                                        : 'bg-yellow-500/10 text-yellow-500'
+                                                        ? 'bg-primary/10 text-primary border border-primary/20' 
+                                                        : 'bg-secondary-container/10 text-secondary-container border border-secondary-container/20'
                                                 }`}>
                                                     {isCompleted ? 'Hoàn thành' : 'Đang học'}
                                                 </span>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trang cá nhân &amp; Tiến độ - EduSex VN</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-surface": "#191c1d",
+                "surface-dim": "#d9dadb",
+                "on-error-container": "#93000a",
+                "error-container": "#ffdad6",
+                "primary-fixed": "#9ef4cd",
+                "secondary-fixed": "#ffdcc2",
+                "error": "#ba1a1a",
+                "on-secondary-fixed": "#2e1500",
+                "inverse-on-surface": "#f0f1f2",
+                "outline-variant": "#bec9c1",
+                "surface": "#f8f9fa",
+                "outline": "#6f7a73",
+                "on-tertiary-container": "#8be3ff",
+                "inverse-surface": "#2e3132",
+                "on-primary-container": "#93e8c2",
+                "on-secondary-container": "#6b3900",
+                "on-primary": "#ffffff",
+                "on-primary-fixed-variant": "#00513a",
+                "on-error": "#ffffff",
+                "secondary": "#8f4e00",
+                "surface-tint": "#026c4e",
+                "on-secondary": "#ffffff",
+                "on-tertiary-fixed-variant": "#004e5f",
+                "surface-container": "#edeeef",
+                "inverse-primary": "#82d7b2",
+                "on-secondary-fixed-variant": "#6d3a00",
+                "surface-container-lowest": "#ffffff",
+                "surface-bright": "#f8f9fa",
+                "secondary-fixed-dim": "#ffb77a",
+                "on-tertiary": "#ffffff",
+                "tertiary": "#004d5d",
+                "primary-container": "#006b4d",
+                "surface-container-highest": "#e1e3e4",
+                "primary-fixed-dim": "#82d7b2",
+                "surface-container-high": "#e7e8e9",
+                "on-background": "#191c1d",
+                "tertiary-fixed": "#b3ebff",
+                "secondary-container": "#fc9d41",
+                "on-surface-variant": "#3f4943",
+                "surface-container-low": "#f3f4f5",
+                "on-primary-fixed": "#002115",
+                "background": "#f8f9fa",
+                "on-tertiary-fixed": "#001f27",
+                "primary": "#005039",
+                "tertiary-container": "#00667b",
+                "tertiary-fixed-dim": "#4ed6fb",
+                "surface-variant": "#e1e3e4"
+        },
+        "borderRadius": {
+                "DEFAULT": "1rem",
+                "lg": "2rem",
+                "xl": "3rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "base": "8px",
+                "card-padding": "32px",
+                "gutter": "24px",
+                "margin-mobile": "20px",
+                "margin-desktop": "64px",
+                "container-max-width": "1280px"
+        },
+        "fontFamily": {
+                "display-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "title-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "body-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "label-sm": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-lg-mobile": [
+                        "Plus Jakarta Sans"
+                ],
+                "body-lg": [
+                        "Plus Jakarta Sans"
+                ]
+        },
+        "fontSize": {
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "title-md": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "300"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Custom scrollbar for soft UI */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #bec9c1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6f7a73;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md antialiased overflow-hidden flex h-screen">
+<!-- TopNavBar (Mobile Fallback) -->
+<nav class="lg:hidden docked full-width top-0 sticky backdrop-blur-md bg-surface/80 shadow-sm flex justify-between items-center w-full px-margin-mobile h-16 z-50">
+<div class="text-headline-lg-mobile font-headline-lg-mobile text-primary">EduSex VN</div>
+<button class="material-symbols-outlined text-primary text-headline-lg-mobile">menu</button>
+</nav>
+<!-- SideNavBar (Desktop Dashboard) -->
+<aside class="h-full w-72 hidden lg:flex flex-col bg-surface-container-low border-r border-outline-variant shrink-0 rounded-r-lg">
+<div class="flex flex-col p-6 gap-2 h-full">
+<!-- Brand -->
+<div class="px-4 py-6 mb-4">
+<span class="text-headline-lg font-display-lg text-primary">EduSex VN</span>
+</div>
+<!-- Header Info -->
+<div class="px-4 py-4 mb-6 flex items-center gap-4 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/20">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="User Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzmRHjndpbAGAlvjHsq0GhcTtI3F350dkI6bOelzY12R35k7_dwhaseCRwcFYo_HzDebUFW3XwsYu0zWx-sRD_AIivzO48J5olwjeQpx6eUkzGCZsi-kAUH_5Xia3sI6wyXklUOn25mVXvt2BBdhrDcK5uANWA_KP2zJF3HAruIXX_4GStjQ7EdiXk9AlxH_o9WWJ3cgq9vfYc6RNsi2Gtl-e865sQ6T4q62_Jacqyh20JOr8QSHmX3w"/>
+<div class="flex flex-col overflow-hidden">
+<span class="text-title-md font-title-md text-on-surface truncate">Nguyễn Văn A</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant truncate">Học viên</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-4 text-on-surface-variant hover:bg-surface-container-high rounded-lg p-4 hover:scale-105 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+                    Tổng quan
+                </a>
+<a class="flex items-center gap-4 bg-primary-fixed text-on-primary-fixed-variant rounded-lg p-4 shadow-sm transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[24px]">school</span>
+                    Khóa học của tôi
+                </a>
+<a class="flex items-center gap-4 text-on-surface-variant hover:bg-surface-container-high rounded-lg p-4 hover:scale-105 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]">groups</span>
+                    Cộng đồng
+                </a>
+<a class="flex items-center gap-4 text-on-surface-variant hover:bg-surface-container-high rounded-lg p-4 hover:scale-105 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]">analytics</span>
+                    Tiến độ
+                </a>
+<a class="flex items-center gap-4 text-on-surface-variant hover:bg-surface-container-high rounded-lg p-4 hover:scale-105 transition-transform duration-200 mt-auto" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+                    Cài đặt
+                </a>
+</nav>
+<!-- CTA -->
+<div class="mt-4">
+<button class="w-full py-4 px-4 bg-secondary-container text-on-secondary-container text-body-md font-title-md rounded-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+                    Hỗ trợ học tập
+                </button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-y-auto bg-background scroll-smooth">
+<div class="w-full max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12">
+<!-- Profile Header & Tabs (Glassmorphic) -->
+<div class="bg-surface/60 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)] rounded-xl p-8 mb-12">
+<div class="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
+<div class="relative">
+<img class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-surface-container-lowest shadow-sm" data-alt="Profile Picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjrgdc9z0GZMlo2tAx1T7LVSV-OamtTdXT-m_7GazSWUSIPwxGINMVTnUWpfKnSZqvW4Me8RDkJFOoSwnx0gTwIqj7kNGSPqeQItmW2vHH0WZVmackXLPAPMmR0OWYYq9vw6ucWlAUm71KUctPiqTVnbFLdY17vAdPSOILyoR4nGo1i2Vh-Zh30Bads3Dc09BpMNvA2_TZzCwbKpF34Kcu7_ZXU2JA7NJIXgJWoP00Z_Oxx5jPPyB08g"/>
+<button class="absolute bottom-0 right-0 w-8 h-8 md:w-10 md:h-10 bg-primary-fixed text-on-primary-fixed-variant border-2 border-surface-container-lowest rounded-full flex items-center justify-center hover:bg-primary-fixed-dim transition-colors shadow-sm cursor-pointer">
+<span class="material-symbols-outlined text-[18px] md:text-[20px]">edit</span>
+</button>
+</div>
+<div class="flex flex-col gap-2 flex-1">
+<div class="flex items-center gap-3 flex-wrap">
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-background">Nguyễn Văn A</h1>
+<span class="bg-primary-container/20 text-primary border border-primary-container/30 text-label-sm font-label-sm px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                            Học viên
+                        </span>
+</div>
+<p class="text-body-lg font-body-lg text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+                        nguyenvana.student@edusex.vn
+                    </p>
+</div>
+</div>
+<!-- Tabs Navigation -->
+<div class="flex items-center gap-8 border-b border-outline-variant/30 overflow-x-auto no-scrollbar">
+<button class="text-title-md font-title-md text-primary border-b-2 border-primary pb-3 whitespace-nowrap px-1 transition-colors" id="btn-tab-courses" onclick="switchTab('courses')">
+                    Khóa học của tôi
+                </button>
+<button class="text-title-md font-title-md text-on-surface-variant border-b-2 border-transparent hover:text-primary pb-3 whitespace-nowrap px-1 transition-colors" id="btn-tab-profile" onclick="switchTab('profile')">
+                    Thông tin tài khoản
+                </button>
+</div>
+</div>
+<!-- TAB 1: Khóa học của tôi -->
+<div class="tab-content active" id="tab-courses">
+<!-- Filters -->
+<div class="flex items-center gap-3 mb-8 overflow-x-auto no-scrollbar pb-2">
+<button class="px-6 py-2 rounded-full text-title-md font-title-md bg-on-background text-background shadow-sm transition-all hover:opacity-90 whitespace-nowrap">
+                        Tất cả
+                    </button>
+<button class="px-6 py-2 rounded-full text-title-md font-title-md bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-all shadow-sm whitespace-nowrap border border-outline-variant/20">
+                        Đang học
+                    </button>
+<button class="px-6 py-2 rounded-full text-title-md font-title-md bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-all shadow-sm whitespace-nowrap border border-outline-variant/20">
+                        Hoàn thành
+                    </button>
+</div>
+<!-- Course Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/60 overflow-hidden hover:-translate-y-2 hover:shadow-[0_25px_50px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col group relative">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none z-0"></div>
+<div class="relative h-48 w-full overflow-hidden z-10 p-2">
+<img class="w-full h-full object-cover rounded shadow-sm group-hover:scale-105 transition-transform duration-500" data-alt="Course 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBTl5tiIT7UE7IwWQGacho9aw7GCoYBFDQDF15k1iP_e-PIn4FXkAFYBW19zknBQmRoJxYd9hpoY4bKQyKOT7P2v0NNfBt0lBPzt5M9hWR3iOZzMeXOCGjJjouaWcKKFi3gCZhTZz7EmG5LfPlMXGOWdT6lbQ9FLcNXH024i6mev2KdFjXHBtvjFlPCK1EPJAXWoqFL2Fq8yUO5cjTV3zIfRKff7zFiJLqu_WbjBFqv4lgSl2I7whovw"/>
+<div class="absolute top-6 left-6 bg-secondary-container/90 backdrop-blur text-on-secondary-container text-label-sm font-label-sm px-4 py-2 rounded-full shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">play_circle</span>
+                                Đang học
+                            </div>
+</div>
+<div class="p-8 flex flex-col flex-1 z-10 bg-surface-container-lowest/80 backdrop-blur-sm">
+<h3 class="text-title-md font-title-md text-on-surface mb-3 line-clamp-2">Kiến Thức Cơ Bản Về Sức Khỏe Sinh Sản</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-8 line-clamp-2 flex-1">Nắm vững các khái niệm nền tảng về cơ thể, sự phát triển và cách chăm sóc bản thân an toàn.</p>
+<div class="mt-auto">
+<div class="flex justify-between items-center mb-3">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Tiến độ</span>
+<span class="text-title-md font-title-md text-secondary">65%</span>
+</div>
+<div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden mb-8 shadow-inner">
+<div class="h-full bg-secondary rounded-full transition-all duration-1000 ease-out" style="width: 65%;"></div>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary text-title-md font-title-md rounded-full hover:bg-primary/90 transition-colors flex justify-center items-center gap-2 shadow-sm">
+                                    Tiếp tục học
+                                    <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/60 overflow-hidden hover:-translate-y-2 hover:shadow-[0_25px_50px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col group relative">
+<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent pointer-events-none z-0"></div>
+<div class="relative h-48 w-full overflow-hidden z-10 p-2">
+<img class="w-full h-full object-cover rounded shadow-sm group-hover:scale-105 transition-transform duration-500" data-alt="Course 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7CpUJIA8EuC6mCYTg2BXTls_orwZMRhqOBMeZ0jS24x5ViyJ8IGf5VgUji_pB0cJTHCQ5tCNDDwn-OFesofnf89XrMVnzM9BA0RPltL-nb6co10t7HestPxK7x2k5NKpa4oFeIEnp-nblmrRrVlinlC5uAtFniJ3fnBjrUmJYf9-ZEdhi4GtiFWClHmmIEEO1eUX_G54tFd2YentKyUZPfC2gwSis4--UQlN6ndAlXehp0MjXbQ7m8A"/>
+<div class="absolute top-6 left-6 bg-secondary-container/90 backdrop-blur text-on-secondary-container text-label-sm font-label-sm px-4 py-2 rounded-full shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">play_circle</span>
+                                Đang học
+                            </div>
+</div>
+<div class="p-8 flex flex-col flex-1 z-10 bg-surface-container-lowest/80 backdrop-blur-sm">
+<h3 class="text-title-md font-title-md text-on-surface mb-3 line-clamp-2">Tâm Lý Học Tuổi Dậy Thì &amp; Cảm Xúc</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-8 line-clamp-2 flex-1">Khám phá những thay đổi tâm lý, cách quản lý cảm xúc và xây dựng các mối quan hệ lành mạnh.</p>
+<div class="mt-auto">
+<div class="flex justify-between items-center mb-3">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Tiến độ</span>
+<span class="text-title-md font-title-md text-secondary">30%</span>
+</div>
+<div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden mb-8 shadow-inner">
+<div class="h-full bg-secondary rounded-full transition-all duration-1000 ease-out" style="width: 30%;"></div>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary text-title-md font-title-md rounded-full hover:bg-primary/90 transition-colors flex justify-center items-center gap-2 shadow-sm">
+                                    Tiếp tục học
+                                    <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/60 overflow-hidden hover:-translate-y-2 hover:shadow-[0_25px_50px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col group relative opacity-90">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container/5 to-transparent pointer-events-none z-0"></div>
+<div class="relative h-48 w-full overflow-hidden z-10 p-2">
+<img class="w-full h-full object-cover rounded shadow-sm group-hover:scale-105 transition-transform duration-500 grayscale-[20%]" data-alt="Course 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE0VxacFXyhR5eyN0kxfUc71uPLOmQFLSV27nsp7KNJe7ElXmzMhf_TVSJHn07OfhvdvVXiBF8I_3kSzBkedWlBEBLJjNl75Hz_08J0Ip14R_0OulwlKOCwgfz4WfObrr5wpZaQFK34jJTIYuFO0aSy3IfIvLfQH2g0ph6w6KFxqZPaB1vBvJLFaaqqVwmJtUeX96CyRBD7tH6SRzp6XStu3fXxusa8KTnyulzn4mrtRbm91iyj-TofQ"/>
+<div class="absolute top-6 left-6 bg-primary-container/90 backdrop-blur text-on-primary-container text-label-sm font-label-sm px-4 py-2 rounded-full shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                                Hoàn thành
+                            </div>
+</div>
+<div class="p-8 flex flex-col flex-1 z-10 bg-surface-container-lowest/80 backdrop-blur-sm">
+<h3 class="text-title-md font-title-md text-on-surface mb-3 line-clamp-2">An Toàn Trên Không Gian Mạng</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-8 line-clamp-2 flex-1">Hướng dẫn bảo vệ thông tin cá nhân và nhận diện các rủi ro khi tham gia mạng xã hội.</p>
+<div class="mt-auto">
+<div class="flex justify-between items-center mb-3">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Tiến độ</span>
+<span class="text-title-md font-title-md text-primary-container">100%</span>
+</div>
+<div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden mb-8 shadow-inner">
+<div class="h-full bg-primary-container rounded-full" style="width: 100%;"></div>
+</div>
+<button class="w-full py-4 bg-surface-container text-on-surface text-title-md font-title-md rounded-full hover:bg-surface-container-high transition-colors flex justify-center items-center gap-2 shadow-sm">
+                                    Xem lại tài liệu
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- TAB 2: Thông tin tài khoản -->
+<div class="tab-content" id="tab-profile">
+<div class="bg-surface/60 backdrop-blur-xl rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/40 p-8 max-w-3xl">
+<h2 class="text-headline-lg font-headline-lg text-on-surface mb-8">Chỉnh sửa hồ sơ</h2>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2 md:col-span-2">
+<label class="text-title-md font-title-md text-on-surface">Họ và tên</label>
+<input class="w-full h-14 px-5 rounded-full border border-outline-variant bg-surface-container-lowest text-body-md font-body-md focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow shadow-inner" type="text" value="Nguyễn Văn A"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-title-md font-title-md text-on-surface">Email</label>
+<input class="w-full h-14 px-5 rounded-full border border-outline-variant bg-surface-container text-on-surface-variant text-body-md font-body-md opacity-70 cursor-not-allowed shadow-inner" disabled="" type="email" value="nguyenvana.student@edusex.vn"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-title-md font-title-md text-on-surface">Số điện thoại</label>
+<input class="w-full h-14 px-5 rounded-full border border-outline-variant bg-surface-container-lowest text-body-md font-body-md focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow shadow-inner" placeholder="Nhập số điện thoại" type="tel"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-title-md font-title-md text-on-surface">Giới tính</label>
+<div class="relative">
+<select class="w-full h-14 px-5 appearance-none rounded-full border border-outline-variant bg-surface-container-lowest text-body-md font-body-md focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow shadow-inner">
+<option selected="" value="male">Nam</option>
+<option value="female">Nữ</option>
+<option value="other">Khác</option>
+<option value="prefer_not_to_say">Không muốn tiết lộ</option>
+</select>
+<span class="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-title-md font-title-md text-on-surface">Ngày sinh</label>
+<input class="w-full h-14 px-5 rounded-full border border-outline-variant bg-surface-container-lowest text-body-md font-body-md focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-on-surface shadow-inner" type="date" value="2005-08-15"/>
+</div>
+<div class="md:col-span-2 pt-8 flex justify-end gap-4 border-t border-outline-variant/30 mt-4">
+<button class="px-8 py-4 text-title-md font-title-md text-primary hover:bg-surface-container rounded-full transition-colors" type="button">
+                                Hủy bỏ
+                            </button>
+<button class="px-8 py-4 bg-primary text-on-primary text-title-md font-title-md rounded-full hover:bg-primary/90 transition-colors shadow-sm" type="button">
+                                Lưu thay đổi
+                            </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto w-full py-margin-mobile px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-base bg-surface-container-lowest border-t border-outline-variant">
+<div class="flex flex-col gap-2">
+<span class="text-title-md font-title-md text-primary">EduSex VN</span>
+<p class="text-label-sm font-label-sm text-on-surface-variant">© 2024 EduSex Việt Nam. Empowering safe education.</p>
+</div>
+<div class="flex flex-wrap gap-6 justify-center md:justify-end items-center">
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary transition-colors focus:underline" href="#">Chính sách bảo mật</a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary transition-colors focus:underline" href="#">Điều khoản sử dụng</a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary transition-colors focus:underline" href="#">Liên hệ</a>
+</div>
+</footer>
+</main>
+<script>
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Reset button styles
+            document.getElementById('btn-tab-courses').className = 'text-title-md font-title-md text-on-surface-variant border-b-2 border-transparent hover:text-primary pb-3 whitespace-nowrap px-1 transition-colors';
+            document.getElementById('btn-tab-profile').className = 'text-title-md font-title-md text-on-surface-variant border-b-2 border-transparent hover:text-primary pb-3 whitespace-nowrap px-1 transition-colors';
+            
+            // Show active tab
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            // Set active button style
+            document.getElementById('btn-tab-' + tabId).className = 'text-title-md font-title-md text-primary border-b-2 border-primary pb-3 whitespace-nowrap px-1 transition-colors';
+        }
+    </script>
+</body></html>

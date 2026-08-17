@@ -130,7 +130,10 @@ async def create_new_comment(db: AsyncSession, author_id: UUID, post_id: UUID, c
     
     comment_details = await db.execute(
         select(ForumComment)
-        .options(joinedload(ForumComment.author).joinedload(User.profile))
+        .options(
+            joinedload(ForumComment.author).joinedload(User.role),
+            joinedload(ForumComment.author).joinedload(User.profile)
+        )
         .where(ForumComment.id == created.id)
     )
     created = comment_details.scalars().first()
