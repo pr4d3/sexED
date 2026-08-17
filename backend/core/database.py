@@ -6,7 +6,8 @@ from core.config import settings
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=True, # Đặt thành False ở môi trường production
-    future=True
+    future=True,
+    connect_args={"statement_cache_size": 0}
 )
 
 # Khởi tạo Async Session Maker
