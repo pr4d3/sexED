@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { User, Users, Check } from 'lucide-react';
 
 export default function RegisterPage() {
     const { register, loading } = useAuth();
@@ -44,115 +42,99 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="space-y-2 text-center lg:text-left">
-                <h2 className="text-3xl font-bold tracking-tight text-white">Đăng Ký Học Tập</h2>
-                <p className="text-sm text-slate-400">Đồng hành cùng giáo dục giới tính chuẩn khoa học</p>
-            </div>
-
+        <>
             {error && (
-                <div className="rounded-md bg-red-900/30 border border-red-500/30 p-4 text-sm text-red-200">
+                <div className="rounded-2xl bg-red-50 border border-red-200/50 p-4 text-xs font-semibold text-red-600">
                     {error}
                 </div>
             )}
 
             {success && (
-                <div className="rounded-md bg-green-900/30 border border-green-500/30 p-4 text-sm text-green-200">
+                <div className="rounded-2xl bg-primary/10 border border-primary/20 p-4 text-xs font-semibold text-primary">
                     Đăng ký tài khoản thành công! Đang chuyển hướng sang Đăng nhập...
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                {/* Role Selector */}
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-on-surface ml-1">
                         Bạn tham gia với tư cách nào?
                     </label>
                     <div className="grid grid-cols-2 gap-4">
                         <div
                             onClick={() => setRole('STUDENT_PARENT')}
-                            className={`relative flex flex-col p-4 rounded-lg border-2 bg-white/5 cursor-pointer hover:bg-white/10 transition-all select-none ${
-                                role === 'STUDENT_PARENT' ? 'border-primary shadow-lg shadow-primary/10' : 'border-white/10'
+                            className={`flex flex-col items-center justify-center p-4 rounded-2xl border cursor-pointer backdrop-blur-sm transition-all select-none ${
+                                role === 'STUDENT_PARENT' 
+                                    ? 'border-primary bg-primary-fixed/30 shadow-sm' 
+                                    : 'border-white/60 bg-white/40 hover:bg-white/60'
                             }`}
                         >
-                            {role === 'STUDENT_PARENT' && (
-                                <div className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
-                                    <Check className="h-3.5 w-3.5" />
-                                </div>
-                            )}
-                            <Users className="h-8 w-8 text-primary mb-2" />
-                            <h4 className="font-semibold text-sm text-white mb-1">Tôi là Phụ huynh</h4>
-                            <p className="text-[11px] text-slate-400 leading-tight">
-                                Học kỹ năng đồng hành và trò chuyện giới tính với trẻ.
-                            </p>
+                            <span className="material-symbols-outlined text-primary mb-2 text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>family_home</span>
+                            <span className="text-xs font-bold text-on-surface">Phụ huynh</span>
                         </div>
-
                         <div
                             onClick={() => setRole('STUDENT_CHILD')}
-                            className={`relative flex flex-col p-4 rounded-lg border-2 bg-white/5 cursor-pointer hover:bg-white/10 transition-all select-none ${
-                                role === 'STUDENT_CHILD' ? 'border-primary shadow-lg shadow-primary/10' : 'border-white/10'
+                            className={`flex flex-col items-center justify-center p-4 rounded-2xl border cursor-pointer backdrop-blur-sm transition-all select-none ${
+                                role === 'STUDENT_CHILD' 
+                                    ? 'border-primary bg-primary-fixed/30 shadow-sm' 
+                                    : 'border-white/60 bg-white/40 hover:bg-white/60'
                             }`}
                         >
-                            {role === 'STUDENT_CHILD' && (
-                                <div className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
-                                    <Check className="h-3.5 w-3.5" />
-                                </div>
-                            )}
-                            <User className="h-8 w-8 text-accent mb-2" />
-                            <h4 className="font-semibold text-sm text-white mb-1">Tôi là Học sinh</h4>
-                            <p className="text-[11px] text-slate-400 leading-tight">
-                                Khám phá thay đổi tuổi dậy thì và tự bảo vệ bản thân.
-                            </p>
+                            <span className="material-symbols-outlined text-primary mb-2 text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>backpack</span>
+                            <span className="text-xs font-bold text-on-surface">Học sinh</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="fullName">
+                {/* Inputs */}
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="fullName">
                         Họ và tên
                     </label>
                     <input
                         id="fullName"
                         type="text"
                         required
-                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                        className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-sm text-on-surface placeholder:text-outline backdrop-blur-sm shadow-inner"
                         placeholder="Nguyễn Văn An"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="username">
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="username">
                         Tên đăng nhập
                     </label>
                     <input
                         id="username"
                         type="text"
                         required
-                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                        className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-sm text-on-surface placeholder:text-outline backdrop-blur-sm shadow-inner"
                         placeholder="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="email">
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="email">
                         Địa chỉ Email
                     </label>
                     <input
                         id="email"
                         type="email"
                         required
-                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                        className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-sm text-on-surface placeholder:text-outline backdrop-blur-sm shadow-inner"
                         placeholder="an.nguyen@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="password">
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="password">
                         Mật khẩu
                     </label>
                     <input
@@ -160,7 +142,7 @@ export default function RegisterPage() {
                         type="password"
                         required
                         minLength={6}
-                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                        className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-sm text-on-surface placeholder:text-outline backdrop-blur-sm shadow-inner"
                         placeholder="•••••••• (Tối thiểu 6 ký tự)"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -170,18 +152,11 @@ export default function RegisterPage() {
                 <button
                     type="submit"
                     disabled={loading || success}
-                    className="w-full flex h-12 items-center justify-center rounded-md bg-primary text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50 cursor-pointer"
+                    className="w-full mt-4 bg-primary text-white py-4 rounded-2xl font-bold text-xs transition-all duration-300 hover:opacity-90 disabled:opacity-50 cursor-pointer shadow-md hover:shadow-lg"
                 >
-                    {loading ? 'Đang tạo tài khoản...' : 'Đăng Ký Ngay'}
+                    {loading ? 'Đang tạo tài khoản...' : 'Đăng ký'}
                 </button>
             </form>
-
-            <div className="text-center text-sm text-slate-400">
-                Đã có tài khoản?{' '}
-                <Link href="/login" className="font-semibold text-primary hover:underline">
-                    Đăng nhập ngay
-                </Link>
-            </div>
-        </div>
+        </>
     );
 }

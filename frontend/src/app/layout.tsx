@@ -19,8 +19,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${inter.variable} h-full dark`}>
-      <body className="min-h-full bg-[#0B0F19] text-[#E2E8F0] font-sans antialiased flex flex-col">
+    <html lang="vi" className={`${inter.variable} h-full`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
+        />
+      </head>
+      <body className="min-h-full bg-background text-on-background font-sans antialiased flex flex-col">
         <AuthProvider>
           {children}
         </AuthProvider>

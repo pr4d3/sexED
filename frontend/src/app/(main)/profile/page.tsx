@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import { User, BookOpen, Settings, CheckCircle2 } from 'lucide-react';
 
 interface EnrolledCourse {
     course_id: string;
@@ -106,27 +105,31 @@ export default function ProfilePage() {
     };
 
     if (profileLoading) {
-        return <div className="text-center py-24 text-slate-400">Đang tải thông tin tài khoản...</div>;
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
+                <div className="text-on-surface-variant text-sm font-semibold animate-pulse">Đang tải thông tin tài khoản...</div>
+            </div>
+        );
     }
 
     const isStudent = user?.role === 'STUDENT_PARENT' || user?.role === 'STUDENT_CHILD';
 
     return (
-        <div className="container mx-auto max-w-5xl px-4 py-12">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="container mx-auto max-w-7xl px-4 md:px-8 py-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Side: Avatar and role widget */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="glass-panel p-6 rounded-2xl text-center space-y-4">
-                        <div className="relative mx-auto h-28 w-28 rounded-full overflow-hidden border-2 border-primary bg-slate-950">
+                    <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 text-center border border-white/60 shadow-sm space-y-5">
+                        <div className="relative mx-auto h-28 w-28 rounded-full overflow-hidden border-4 border-surface-container shadow-sm bg-surface-container-low">
                             <img
-                                src={avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120'}
+                                src={avatarUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAjrgdc9z0GZMlo2tAx1T7LVSV-OamtTdXT-m_7GazSWUSIPwxGINMVTnUWpfKnSZqvW4Me8RDkJFOoSwnx0gTwIqj7kNGSPqeQItmW2vHH0WZVmackXLPAPMmR0OWYYq9vw6ucWlAUm71KUctPiqTVnbFLdY17vAdPSOILyoR4nGo1i2Vh-Zh30Bads3Dc09BpMNvA2_TZzCwbKpF34Kcu7_ZXU2JA7NJIXgJWoP00Z_Oxx5jPPyB08g'}
                                 alt="User Avatar"
                                 className="h-full w-full object-cover"
                             />
                         </div>
-                        <div>
-                            <h3 className="text-lg font-bold text-white leading-tight">{fullName}</h3>
-                            <span className="inline-flex mt-2 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
+                        <div className="space-y-1">
+                            <h3 className="text-base font-bold text-on-surface leading-tight">{fullName}</h3>
+                            <span className="inline-flex px-3 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold uppercase tracking-wider">
                                 {user?.role === 'ADMIN'
                                     ? 'Quản trị viên'
                                     : user?.role === 'INSTRUCTOR'
@@ -136,31 +139,35 @@ export default function ProfilePage() {
                                     : 'Học sinh'}
                             </span>
                         </div>
-                        <p className="text-xs text-slate-400 leading-relaxed font-light">
+                        <p className="text-xs text-on-surface-variant leading-relaxed font-light">
                             {bio || 'Chưa thiết lập tiểu sử.'}
                         </p>
                     </div>
 
                     {/* Navigation Tab Menu */}
-                    <div className="glass-panel p-2 rounded-xl flex flex-col space-y-1">
+                    <div className="bg-white/80 backdrop-blur-md rounded-2xl p-2 flex flex-col space-y-1 border border-white/60 shadow-sm">
                         {isStudent && (
                             <button
                                 onClick={() => setActiveTab('progress')}
-                                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                                    activeTab === 'progress' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                    activeTab === 'progress' 
+                                        ? 'bg-primary text-white shadow-sm' 
+                                        : 'text-on-surface-variant hover:text-on-surface hover:bg-white/40'
                                 }`}
                             >
-                                <BookOpen className="h-4.5 w-4.5" />
+                                <span className="material-symbols-outlined text-[18px]">school</span>
                                 Tiến độ học tập
                             </button>
                         )}
                         <button
                             onClick={() => setActiveTab('settings')}
-                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                                activeTab === 'settings' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                activeTab === 'settings' 
+                                    ? 'bg-primary text-white shadow-sm' 
+                                    : 'text-on-surface-variant hover:text-on-surface hover:bg-white/40'
                             }`}
                         >
-                            <Settings className="h-4.5 w-4.5" />
+                            <span className="material-symbols-outlined text-[18px]">settings</span>
                             Thông tin tài khoản
                         </button>
                     </div>
@@ -170,54 +177,54 @@ export default function ProfilePage() {
                 <div className="lg:col-span-2 space-y-6">
                     {/* Tab 1: Learning Progress */}
                     {activeTab === 'progress' && isStudent && (
-                        <div className="glass-panel p-8 rounded-2xl space-y-6">
-                            <h2 className="text-xl font-bold text-white">Khóa học của tôi</h2>
+                        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-white/60 shadow-sm space-y-6">
+                            <h2 className="text-lg font-bold text-on-surface">Khóa học của tôi</h2>
                             
                             {coursesLoading ? (
-                                <div className="text-slate-400 py-6">Đang tải danh mục khóa học...</div>
+                                <div className="text-on-surface-variant text-xs font-medium py-6 animate-pulse">Đang tải danh mục khóa học...</div>
                             ) : myCourses.length === 0 ? (
                                 <div className="text-center py-12 space-y-4">
-                                    <p className="text-slate-400 text-sm">Bạn chưa đăng ký tham gia khóa học nào.</p>
-                                    <Link href="/courses" className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 text-xs font-semibold text-white transition-colors hover:bg-primary-hover">
+                                    <p className="text-on-surface-variant text-sm font-light">Bạn chưa đăng ký tham gia khóa học nào.</p>
+                                    <Link href="/courses" className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-6 text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity">
                                         Khám phá khóa học ngay
                                     </Link>
                                 </div>
                             ) : (
                                 <div className="space-y-6">
                                     {myCourses.map((c) => (
-                                        <div key={c.course_id} className="glass-card p-6 rounded-xl border border-white/5 flex flex-col sm:flex-row items-center gap-6 justify-between">
-                                            <div className="flex-1 w-full space-y-3">
-                                                <div className="flex items-center justify-between">
-                                                    <h3 className="font-bold text-white text-base leading-snug">{c.course_title}</h3>
-                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${
+                                        <div key={c.course_id} className="bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-white/50 flex flex-col sm:flex-row items-center gap-6 justify-between shadow-sm hover-shadow transition-all duration-300">
+                                            <div className="flex-1 w-full space-y-4">
+                                                <div className="flex items-center justify-between gap-4">
+                                                    <h3 className="font-bold text-on-surface text-sm sm:text-base leading-snug">{c.course_title}</h3>
+                                                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border uppercase ${
                                                         c.status === 'COMPLETED'
-                                                            ? 'border-green-500/30 bg-green-500/10 text-green-500'
-                                                            : 'border-yellow-500/30 bg-yellow-500/10 text-yellow-500'
+                                                            ? 'border-primary/20 bg-primary/10 text-primary'
+                                                            : 'border-secondary-container/20 bg-secondary-container/10 text-secondary-container'
                                                     }`}>
                                                         {c.status === 'COMPLETED' ? 'Hoàn thành' : 'Đang học'}
                                                     </span>
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <div className="flex justify-between text-xs text-slate-400 font-medium">
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between text-xs text-on-surface-variant font-medium">
                                                         <span>Hoàn thành: {c.completed_lessons}/{c.total_lessons} bài học</span>
                                                         <span>{c.progress_percentage}%</span>
                                                     </div>
-                                                    <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                                                        <div className="bg-success h-full transition-all duration-500" style={{ width: `${c.progress_percentage}%` }} />
+                                                    <div className="w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden">
+                                                        <div className="bg-primary h-full transition-all duration-500 rounded-full" style={{ width: `${c.progress_percentage}%` }} />
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="flex sm:flex-col gap-2 w-full sm:w-auto">
                                                 <Link
                                                     href={`/courses/${c.course_id}/learn`}
-                                                    className="flex-1 sm:flex-initial inline-flex h-10 items-center justify-center rounded-md bg-primary px-5 text-xs font-semibold text-white transition-colors hover:bg-primary-hover"
+                                                    className="flex-1 sm:flex-initial inline-flex h-10 items-center justify-center rounded-full bg-primary px-5 text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity"
                                                 >
                                                     Vào học
                                                 </Link>
                                                 {c.status === 'COMPLETED' && (
                                                     <Link
                                                         href={`/courses/${c.course_id}/outro`}
-                                                        className="flex-1 sm:flex-initial inline-flex h-10 items-center justify-center rounded-md border border-white/10 bg-white/5 px-4 text-xs font-semibold text-white transition-colors hover:bg-white/10"
+                                                        className="flex-1 sm:flex-initial inline-flex h-10 items-center justify-center rounded-full border border-outline/30 bg-white/50 px-4 text-xs font-bold text-on-surface hover:bg-white transition-colors"
                                                     >
                                                         Xem tổng kết
                                                     </Link>
@@ -232,41 +239,41 @@ export default function ProfilePage() {
 
                     {/* Tab 2: Settings Profile Update */}
                     {activeTab === 'settings' && (
-                        <div className="glass-panel p-8 rounded-2xl space-y-6">
-                            <h2 className="text-xl font-bold text-white">Chỉnh sửa hồ sơ cá nhân</h2>
+                        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-white/60 shadow-sm space-y-6">
+                            <h2 className="text-lg font-bold text-on-surface">Chỉnh sửa hồ sơ cá nhân</h2>
 
                             {msg && (
-                                <div className={`rounded-md p-4 text-sm border ${
+                                <div className={`rounded-xl p-4 text-xs font-semibold border ${
                                     msg.type === 'success'
-                                        ? 'bg-green-950/30 border-green-500/30 text-green-200'
-                                        : 'bg-red-950/30 border-red-500/30 text-red-200'
+                                        ? 'bg-primary/10 border-primary/20 text-primary'
+                                        : 'bg-red-50 border-red-200/50 text-red-600'
                                 }`}>
                                     {msg.text}
                                 </div>
                             )}
 
                             <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="fullName">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="fullName">
                                         Họ và tên
                                     </label>
                                     <input
                                         id="fullName"
                                         type="text"
                                         required
-                                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none transition-all"
+                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         value={fullName}
                                         onChange={(e) => setFullName(e.target.value)}
                                     />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="gender">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="gender">
                                         Giới tính
                                     </label>
                                     <select
                                         id="gender"
-                                        className="w-full rounded-md border border-white/10 bg-[#0E1322] px-4 py-2.5 text-sm text-white focus:border-primary focus:outline-none transition-all"
+                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         value={gender}
                                         onChange={(e) => setGender(e.target.value)}
                                     >
@@ -277,55 +284,55 @@ export default function ProfilePage() {
                                     </select>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="dob">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="dob">
                                         Ngày sinh
                                     </label>
                                     <input
                                         id="dob"
                                         type="date"
-                                        className="w-full rounded-md border border-white/10 bg-[#0E1322] px-4 py-2.5 text-sm text-white focus:border-primary focus:outline-none transition-all"
+                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         value={dob}
                                         onChange={(e) => setDob(e.target.value)}
                                     />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="phone">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="phone">
                                         Số điện thoại
                                     </label>
                                     <input
                                         id="phone"
                                         type="text"
-                                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none transition-all"
+                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         placeholder="0901234567"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
                                     />
                                 </div>
 
-                                <div className="space-y-2 md:col-span-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="avatarUrl">
+                                <div className="flex flex-col gap-1.5 md:col-span-2">
+                                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="avatarUrl">
                                         Đường dẫn ảnh đại diện (Avatar URL)
                                     </label>
                                     <input
                                         id="avatarUrl"
                                         type="text"
-                                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none transition-all"
+                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         placeholder="https://image-url.com/avatar.jpg"
                                         value={avatarUrl}
                                         onChange={(e) => setAvatarUrl(e.target.value)}
                                     />
                                 </div>
 
-                                <div className="space-y-2 md:col-span-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="bio">
+                                <div className="flex flex-col gap-1.5 md:col-span-2">
+                                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="bio">
                                         Tiểu sử bản thân (Bio)
                                     </label>
                                     <textarea
                                         id="bio"
                                         rows={4}
-                                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none transition-all"
+                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none resize-none"
                                         placeholder="Nhập giới thiệu ngắn về bản thân..."
                                         value={bio}
                                         onChange={(e) => setBio(e.target.value)}
@@ -336,7 +343,7 @@ export default function ProfilePage() {
                                     <button
                                         type="submit"
                                         disabled={updating}
-                                        className="w-full flex h-11 items-center justify-center rounded-md bg-primary text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50 cursor-pointer"
+                                        className="w-full flex h-11 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
                                     >
                                         {updating ? 'Đang lưu...' : 'Lưu thay đổi'}
                                     </button>

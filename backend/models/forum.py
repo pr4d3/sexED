@@ -27,10 +27,10 @@ class ForumPost(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    category = relationship("ForumCategory")
-    author = relationship("User", foreign_keys=[author_id])
-    moderator = relationship("User", foreign_keys=[moderated_by])
-    comments = relationship("ForumComment", back_populates="post", cascade="all, delete-orphan")
+    category = relationship("ForumCategory", lazy="joined")
+    author = relationship("User", foreign_keys=[author_id], lazy="joined")
+    moderator = relationship("User", foreign_keys=[moderated_by], lazy="joined")
+    comments = relationship("ForumComment", back_populates="post", cascade="all, delete-orphan", lazy="selectin")
 
 class ForumComment(Base):
     __tablename__ = "forum_comments"
@@ -45,9 +45,9 @@ class ForumComment(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    post = relationship("ForumPost", back_populates="comments")
-    author = relationship("User", foreign_keys=[author_id])
-    moderator = relationship("User", foreign_keys=[moderated_by])
+    post = relationship("ForumPost", back_populates="comments", lazy="joined")
+    author = relationship("User", foreign_keys=[author_id], lazy="joined")
+    moderator = relationship("User", foreign_keys=[moderated_by], lazy="joined")
     
-    parent = relationship("ForumComment", remote_side=[id], back_populates="replies")
-    replies = relationship("ForumComment", back_populates="parent", cascade="all, delete-orphan")
+    parent = relationship("ForumComment", remote_side=[id], back_populates="replies", lazy="joined")
+    replies = relationship("ForumComment", back_populates="parent", cascade="all, delete-orphan", lazy="selectin")

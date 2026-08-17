@@ -9,7 +9,15 @@ from models.user import User
 from uuid import UUID
 
 async def get_courses(db: AsyncSession, audience_filter: str = None) -> list[Course]:
-    query = select(Course).options(joinedload(Course.instructor)).where(Course.is_published == True)
+    query = (
+        select(Course)
+        .options(
+            selectinload(Course.lessons),
+            joinedload(Course.instructor).joinedload(User.role),
+            joinedload(Course.instructor).joinedload(User.profile)
+        )
+        .where(Course.is_published == True)
+    )
     if audience_filter:
         query = query.where(Course.target_audience.in_([audience_filter, "BOTH"]))
     result = await db.execute(query)
@@ -18,13 +26,25 @@ async def get_courses(db: AsyncSession, audience_filter: str = None) -> list[Cou
 async def get_course_by_id(db: AsyncSession, course_id: UUID) -> Course:
     result = await db.execute(
         select(Course)
-        .options(selectinload(Course.lessons), joinedload(Course.instructor))
+        .options(
+            selectinload(Course.lessons),
+            joinedload(Course.instructor).joinedload(User.role),
+            joinedload(Course.instructor).joinedload(User.profile)
+        )
         .where(Course.id == course_id)
     )
     return result.scalars().first()
 
 async def get_course_by_slug(db: AsyncSession, slug: str) -> Course:
-    result = await db.execute(select(Course).where(Course.slug == slug))
+    result = await db.execute(
+        select(Course)
+        .options(
+            selectinload(Course.lessons),
+            joinedload(Course.instructor).joinedload(User.role),
+            joinedload(Course.instructor).joinedload(User.profile)
+        )
+        .where(Course.slug == slug)
+    )
     return result.scalars().first()
 
 async def create_course(db: AsyncSession, course: Course) -> Course:
@@ -60,7 +80,11 @@ async def create_enrollment(db: AsyncSession, enrollment: CourseEnrollment) -> C
 async def get_user_enrollments(db: AsyncSession, user_id: UUID) -> list[CourseEnrollment]:
     result = await db.execute(
         select(CourseEnrollment)
-        .options(joinedload(CourseEnrollment.course).joinedload(Course.instructor))
+        .options(
+            joinedload(CourseEnrollment.course).selectinload(Course.lessons),
+            joinedload(CourseEnrollment.course).joinedload(Course.instructor).joinedload(User.role),
+            joinedload(CourseEnrollment.course).joinedload(Course.instructor).joinedload(User.profile)
+        )
         .where(CourseEnrollment.user_id == user_id)
     )
     return result.scalars().all()

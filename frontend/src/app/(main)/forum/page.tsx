@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import { MessageSquare, Plus, Search, HelpCircle, X } from 'lucide-react';
 
 interface Category {
     id: number;
@@ -110,7 +109,6 @@ export default function ForumPage() {
             });
 
             if (res.success) {
-                alert("Đăng bài viết mới thành công!");
                 setModalOpen(false);
                 setNewTitle('');
                 setNewContent('');
@@ -123,129 +121,191 @@ export default function ForumPage() {
         }
     };
 
+    const isAdmin = user?.role === 'ADMIN';
+
     return (
-        <div className="container mx-auto max-w-7xl px-4 py-12">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
-                {/* Left Side: Category filters & Action CTA */}
-                <div className="lg:col-span-1 space-y-6">
-                    {user && (
-                        <button
-                            onClick={() => setModalOpen(true)}
-                            className="w-full flex h-11 items-center justify-center gap-2 rounded-lg bg-primary text-sm font-bold text-white transition-colors hover:bg-primary-hover cursor-pointer"
-                        >
-                            <Plus className="h-4.5 w-4.5" />
-                            Tạo thảo luận
-                        </button>
-                    )}
-
-                    <div className="glass-panel p-6 rounded-2xl space-y-4">
-                        <h3 className="font-bold text-white text-sm">Chuyên mục diễn đàn</h3>
-                        <div className="flex flex-col space-y-1">
-                            <button
-                                onClick={() => setSelectedCat(null)}
-                                className={`text-left px-4 py-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                                    selectedCat === null ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                }`}
-                            >
-                                Tất cả chuyên mục
-                            </button>
-                            {categories.map((cat) => (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => setSelectedCat(cat.id)}
-                                    className={`text-left px-4 py-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                                        selectedCat === cat.id ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                    }`}
-                                >
-                                    {cat.name}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Side: Search and feed list */}
-                <div className="lg:col-span-3 space-y-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h2 className="text-xl font-bold text-white">Thảo luận cộng đồng</h2>
-                        
-                        <div className="relative w-full sm:w-72">
-                            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                            <input
+        <div className="container mx-auto max-w-7xl px-4 md:px-8 py-12 flex flex-col lg:flex-row gap-8">
+            {/* Main Content (Forum Canvas) */}
+            <main className="flex-grow space-y-8">
+                {/* Header Section */}
+                <div className="space-y-6">
+                    <h1 className="text-2xl md:text-4xl font-extrabold text-on-surface">Cộng đồng thảo luận</h1>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="relative flex-grow">
+                            <span className="material-symbols-outlined absolute left-4 top-1/2 transform -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+                            <input 
+                                className="w-full pl-12 pr-6 py-3.5 bg-white/80 border border-white/60 rounded-full focus:outline-none focus:ring-2 focus:ring-primary text-sm shadow-sm transition-all" 
+                                placeholder="Tìm kiếm chủ đề, câu hỏi..." 
                                 type="text"
-                                className="w-full rounded-md border border-white/10 bg-white/5 pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:border-primary focus:outline-none transition-all"
-                                placeholder="Tìm kiếm câu hỏi..."
                                 value={search}
                                 onChange={handleSearchChange}
                             />
                         </div>
+                        {user && (
+                            <button 
+                                onClick={() => setModalOpen(true)}
+                                className="bg-primary text-white px-8 py-3.5 rounded-full text-xs font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity whitespace-nowrap shadow-md cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">add</span>
+                                Đặt câu hỏi
+                            </button>
+                        )}
                     </div>
 
-                    {loading ? (
-                        <div className="text-center text-slate-400 py-16">Đang tải các bài thảo luận...</div>
-                    ) : posts.length === 0 ? (
-                        <div className="text-center text-slate-500 py-16">Chưa có bài viết nào trong mục này.</div>
-                    ) : (
-                        <div className="space-y-4">
-                            {posts.map((post) => (
-                                <Link
-                                    key={post.id}
-                                    href={`/forum/${post.id}`}
-                                    className="block glass-card p-6 rounded-xl border border-white/5 hover:border-primary/30 hover:bg-white/[0.01] transition-all"
-                                >
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <span className="inline-flex px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase">
-                                                {post.category_name}
-                                            </span>
-                                            <span className="text-[10px] text-slate-500">
-                                                {new Date(post.created_at).toLocaleDateString('vi-VN')}
-                                            </span>
+                    {/* Topic Chips */}
+                    <div className="flex flex-wrap gap-2.5 pt-2">
+                        <button 
+                            onClick={() => setSelectedCat(null)}
+                            className={`px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm cursor-pointer ${
+                                selectedCat === null 
+                                    ? 'bg-primary text-white' 
+                                    : 'bg-white/80 border border-white/50 text-on-surface-variant hover:bg-white'
+                            }`}
+                        >
+                            Tất cả
+                        </button>
+                        {categories.map((cat) => (
+                            <button 
+                                key={cat.id}
+                                onClick={() => setSelectedCat(cat.id)}
+                                className={`px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm cursor-pointer ${
+                                    selectedCat === cat.id 
+                                        ? 'bg-primary text-white' 
+                                        : 'bg-white/80 border border-white/50 text-on-surface-variant hover:bg-white'
+                                }`}
+                            >
+                                {cat.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Post Feed */}
+                {loading ? (
+                    <div className="text-center text-on-surface-variant text-xs font-semibold py-16 animate-pulse">Đang tải các bài thảo luận...</div>
+                ) : posts.length === 0 ? (
+                    <div className="text-center text-on-surface-variant/80 text-sm font-light py-16">Chưa có bài viết nào trong mục này.</div>
+                ) : (
+                    <div className="space-y-6">
+                        {posts.map((post) => (
+                            <Link
+                                key={post.id}
+                                href={`/forum/${post.id}`}
+                                className="block bg-white/80 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/60 shadow-sm hover:border-primary/25 hover:shadow-md transition-all duration-300"
+                            >
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-start gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                                                {post.author.full_name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs font-bold text-on-surface">{post.author.full_name}</span>
+                                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                                        post.author.role === 'ADMIN' 
+                                                            ? 'bg-red-50 text-error border border-error/25' 
+                                                            : post.author.role === 'INSTRUCTOR'
+                                                            ? 'bg-primary/10 text-primary'
+                                                            : 'bg-surface-container text-on-surface-variant'
+                                                    }`}>
+                                                        {post.author.role === 'ADMIN' ? 'Admin' : post.author.role === 'INSTRUCTOR' ? 'Chuyên gia' : 'Học viên'}
+                                                    </span>
+                                                </div>
+                                                <span className="text-[10px] text-on-surface-variant block mt-0.5">
+                                                    {new Date(post.created_at).toLocaleDateString('vi-VN')}
+                                                </span>
+                                            </div>
                                         </div>
-                                        
-                                        <h3 className="font-bold text-white text-base hover:text-primary transition-colors leading-snug">{post.title}</h3>
-                                        <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{post.short_content}</p>
-                                        
-                                        <div className="flex justify-between items-center border-t border-white/5 pt-4 text-xs text-slate-500">
-                                            <span>
-                                                Bởi: <strong className="text-slate-300">{post.author.full_name}</strong> ({
-                                                    post.author.role === 'ADMIN' ? 'Admin' : post.author.role === 'INSTRUCTOR' ? 'Giảng viên' : 'Học viên'
-                                                })
-                                            </span>
-                                            <span className="flex items-center gap-1.5 font-medium">
-                                                <MessageSquare className="h-4 w-4 text-primary" />
-                                                {post.comment_count}
-                                            </span>
+                                        <span className="inline-block px-3 py-1 rounded-full bg-secondary-container/10 text-secondary-container border border-secondary-container/25 text-[9px] font-bold uppercase">
+                                            {post.category_name}
+                                        </span>
+                                    </div>
+
+                                    <h2 className="text-sm sm:text-base font-bold text-on-surface hover:text-primary transition-colors leading-snug">
+                                        {post.title}
+                                    </h2>
+                                    <p className="text-xs text-on-surface-variant font-light leading-relaxed line-clamp-2">
+                                        {post.short_content}
+                                    </p>
+
+                                    <div className="flex items-center gap-6 pt-4 border-t border-outline-variant/10 text-xs text-on-surface-variant">
+                                        <div className="flex items-center gap-1.5 font-bold">
+                                            <span className="material-symbols-outlined text-[18px]">chat_bubble</span>
+                                            <span>{post.comment_count} bình luận</span>
                                         </div>
                                     </div>
-                                </Link>
-                            ))}
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </main>
+
+            {/* Right Sidebar (Admin/Moderation Tools context) */}
+            {isAdmin && (
+                <aside className="w-full lg:w-[320px] shrink-0">
+                    <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-white/60 shadow-sm sticky top-24 space-y-8">
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider">Công cụ quản trị</h3>
+                            <div className="space-y-3">
+                                <button className="w-full flex items-center justify-between p-4 rounded-2xl bg-white hover:bg-surface border border-outline-variant/20 shadow-sm transition-all cursor-pointer">
+                                    <div className="flex items-center gap-3">
+                                        <span className="material-symbols-outlined text-on-surface-variant text-[20px]">report</span>
+                                        <span className="text-xs font-bold text-on-surface">Bài viết bị báo cáo</span>
+                                    </div>
+                                    <span className="bg-error text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+                                </button>
+                                <button className="w-full flex items-center gap-3 p-4 rounded-2xl bg-white hover:bg-surface border border-outline-variant/20 shadow-sm transition-all cursor-pointer">
+                                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">pending_actions</span>
+                                    <span className="text-xs font-bold text-on-surface">Chờ duyệt (5)</span>
+                                </button>
+                                <button className="w-full flex items-center gap-3 p-4 rounded-2xl bg-white hover:bg-surface border border-outline-variant/20 shadow-sm transition-all cursor-pointer">
+                                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">group</span>
+                                    <span className="text-xs font-bold text-on-surface">Quản lý thành viên</span>
+                                </button>
+                            </div>
                         </div>
-                    )}
-                </div>
-            </div>
+
+                        <div className="pt-6 border-t border-outline-variant/10 space-y-4">
+                            <h4 className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Thống kê diễn đàn</h4>
+                            <div className="grid grid-cols-2 gap-3 text-center">
+                                <div className="bg-white border border-outline-variant/20 p-3.5 rounded-2xl shadow-sm">
+                                    <span className="text-[10px] text-on-surface-variant font-medium block">Tổng bài viết</span>
+                                    <strong className="text-base font-extrabold text-on-surface mt-1 block">1,248</strong>
+                                </div>
+                                <div className="bg-white border border-outline-variant/20 p-3.5 rounded-2xl shadow-sm">
+                                    <span className="text-[10px] text-on-surface-variant font-medium block">Thành viên mới</span>
+                                    <strong className="text-base font-extrabold text-on-surface mt-1 block">342</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            )}
 
             {/* Create Thread Modal */}
             {modalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0E1322] p-6 shadow-2xl relative">
-                        <button
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-lg rounded-3xl border border-white/60 bg-white/95 p-8 shadow-lg relative">
+                        <button 
                             onClick={() => setModalOpen(false)}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"
+                            className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface cursor-pointer"
                         >
-                            <X className="h-5 w-5" />
+                            <span className="material-symbols-outlined text-[20px]">close</span>
                         </button>
                         
-                        <h3 className="text-lg font-bold text-white mb-6">Tạo thảo luận mới</h3>
+                        <h3 className="text-base font-extrabold text-on-surface mb-6">Tạo thảo luận mới</h3>
 
-                        <form onSubmit={handleCreatePost} className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="catSelect">
+                        <form onSubmit={handleCreatePost} className="space-y-5">
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="catSelect">
                                     Chuyên mục
                                 </label>
-                                <select
+                                <select 
                                     id="catSelect"
-                                    className="w-full rounded-md border border-white/10 bg-[#070A12] px-4 py-2.5 text-sm text-white focus:border-primary focus:outline-none"
+                                    className="w-full bg-white border border-outline-variant/30 rounded-xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                                     value={newCatId || ''}
                                     onChange={(e) => setNewCatId(parseInt(e.target.value))}
                                 >
@@ -255,40 +315,40 @@ export default function ForumPage() {
                                 </select>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="postTitle">
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="postTitle">
                                     Tiêu đề câu hỏi / chia sẻ
                                 </label>
-                                <input
+                                <input 
                                     id="postTitle"
                                     type="text"
                                     required
-                                    className="w-full rounded-md border border-white/10 bg-[#070A12] px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:border-primary focus:outline-none"
+                                    className="w-full bg-white border border-outline-variant/30 rounded-xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                                     placeholder="Tiêu đề in đậm tóm tắt câu hỏi của bạn..."
                                     value={newTitle}
                                     onChange={(e) => setNewTitle(e.target.value)}
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="postBody">
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="postBody">
                                     Nội dung chi tiết
                                 </label>
-                                <textarea
+                                <textarea 
                                     id="postBody"
                                     required
                                     rows={5}
-                                    className="w-full rounded-md border border-white/10 bg-[#070A12] px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:border-primary focus:outline-none"
+                                    className="w-full bg-white border border-outline-variant/30 rounded-xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"
                                     placeholder="Mô tả cụ thể thắc mắc, bối cảnh tâm sinh lý cần hướng dẫn..."
                                     value={newContent}
                                     onChange={(e) => setNewContent(e.target.value)}
                                 />
                             </div>
 
-                            <button
+                            <button 
                                 type="submit"
                                 disabled={submitting}
-                                className="w-full flex h-11 items-center justify-center rounded-md bg-primary text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50 cursor-pointer"
+                                className="w-full flex h-11 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
                             >
                                 {submitting ? 'Đang gửi...' : 'Đăng thảo luận'}
                             </button>

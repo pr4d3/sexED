@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
@@ -38,78 +37,67 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="space-y-2 text-center lg:text-left">
-                <h2 className="text-3xl font-bold tracking-tight text-white">Đăng Nhập</h2>
-                <p className="text-sm text-slate-400">Chào mừng quay trở lại với ChiChan SexEd</p>
-            </div>
-
+        <>
             {error && (
-                <div className="rounded-md bg-red-900/30 border border-red-500/30 p-4 text-sm text-red-200">
+                <div className="rounded-2xl bg-red-50 border border-red-200/50 p-4 text-xs font-semibold text-red-600">
                     {error}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="username">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="username">
                         Tên đăng nhập hoặc Email
                     </label>
                     <input
                         id="username"
                         type="text"
                         required
-                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                        className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-sm text-on-surface placeholder:text-outline backdrop-blur-sm shadow-inner"
                         placeholder="username hoặc email"
                         value={usernameOrEmail}
                         onChange={(e) => setUsernameOrEmail(e.target.value)}
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="password">
-                            Mật khẩu
-                        </label>
-                    </div>
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-on-surface ml-1" htmlFor="password">
+                        Mật khẩu
+                    </label>
                     <input
                         id="password"
                         type="password"
                         required
-                        className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                        className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-sm text-on-surface placeholder:text-outline backdrop-blur-sm shadow-inner"
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
 
-                <div className="flex items-center justify-between">
-                    <label className="flex items-center space-x-2 text-sm text-slate-400 cursor-pointer">
+                <div className="flex items-center justify-between mt-2 px-1">
+                    <label className="flex items-center gap-2 cursor-pointer">
                         <input
                             type="checkbox"
-                            className="rounded border-white/10 bg-white/5 text-primary focus:ring-0 focus:ring-offset-0"
+                            className="rounded border-outline-variant text-primary focus:ring-primary w-4 h-4 bg-white/50"
                             checked={rememberMe}
                             onChange={(e) => setRememberMe(e.target.checked)}
                         />
-                        <span>Ghi nhớ đăng nhập</span>
+                        <span className="text-xs text-on-surface-variant font-medium">Ghi nhớ đăng nhập</span>
                     </label>
+                    <a className="text-xs font-semibold text-primary hover:underline hover:text-primary-container transition-colors" href="#">
+                        Quên mật khẩu?
+                    </a>
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full flex h-12 items-center justify-center rounded-md bg-primary text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50 cursor-pointer"
+                    className="w-full mt-4 bg-primary text-white py-4 rounded-2xl font-bold text-xs transition-all duration-300 hover:opacity-90 disabled:opacity-50 cursor-pointer shadow-md hover:shadow-lg"
                 >
-                    {loading ? 'Đang xác thực...' : 'Đăng Nhập'}
+                    {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </button>
             </form>
-
-            <div className="text-center text-sm text-slate-400">
-                Chưa có tài khoản?{' '}
-                <Link href="/register" className="font-semibold text-primary hover:underline">
-                    Đăng ký ngay
-                </Link>
-            </div>
-        </div>
+        </>
     );
 }
