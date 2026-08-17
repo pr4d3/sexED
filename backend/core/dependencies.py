@@ -8,6 +8,8 @@ from core.database import get_db
 from models.user import User
 from models.role import Role
 
+from sqlalchemy.orm import joinedload
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
@@ -24,7 +26,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     except JWTError:
         raise credentials_exception
 
-    result = await db.execute(select(User).where(User.id == user_id))
+    result = await db.execute(
+        select(User)
+        .options(joinedload(User.role), joinedload(User.profile))
+        .where(User.id == user_id)
+    )
     user = result.scalars().first()
     if user is None:
         raise credentials_exception
