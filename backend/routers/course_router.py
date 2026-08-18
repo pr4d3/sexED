@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
-from core.dependencies import get_current_user, RoleGuard
+from core.dependencies import get_current_user, RoleGuard, get_optional_user
 from models.user import User
 from models.role import Role
 from repositories import course_repository
@@ -13,6 +13,7 @@ from schemas.auth_schema import StandardResponse
 from services import course_service
 from uuid import UUID
 from typing import Optional
+from sqlalchemy import select
 
 router = APIRouter(prefix="/api/v1/courses", tags=["Courses & Content"])
 
@@ -22,28 +23,7 @@ async def get_courses(target_audience: Optional[str] = None, db: AsyncSession = 
     return CourseListResponse(success=True, data=courses)
 
 @router.get("/{course_id}/intro", response_model=CourseIntroResponse, status_code=status.HTTP_200_OK)
-async def get_course_intro(course_id: UUID, db: AsyncSession = Depends(get_db)):
-    from fastapi.security import OAuth2PasswordBearer
-    from jose import jwt, JWTError
-    from core.config import settings
-    from sqlalchemy import select
-    
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
-    
-    async def get_optional_user(token: Optional[str] = Depends(oauth2_scheme)) -> Optional[User]:
-        if not token:
-            return None
-        try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-            user_id: str = payload.get("sub")
-            if user_id is None:
-                return None
-            result = await db.execute(select(User).where(User.id == user_id))
-            return result.scalars().first()
-        except JWTError:
-            return None
-            
-    current_user = await get_optional_user()
+async def get_course_intro(course_id: UUID, current_user: Optional[User] = Depends(get_optional_user), db: AsyncSession = Depends(get_db)):
     intro_data = await course_service.get_course_intro(db, course_id, current_user)
     
     if current_user:

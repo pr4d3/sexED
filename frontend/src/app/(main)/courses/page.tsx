@@ -113,7 +113,7 @@ export default function CoursesPage() {
                             : 'border-green-500/25 bg-green-500/10 text-green-500';
 
                         return (
-                            <div key={course.id} className="glass-card flex flex-col h-full rounded-2xl overflow-hidden hover:scale-[1.02] hover:border-white/15 transition-all duration-300">
+                            <div key={course.id} className="glass-card flex flex-col h-full rounded-2xl overflow-hidden hover:scale-[1.02] hover:border-outline-variant/30 transition-all duration-300">
                                 <img
                                     src={course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500'}
                                     alt={course.title}
@@ -124,12 +124,12 @@ export default function CoursesPage() {
                                         <span className={`inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider ${badgeClass}`}>
                                             {badgeText}
                                         </span>
-                                        <h3 className="font-bold text-white text-lg line-clamp-2 leading-snug">{course.title}</h3>
+                                        <h3 className="font-bold text-on-surface text-lg line-clamp-2 leading-snug">{course.title}</h3>
                                     </div>
                                     <div className="space-y-4">
-                                        <div className="flex justify-between items-center text-xs text-slate-400 border-t border-white/5 pt-4">
-                                            <span>Giảng viên: <strong>{course.instructor_name}</strong></span>
-                                            <span><strong>{course.total_lessons}</strong> Bài học</span>
+                                        <div className="flex justify-between items-center text-xs text-on-surface-variant border-t border-outline-variant/30 pt-4">
+                                            <span>Giảng viên: <strong className="text-on-surface font-semibold">{course.instructor_name}</strong></span>
+                                            <span><strong className="text-on-surface font-semibold">{course.total_lessons}</strong> Bài học</span>
                                         </div>
                                         <Link href={`/courses/${course.id}/intro`} className="w-full inline-flex h-10 items-center justify-center rounded-md bg-primary text-xs font-semibold text-white transition-colors hover:bg-primary-hover">
                                             Xem Chi Tiết
