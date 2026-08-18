@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { ForumPostDetailSkeleton } from '@/components/Skeleton';
+import { useToast } from '@/context/ToastContext';
 import { ArrowLeft, MessageSquare, ShieldAlert, Reply, Trash2, EyeOff } from 'lucide-react';
 
 interface Comment {
@@ -30,6 +32,7 @@ export default function PostDetailPage() {
     const [post, setPost] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { showToast } = useToast();
     const [mainComment, setMainComment] = useState('');
     
     // Active comment id for replies
@@ -65,6 +68,7 @@ export default function PostDetailPage() {
                 parent_comment_id: parentId,
             });
             if (res.success) {
+                showToast("Gửi bình luận thành công!", "success");
                 if (parentId) {
                     setReplyToId(null);
                     setReplyContent('');
@@ -74,7 +78,7 @@ export default function PostDetailPage() {
                 fetchPostDetail(); // reload comments
             }
         } catch (err: any) {
-            alert(err.message || 'Lỗi khi gửi bình luận');
+            showToast(err.message || 'Lỗi khi gửi bình luận', 'error');
         }
     };
 
@@ -83,11 +87,11 @@ export default function PostDetailPage() {
         try {
             const res = await api.put(`/admin/forum/posts/${postId}/moderate`, { action });
             if (res.success) {
-                alert("Kiểm duyệt bài viết thành công!");
+                showToast("Kiểm duyệt bài viết thành công!", "success");
                 router.push('/forum');
             }
         } catch (err: any) {
-            alert(err.message || 'Không thể kiểm duyệt bài viết');
+            showToast(err.message || 'Không thể kiểm duyệt bài viết', 'error');
         }
     };
 
@@ -96,11 +100,11 @@ export default function PostDetailPage() {
         try {
             const res = await api.put(`/admin/forum/comments/${commentId}/moderate`, { action });
             if (res.success) {
-                alert("Kiểm duyệt bình luận thành công!");
+                showToast("Kiểm duyệt bình luận thành công!", "success");
                 fetchPostDetail();
             }
         } catch (err: any) {
-            alert(err.message || 'Không thể kiểm duyệt bình luận');
+            showToast(err.message || 'Không thể kiểm duyệt bình luận', 'error');
         }
     };
 
@@ -115,7 +119,7 @@ export default function PostDetailPage() {
     };
 
     if (loading) {
-        return <div className="text-center py-24 text-slate-400">Đang tải nội dung thảo luận...</div>;
+        return <ForumPostDetailSkeleton />;
     }
 
     if (error || !post) {
@@ -138,10 +142,10 @@ export default function PostDetailPage() {
 
         return (
             <div className="space-y-4">
-                <div className={`glass-card p-5 rounded-xl border border-white/5 space-y-3 ${isReply ? 'ml-8 sm:ml-12 border-l-2 border-l-primary' : ''}`}>
-                    <div className="flex justify-between items-start text-xs text-slate-400 border-b border-white/5 pb-2">
+                <div className={`bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/30 space-y-3 ${isReply ? 'ml-8 sm:ml-12 border-l-2 border-l-primary shadow-sm' : 'shadow-sm'}`}>
+                    <div className="flex justify-between items-start text-xs text-on-surface-variant border-b border-outline-variant/10 pb-2">
                         <div className="flex items-center gap-2">
-                            <strong className="text-slate-200">{comment.author.full_name}</strong>
+                            <strong className="text-on-surface font-semibold">{comment.author.full_name}</strong>
                             <span className="text-[10px] uppercase font-bold text-primary">
                                 ({comment.author.role === 'ADMIN' ? 'Admin' : comment.author.role === 'INSTRUCTOR' ? 'Giảng viên' : 'Học viên'})
                             </span>
@@ -149,13 +153,13 @@ export default function PostDetailPage() {
                             <span>{commentDate.toLocaleDateString('vi-VN')} {commentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                         {comment.status !== 'PUBLISHED' && (
-                            <span className="text-[10px] text-red-400 font-bold border border-red-500/20 bg-red-500/10 px-1.5 py-0.5 rounded uppercase">
+                            <span className="text-[10px] text-red-500 font-bold border border-red-500/20 bg-red-500/10 px-1.5 py-0.5 rounded uppercase">
                                 {comment.status}
                             </span>
                         )}
                     </div>
 
-                    <p className="text-slate-300 text-sm leading-relaxed">{comment.content}</p>
+                    <p className="text-on-surface text-sm leading-relaxed">{comment.content}</p>
 
                     <div className="flex gap-4 text-xs font-semibold">
                         {user && (
@@ -186,9 +190,9 @@ export default function PostDetailPage() {
 
                     {/* Nested reply input */}
                     {showReplyForm && (
-                        <form onSubmit={(e) => handleCommentSubmit(e, comment.id)} className="space-y-2 pt-2 border-t border-white/5">
+                        <form onSubmit={(e) => handleCommentSubmit(e, comment.id)} className="space-y-2 pt-2 border-t border-outline-variant/10">
                             <textarea
-                                className="w-full rounded-md border border-white/10 bg-[#070A12] px-4 py-2 text-xs text-white placeholder-slate-600 focus:border-primary focus:outline-none"
+                                className="w-full rounded-xl border border-outline-variant/30 bg-surface px-4 py-2 text-xs text-on-surface placeholder:text-outline focus:border-primary focus:outline-none"
                                 rows={2}
                                 required
                                 placeholder="Viết phản hồi thảo luận y khoa..."
@@ -199,7 +203,7 @@ export default function PostDetailPage() {
                                 <button
                                     type="button"
                                     onClick={() => setReplyToId(null)}
-                                    className="h-8 rounded px-3 text-[10px] font-semibold text-slate-400 hover:text-white"
+                                    className="h-8 rounded px-3 text-[10px] font-semibold text-on-surface-variant hover:text-on-surface"
                                 >
                                     Hủy
                                 </button>
@@ -223,25 +227,25 @@ export default function PostDetailPage() {
 
     return (
         <div className="container mx-auto max-w-4xl px-4 py-12 space-y-8">
-            <button 
-                onClick={() => router.push('/forum')} 
-                className="inline-flex h-9 items-center gap-2 rounded-md border border-white/10 bg-white/5 px-4 text-xs font-semibold text-white hover:bg-white/10 cursor-pointer"
+            <Link 
+                href="/forum" 
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors mb-6"
             >
-                <ArrowLeft className="h-4 w-4" />
-                Quay lại diễn đàn
-            </button>
+                <span className="material-symbols-outlined text-sm">arrow_back</span>
+                Quay lại Diễn đàn
+            </Link>
 
-            <article className="glass-panel p-8 rounded-2xl border border-white/10 space-y-6">
+            <article className="glass-panel p-8 rounded-2xl border border-outline-variant/30 space-y-6 shadow-sm">
                 {/* Header */}
-                <div className="space-y-4 border-b border-white/5 pb-6">
+                <div className="space-y-4 border-b border-outline-variant/20 pb-6">
                     <div className="flex justify-between items-start gap-4">
                         <span className="inline-flex px-2.5 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
                             {post.category_name}
                         </span>
                         
                         {isAdmin && (
-                            <div className="flex gap-3 text-xs font-semibold text-red-400 border border-red-500/20 bg-red-500/5 px-3 py-1.5 rounded-lg">
-                                <span className="flex items-center gap-1 text-slate-400 font-bold uppercase text-[9px] mr-1">
+                            <div className="flex gap-3 text-xs font-semibold text-red-500 border border-red-500/20 bg-red-500/5 px-3 py-1.5 rounded-lg">
+                                <span className="flex items-center gap-1 text-on-surface-variant font-bold uppercase text-[9px] mr-1">
                                     <ShieldAlert className="h-3.5 w-3.5" />
                                     Admin:
                                 </span>
@@ -252,24 +256,24 @@ export default function PostDetailPage() {
                         )}
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">{post.title}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-on-surface leading-tight leading-snug">{post.title}</h1>
                     
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
-                        <span>Đăng bởi: <strong className="text-slate-300">{post.author.full_name}</strong></span>
+                    <div className="flex items-center gap-3 text-xs text-on-surface-variant mt-2">
+                        <span>Đăng bởi: <strong className="text-on-surface font-semibold">{post.author.full_name}</strong></span>
                         <span>•</span>
                         <span>{new Date(post.created_at).toLocaleDateString('vi-VN')}</span>
                     </div>
                 </div>
 
                 {/* Body */}
-                <div className="text-slate-300 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                <div className="text-on-surface-variant text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
                     {post.content}
                 </div>
             </article>
 
             {/* Comments block */}
             <div className="space-y-8">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2 border-t border-white/10 pt-8">
+                <h3 className="text-lg font-bold text-on-surface flex items-center gap-2 border-t border-outline-variant/30 pt-8">
                     <MessageSquare className="h-5 w-5 text-primary" />
                     Ý kiến thảo luận ({countComments(post.comments)})
                 </h3>
@@ -278,7 +282,7 @@ export default function PostDetailPage() {
                 {user ? (
                     <form onSubmit={(e) => handleCommentSubmit(e, null)} className="space-y-3">
                         <textarea
-                            className="w-full rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                            className="w-full rounded-2xl border border-outline-variant/30 bg-white px-4 py-3 text-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-inner"
                             rows={3}
                             required
                             placeholder="Chia sẻ suy nghĩ, ý kiến đóng góp khoa học của bạn..."
@@ -293,7 +297,7 @@ export default function PostDetailPage() {
                         </button>
                     </form>
                 ) : (
-                    <div className="rounded-lg border border-white/5 bg-white/[0.01] p-4 text-center text-sm text-slate-400">
+                    <div className="rounded-2xl border border-outline-variant/30 bg-surface-container/50 p-4 text-center text-sm text-on-surface-variant">
                         Vui lòng{' '}
                         <Link href="/login" className="font-semibold text-primary hover:underline">
                             Đăng nhập
@@ -305,7 +309,7 @@ export default function PostDetailPage() {
                 {/* Comments List tree */}
                 <div className="space-y-6">
                     {post.comments.length === 0 ? (
-                        <p className="text-sm text-slate-500 py-4">Chưa có ý kiến phản hồi nào.</p>
+                        <p className="text-sm text-on-surface-variant py-4">Chưa có ý kiến phản hồi nào.</p>
                     ) : (
                         post.comments.map((comment: Comment) => (
                             <CommentNode key={comment.id} comment={comment} />

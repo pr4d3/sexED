@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { LearnPageSkeleton } from '@/components/Skeleton';
+import { useToast } from '@/context/ToastContext';
 
 interface Lesson {
     lesson_id: string;
@@ -27,6 +29,7 @@ export default function CourseLearnPage() {
     const [error, setError] = useState<string | null>(null);
     const [activeIdx, setActiveIdx] = useState(0);
     const [completing, setCompleting] = useState(false);
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (!courseId) return;
@@ -68,24 +71,24 @@ export default function CourseLearnPage() {
                 });
 
                 if (res.data.is_course_just_completed) {
+                    showToast("Chúc mừng bạn đã hoàn thành khóa học!", "success");
                     router.push(`/courses/${courseId}/outro`);
-                } else if (activeIdx < learnData.lessons.length - 1) {
-                    setActiveIdx(activeIdx + 1);
+                } else {
+                    showToast("Đã hoàn thành bài học!", "success");
+                    if (activeIdx < learnData.lessons.length - 1) {
+                        setActiveIdx(activeIdx + 1);
+                    }
                 }
             }
         } catch (err: any) {
-            alert(err.message || 'Lỗi khi ghi nhận hoàn thành bài học');
+            showToast(err.message || 'Lỗi khi ghi nhận hoàn thành bài học', 'error');
         } finally {
             setCompleting(false);
         }
     };
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-                <div className="text-on-surface-variant text-sm font-semibold animate-pulse">Đang tải phòng học...</div>
-            </div>
-        );
+        return <LearnPageSkeleton />;
     }
 
     if (error || !learnData) {

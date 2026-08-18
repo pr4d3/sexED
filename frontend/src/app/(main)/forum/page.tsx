@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { ForumPostSkeleton } from '@/components/Skeleton';
+import { useToast } from '@/context/ToastContext';
 
 interface Category {
     id: number;
@@ -32,6 +34,7 @@ export default function ForumPage() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const { showToast } = useToast();
     
     // Modal states
     const [modalOpen, setModalOpen] = useState(false);
@@ -109,13 +112,14 @@ export default function ForumPage() {
             });
 
             if (res.success) {
+                showToast("Đăng bài viết thành công!", "success");
                 setModalOpen(false);
                 setNewTitle('');
                 setNewContent('');
                 fetchPosts();
             }
         } catch (err: any) {
-            alert(err.message || "Lỗi khi đăng bài viết");
+            showToast(err.message || "Lỗi khi đăng bài viết", "error");
         } finally {
             setSubmitting(false);
         }
@@ -183,7 +187,11 @@ export default function ForumPage() {
 
                 {/* Post Feed */}
                 {loading ? (
-                    <div className="text-center text-on-surface-variant text-xs font-semibold py-16 animate-pulse">Đang tải các bài thảo luận...</div>
+                    <div className="space-y-6">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <ForumPostSkeleton key={i} />
+                        ))}
+                    </div>
                 ) : posts.length === 0 ? (
                     <div className="text-center text-on-surface-variant/80 text-sm font-light py-16">Chưa có bài viết nào trong mục này.</div>
                 ) : (
