@@ -27,7 +27,19 @@ app = FastAPI(
 )
 
 # Cấu hình CORS
-origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
+origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "https://sex-ed-gray.vercel.app",
+]
+if settings.ALLOWED_ORIGINS and settings.ALLOWED_ORIGINS != "*":
+    env_origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
+    origins.extend(env_origins)
+origins = list(set(origins))
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
