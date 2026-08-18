@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { BookOpen } from 'lucide-react';
+import { CourseCardSkeleton } from '@/components/Skeleton';
 
 interface Course {
     id: string;
@@ -45,34 +46,40 @@ export default function CoursesPage() {
     return (
         <div className="container mx-auto max-w-7xl px-4 py-12 space-y-12">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-white/10 pb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-outline-variant/30 pb-6">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-white tracking-tight">Danh Sách Khóa Học</h1>
-                    <p className="text-sm text-slate-400 mt-1">Học liệu chính thống từ đề tài nghiên cứu khoa học</p>
+                    <h1 className="text-3xl font-extrabold text-on-surface tracking-tight">Danh Sách Khóa Học</h1>
+                    <p className="text-sm text-on-surface-variant mt-1">Học liệu chính thống từ đề tài nghiên cứu khoa học</p>
                 </div>
                 
                 {/* Filters */}
-                <div className="flex gap-2 p-1 rounded-lg bg-white/5 border border-white/10">
+                <div className="flex gap-2 p-1.5 rounded-full bg-surface-container border border-outline-variant/30 shadow-inner">
                     <button
                         onClick={() => setFilter('ALL')}
-                        className={`px-4 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                            filter === 'ALL' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'
+                        className={`px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                            filter === 'ALL' 
+                                ? 'bg-primary text-white shadow-sm' 
+                                : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-high'
                         }`}
                     >
                         Tất cả
                     </button>
                     <button
                         onClick={() => setFilter('CHILD')}
-                        className={`px-4 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                            filter === 'CHILD' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'
+                        className={`px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                            filter === 'CHILD' 
+                                ? 'bg-primary text-white shadow-sm' 
+                                : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-high'
                         }`}
                     >
                         Trẻ vị thành niên
                     </button>
                     <button
                         onClick={() => setFilter('PARENT')}
-                        className={`px-4 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                            filter === 'PARENT' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'
+                        className={`px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                            filter === 'PARENT' 
+                                ? 'bg-primary text-white shadow-sm' 
+                                : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-high'
                         }`}
                     >
                         Phụ huynh
@@ -82,7 +89,11 @@ export default function CoursesPage() {
 
             {/* Content list */}
             {loading ? (
-                <div className="text-center text-slate-400 py-24">Đang tải danh sách khóa học...</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <CourseCardSkeleton key={i} />
+                    ))}
+                </div>
             ) : error ? (
                 <div className="text-center text-red-400 py-12 border border-red-500/10 rounded-xl bg-red-950/10 max-w-md mx-auto">
                     {error}

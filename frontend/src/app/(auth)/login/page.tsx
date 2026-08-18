@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 export default function LoginPage() {
     const { login, loading } = useAuth();
     const router = useRouter();
+    const { showToast } = useToast();
     
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,6 +26,7 @@ export default function LoginPage() {
             });
             
             if (res.success) {
+                showToast("Đăng nhập thành công!", "success");
                 const userRole = res.data.user.role;
                 if (userRole === 'ADMIN' || userRole === 'INSTRUCTOR') {
                     router.push('/dashboard');
@@ -32,7 +35,9 @@ export default function LoginPage() {
                 }
             }
         } catch (err: any) {
-            setError(err.message || 'Sai thông tin đăng nhập');
+            const errMsg = err.message || 'Sai thông tin đăng nhập';
+            setError(errMsg);
+            showToast(errMsg, 'error');
         }
     };
 

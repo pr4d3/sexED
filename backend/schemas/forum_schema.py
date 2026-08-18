@@ -1,15 +1,19 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
 
 class CategoryResponseData(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     name: str
     slug: str
     description: Optional[str] = None
 
 class CategoryListResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     success: bool
     data: list[CategoryResponseData]
 

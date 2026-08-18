@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 export default function RegisterPage() {
     const { register, loading } = useAuth();
     const router = useRouter();
+    const { showToast } = useToast();
 
     const [role, setRole] = useState<'STUDENT_PARENT' | 'STUDENT_CHILD'>('STUDENT_PARENT');
     const [fullName, setFullName] = useState('');
@@ -32,12 +34,15 @@ export default function RegisterPage() {
 
             if (res.success) {
                 setSuccess(true);
+                showToast("Đăng ký tài khoản thành công!", "success");
                 setTimeout(() => {
                     router.push('/login');
                 }, 1500);
             }
         } catch (err: any) {
-            setError(err.message || 'Lỗi đăng ký tài khoản');
+            const errMsg = err.message || 'Lỗi đăng ký tài khoản';
+            setError(errMsg);
+            showToast(errMsg, 'error');
         }
     };
 

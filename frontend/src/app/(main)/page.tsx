@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { CourseCardSkeleton, ForumPostSkeleton } from '@/components/Skeleton';
 
 interface Course {
     id: string;
@@ -159,7 +160,11 @@ export default function HomePage() {
 
                     {/* Course Grid */}
                     {loading ? (
-                        <div className="text-center py-12 text-on-surface-variant text-sm font-medium">Đang tải danh sách khóa học...</div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <CourseCardSkeleton key={i} />
+                            ))}
+                        </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
                             {coursesToRender.length === 0 ? (
@@ -222,7 +227,11 @@ export default function HomePage() {
                     </div>
 
                     {loading ? (
-                        <div className="text-center py-12 text-on-surface-variant text-sm font-medium">Đang tải thảo luận nổi bật...</div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <ForumPostSkeleton key={i} />
+                            ))}
+                        </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {!homeData?.recent_forum_posts || homeData.recent_forum_posts.length === 0 ? (

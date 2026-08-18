@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { CourseIntroSkeleton } from '@/components/Skeleton';
+import { useToast } from '@/context/ToastContext';
 
 interface SyllabusItem {
     id: string;
@@ -24,6 +26,7 @@ export default function CourseIntroPage() {
     const [error, setError] = useState<string | null>(null);
     const [enrolling, setEnrolling] = useState(false);
     const [expandedSyllabus, setExpandedSyllabus] = useState<boolean>(true);
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (!courseId) return;
@@ -58,21 +61,18 @@ export default function CourseIntroPage() {
         try {
             const res = await api.post(`/courses/${courseId}/enroll`, {});
             if (res.success) {
+                showToast("Đăng ký khóa học thành công!", "success");
                 router.push(`/courses/${courseId}/learn`);
             }
         } catch (err: any) {
-            alert(err.message || "Lỗi khi đăng ký khóa học");
+            showToast(err.message || "Lỗi khi đăng ký khóa học", "error");
         } finally {
             setEnrolling(false);
         }
     };
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[400px]">
-                <div className="text-on-surface-variant text-sm font-semibold animate-pulse">Đang tải chi tiết khóa học...</div>
-            </div>
-        );
+        return <CourseIntroSkeleton />;
     }
 
     if (error || !courseData) {

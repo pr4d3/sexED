@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 interface ManagedCourse {
     course_id: string;
@@ -18,6 +19,7 @@ interface ManagedCourse {
 
 export default function DashboardOverviewPage() {
     const { user } = useAuth();
+    const { showToast } = useToast();
     
     const [stats, setStats] = useState<any>(null);
     const [courses, setCourses] = useState<ManagedCourse[]>([]);
@@ -78,7 +80,7 @@ export default function DashboardOverviewPage() {
             });
 
             if (res.success) {
-                alert("Tạo khóa học mới thành công!");
+                showToast("Tạo khóa học mới thành công!", "success");
                 setModalOpen(false);
                 
                 // Clear fields
@@ -92,7 +94,7 @@ export default function DashboardOverviewPage() {
                 fetchManagedCourses();
             }
         } catch (err: any) {
-            alert(err.message || 'Lỗi khi tạo khóa học');
+            showToast(err.message || 'Lỗi khi tạo khóa học', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -122,7 +124,13 @@ export default function DashboardOverviewPage() {
                     <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                         <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>menu_book</span>
                     </div>
-                    <div className="text-xl font-extrabold text-on-surface">{stats?.total_courses || 0}</div>
+                    <div className="text-xl font-extrabold text-on-surface">
+                        {loading || !stats ? (
+                            <div className="h-6 w-12 bg-on-surface/10 rounded animate-pulse mx-auto my-0.5" />
+                        ) : (
+                            stats.total_courses || 0
+                        )}
+                    </div>
                     <span className="text-[9px] text-on-surface-variant uppercase tracking-wider block font-bold">Khóa học</span>
                 </div>
 
@@ -130,7 +138,13 @@ export default function DashboardOverviewPage() {
                     <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                         <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>group</span>
                     </div>
-                    <div className="text-xl font-extrabold text-on-surface">{stats?.total_students_enrolled || 0}</div>
+                    <div className="text-xl font-extrabold text-on-surface">
+                        {loading || !stats ? (
+                            <div className="h-6 w-12 bg-on-surface/10 rounded animate-pulse mx-auto my-0.5" />
+                        ) : (
+                            stats.total_students_enrolled || 0
+                        )}
+                    </div>
                     <span className="text-[9px] text-on-surface-variant uppercase tracking-wider block font-bold">Học viên</span>
                 </div>
 
@@ -138,7 +152,13 @@ export default function DashboardOverviewPage() {
                     <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-secondary-container/10 text-secondary">
                         <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
                     </div>
-                    <div className="text-xl font-extrabold text-on-surface">{stats?.total_completed_students || 0}</div>
+                    <div className="text-xl font-extrabold text-on-surface">
+                        {loading || !stats ? (
+                            <div className="h-6 w-12 bg-on-surface/10 rounded animate-pulse mx-auto my-0.5" />
+                        ) : (
+                            stats.total_completed_students || 0
+                        )}
+                    </div>
                     <span className="text-[9px] text-on-surface-variant uppercase tracking-wider block font-bold">Tốt nghiệp</span>
                 </div>
 
@@ -146,7 +166,13 @@ export default function DashboardOverviewPage() {
                     <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-tertiary-container/10 text-tertiary">
                         <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>percent</span>
                     </div>
-                    <div className="text-xl font-extrabold text-on-surface">{stats?.average_completion_rate || 0}%</div>
+                    <div className="text-xl font-extrabold text-on-surface">
+                        {loading || !stats ? (
+                            <div className="h-6 w-12 bg-on-surface/10 rounded animate-pulse mx-auto my-0.5" />
+                        ) : (
+                            `${stats.average_completion_rate || 0}%`
+                        )}
+                    </div>
                     <span className="text-[9px] text-on-surface-variant uppercase tracking-wider block font-bold">Hoàn thành TB</span>
                 </div>
 
@@ -154,7 +180,13 @@ export default function DashboardOverviewPage() {
                     <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                         <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
                     </div>
-                    <div className="text-xl font-extrabold text-on-surface">{stats?.total_lessons_published || 0}</div>
+                    <div className="text-xl font-extrabold text-on-surface">
+                        {loading || !stats ? (
+                            <div className="h-6 w-12 bg-on-surface/10 rounded animate-pulse mx-auto my-0.5" />
+                        ) : (
+                            stats.total_lessons_published || 0
+                        )}
+                    </div>
                     <span className="text-[9px] text-on-surface-variant uppercase tracking-wider block font-bold">Bài giảng</span>
                 </div>
             </div>
@@ -164,7 +196,34 @@ export default function DashboardOverviewPage() {
                 <h3 className="text-base font-extrabold text-on-surface">Khóa học do tôi quản lý</h3>
                 
                 {loading ? (
-                    <div className="text-on-surface-variant text-xs font-semibold py-6 animate-pulse">Đang tải danh sách khóa học...</div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr className="border-b border-outline-variant/30 text-on-surface-variant font-bold uppercase tracking-wider text-[9px]">
+                                    <th className="py-4 px-4 bg-white/20">Khóa học</th>
+                                    <th className="py-4 px-4 bg-white/20">Đối tượng</th>
+                                    <th className="py-4 px-4 bg-white/20">Số bài học</th>
+                                    <th className="py-4 px-4 bg-white/20">Lượt học viên</th>
+                                    <th className="py-4 px-4 bg-white/20">Đã xong / Đang học</th>
+                                    <th className="py-4 px-4 bg-white/20">Trạng thái</th>
+                                    <th className="py-4 px-4 bg-white/20">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <tr key={i} className="border-b border-outline-variant/10">
+                                        <td className="py-4 px-4"><div className="h-4 w-40 bg-on-surface/10 rounded animate-pulse" /></td>
+                                        <td className="py-4 px-4"><div className="h-4 w-20 bg-on-surface/10 rounded animate-pulse" /></td>
+                                        <td className="py-4 px-4"><div className="h-4 w-12 bg-on-surface/10 rounded animate-pulse" /></td>
+                                        <td className="py-4 px-4"><div className="h-4 w-12 bg-on-surface/10 rounded animate-pulse" /></td>
+                                        <td className="py-4 px-4"><div className="h-4 w-24 bg-on-surface/10 rounded animate-pulse" /></td>
+                                        <td className="py-4 px-4"><div className="h-6 w-16 bg-on-surface/10 rounded-full animate-pulse" /></td>
+                                        <td className="py-4 px-4"><div className="h-8 w-24 bg-on-surface/10 rounded-md animate-pulse" /></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : courses.length === 0 ? (
                     <p className="text-xs text-on-surface-variant/85 py-6">Bạn chưa tạo khóa học nào.</p>
                 ) : (
