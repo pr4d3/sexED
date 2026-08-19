@@ -35,15 +35,23 @@ origins = [
     "http://127.0.0.1:3001",
     "https://sex-ed-gray.vercel.app",
 ]
-if settings.ALLOWED_ORIGINS and settings.ALLOWED_ORIGINS != "*":
-    env_origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
-    origins.extend(env_origins)
+
+allow_all = False
+if settings.ALLOWED_ORIGINS:
+    if settings.ALLOWED_ORIGINS == "*":
+        allow_all = True
+        origins = ["*"]
+    else:
+        env_origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
+        origins.extend(env_origins)
+
 origins = list(set(origins))
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=not allow_all,  # must be False if allow_origins is ["*"]
+    allow_origin_regex="https://.*\\.vercel\\.app" if not allow_all else None,
     allow_methods=["*"],
     allow_headers=["*"],
 )
