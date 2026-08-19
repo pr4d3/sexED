@@ -45,6 +45,16 @@ export default function ForumPage() {
 
     const searchTimer = useRef<any>(null);
 
+    const newContentRef = useRef<HTMLTextAreaElement>(null);
+    useEffect(() => {
+        if (newContentRef.current) {
+            newContentRef.current.style.height = 'auto';
+            if (newContent) {
+                newContentRef.current.style.height = `${newContentRef.current.scrollHeight}px`;
+            }
+        }
+    }, [newContent]);
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -313,7 +323,7 @@ export default function ForumPage() {
                                 </label>
                                 <select 
                                     id="catSelect"
-                                    className="w-full bg-white border border-outline-variant/30 rounded-xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                    className="w-full bg-white border border-outline-variant/30 rounded-2xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                                     value={newCatId || ''}
                                     onChange={(e) => setNewCatId(parseInt(e.target.value))}
                                 >
@@ -331,7 +341,7 @@ export default function ForumPage() {
                                     id="postTitle"
                                     type="text"
                                     required
-                                    className="w-full bg-white border border-outline-variant/30 rounded-xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                    className="w-full bg-white border border-outline-variant/30 rounded-2xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                                     placeholder="Tiêu đề in đậm tóm tắt câu hỏi của bạn..."
                                     value={newTitle}
                                     onChange={(e) => setNewTitle(e.target.value)}
@@ -343,10 +353,11 @@ export default function ForumPage() {
                                     Nội dung chi tiết
                                 </label>
                                 <textarea 
+                                    ref={newContentRef}
                                     id="postBody"
                                     required
                                     rows={5}
-                                    className="w-full bg-white border border-outline-variant/30 rounded-xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"
+                                    className="w-full bg-white border border-outline-variant/30 rounded-2xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none overflow-hidden"
                                     placeholder="Mô tả cụ thể thắc mắc, bối cảnh tâm sinh lý cần hướng dẫn..."
                                     value={newContent}
                                     onChange={(e) => setNewContent(e.target.value)}

@@ -131,7 +131,7 @@ export default function CoursesPage() {
                                             <span>Giảng viên: <strong className="text-on-surface font-semibold">{course.instructor_name}</strong></span>
                                             <span><strong className="text-on-surface font-semibold">{course.total_lessons}</strong> Bài học</span>
                                         </div>
-                                        <Link href={`/courses/${course.id}/intro`} className="w-full inline-flex h-10 items-center justify-center rounded-md bg-primary text-xs font-semibold text-white transition-colors hover:bg-primary-hover">
+                                        <Link href={`/courses/${course.id}/intro`} className="w-full inline-flex h-10 items-center justify-center rounded-md bg-primary text-xs font-semibold text-white transition-colors hover:bg-primary/90">
                                             Xem Chi Tiết
                                         </Link>
                                     </div>

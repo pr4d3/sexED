@@ -21,7 +21,7 @@ export default function DashboardLayout({
     return (
         <div className="flex min-h-screen w-full bg-background text-on-background antialiased font-sans">
             {/* Sidebar navigation */}
-            <aside className="w-64 border-r border-outline-variant/30 bg-white/80 backdrop-blur-md flex flex-col justify-between shrink-0">
+            <aside className="w-64 border-r border-outline-variant/30 bg-white/80 backdrop-blur-md flex flex-col justify-between shrink-0 h-screen sticky top-0">
                 <div className="p-6 space-y-8">
                     <div className="flex items-center justify-between">
                         <Link href="/" className="text-lg font-extrabold text-primary">
@@ -39,7 +39,7 @@ export default function DashboardLayout({
                         
                         <Link
                             href="/dashboard"
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all ${
+                            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition-all ${
                                 isLinkActive('/dashboard') 
                                     ? 'bg-primary text-white shadow-sm' 
                                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/50'
@@ -51,7 +51,7 @@ export default function DashboardLayout({
 
                         <Link
                             href="/dashboard/students"
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all ${
+                            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition-all ${
                                 isLinkActive('/dashboard/students') 
                                     ? 'bg-primary text-white shadow-sm' 
                                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/50'
@@ -77,7 +77,7 @@ export default function DashboardLayout({
 
                     <button
                         onClick={() => router.push('/')}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/50 transition-all cursor-pointer"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/50 transition-all cursor-pointer"
                     >
                         <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                         Về trang chủ
