@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 
 interface Author {
@@ -20,6 +20,16 @@ export default function AboutPage() {
     const [feedbackEmail, setFeedbackEmail] = useState('');
     const [feedbackContent, setFeedbackContent] = useState('');
     const [feedbackSent, setFeedbackSent] = useState(false);
+
+    const feedbackContentRef = useRef<HTMLTextAreaElement>(null);
+    useEffect(() => {
+        if (feedbackContentRef.current) {
+            feedbackContentRef.current.style.height = 'auto';
+            if (feedbackContent) {
+                feedbackContentRef.current.style.height = `${feedbackContentRef.current.scrollHeight}px`;
+            }
+        }
+    }, [feedbackContent]);
 
     useEffect(() => {
         const fetchAboutData = async () => {
@@ -216,7 +226,7 @@ export default function AboutPage() {
                                 {/* Feedback Form */}
                                 <form onSubmit={handleSendFeedback} className="space-y-5 bg-white/40 p-6 rounded-2xl border border-white/60 shadow-inner backdrop-blur-sm">
                                     {feedbackSent && (
-                                        <div className="rounded-xl bg-primary/10 border border-primary/20 p-3 text-xs font-semibold text-primary">
+                                        <div className="rounded-2xl bg-primary/10 border border-primary/20 p-3 text-xs font-semibold text-primary">
                                             Cảm ơn bạn đã đóng góp ý kiến cho đội ngũ nghiên cứu!
                                         </div>
                                     )}
@@ -226,7 +236,7 @@ export default function AboutPage() {
                                             value={feedbackName} 
                                             onChange={(e) => setFeedbackName(e.target.value)} 
                                             required
-                                            className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none" 
+                                            className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none" 
                                             placeholder="Nhập họ và tên của bạn" 
                                             type="text"
                                         />
@@ -237,7 +247,7 @@ export default function AboutPage() {
                                             value={feedbackEmail} 
                                             onChange={(e) => setFeedbackEmail(e.target.value)} 
                                             required
-                                            className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none" 
+                                            className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none" 
                                             placeholder="Nhập địa chỉ email" 
                                             type="email"
                                         />
@@ -245,17 +255,18 @@ export default function AboutPage() {
                                     <div>
                                         <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nội dung đóng góp</label>
                                         <textarea 
+                                            ref={feedbackContentRef}
                                             value={feedbackContent} 
                                             onChange={(e) => setFeedbackContent(e.target.value)} 
                                             required
-                                            className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none resize-none" 
+                                            className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none resize-none overflow-hidden" 
                                             placeholder="Chia sẻ ý kiến của bạn..." 
                                             rows={4}
                                         />
                                     </div>
                                     <button 
                                         type="submit"
-                                        className="w-full bg-primary text-white py-3.5 rounded-xl font-bold text-xs transition-all shadow-md hover:shadow-lg hover:opacity-95"
+                                        className="w-full bg-primary text-white py-3.5 rounded-2xl font-bold text-xs transition-all shadow-md hover:shadow-lg hover:opacity-95"
                                     >
                                         Gửi phản hồi
                                     </button>

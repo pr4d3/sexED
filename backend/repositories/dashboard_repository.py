@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, case
 from sqlalchemy.orm import selectinload, joinedload
 from models.course import Course
 from models.lesson import Lesson
@@ -73,7 +73,7 @@ async def get_instructor_courses_with_stats(db: AsyncSession, instructor_id: UUI
         enroll_res = await db.execute(
             select(
                 func.count(CourseEnrollment.id),
-                func.sum(func.case((CourseEnrollment.status == "COMPLETED", 1), else_=0))
+                func.sum(case((CourseEnrollment.status == "COMPLETED", 1), else_=0))
             )
             .where(CourseEnrollment.course_id == course.id)
         )

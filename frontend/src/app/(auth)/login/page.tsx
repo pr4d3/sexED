@@ -27,12 +27,7 @@ export default function LoginPage() {
             
             if (res.success) {
                 showToast("Đăng nhập thành công!", "success");
-                const userRole = res.data.user.role;
-                if (userRole === 'ADMIN' || userRole === 'INSTRUCTOR') {
-                    router.push('/dashboard');
-                } else {
-                    router.push('/profile');
-                }
+                router.push('/');
             }
         } catch (err: any) {
             const errMsg = err.message || 'Sai thông tin đăng nhập';

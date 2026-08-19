@@ -60,6 +60,7 @@ async def get_course_intro(db: AsyncSession, course_id: UUID, current_user = Non
         },
         "total_lessons": len(course.lessons),
         "is_enrolled": is_enrolled,
+        "outro_content": course.outro_content,
         "syllabus": syllabus
     }
 
@@ -245,3 +246,18 @@ async def delete_lesson_from_course(db: AsyncSession, instructor_id: UUID, cours
         raise HTTPException(status_code=404, detail="Không tìm thấy bài học.")
         
     await course_repository.delete_lesson(db, lesson)
+
+async def reorder_lessons_in_course(db: AsyncSession, instructor_id: UUID, course_id: UUID, lesson_ids: list[UUID], is_admin: bool = False):
+    course = await course_repository.get_course_by_id(db, course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Khóa học không tồn tại.")
+        
+    if not is_admin and course.instructor_id != instructor_id:
+        raise HTTPException(status_code=403, detail="Bạn không sở hữu khóa học này.")
+        
+    for idx, lesson_id in enumerate(lesson_ids):
+        lesson = await course_repository.get_lesson_by_id(db, lesson_id)
+        if lesson and lesson.course_id == course_id:
+            lesson.order_index = idx + 1
+            await course_repository.update_lesson(db, lesson)
+    return True

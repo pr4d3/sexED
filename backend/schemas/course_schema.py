@@ -25,6 +25,7 @@ class CourseIntroData(BaseModel):
     instructor: InstructorInfo
     total_lessons: int
     is_enrolled: bool
+    outro_content: Optional[str] = None
     syllabus: list[SyllabusLesson]
 
 class CourseIntroResponse(BaseModel):
@@ -110,3 +111,6 @@ class LessonCreate(BaseModel):
     content_body: Optional[str] = None
     order_index: int = 1
     duration_minutes: Optional[int] = None
+
+class LessonReorder(BaseModel):
+    lesson_ids: list[UUID]

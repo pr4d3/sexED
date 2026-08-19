@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
@@ -34,6 +34,16 @@ export default function ProfilePage() {
     const [bio, setBio] = useState('');
     const [updating, setUpdating] = useState(false);
     const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+    const bioRef = useRef<HTMLTextAreaElement>(null);
+    useEffect(() => {
+        if (bioRef.current) {
+            bioRef.current.style.height = 'auto';
+            if (bio) {
+                bioRef.current.style.height = `${bioRef.current.scrollHeight}px`;
+            }
+        }
+    }, [bio]);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -149,7 +159,7 @@ export default function ProfilePage() {
                         {isStudent && (
                             <button
                                 onClick={() => setActiveTab('progress')}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                                     activeTab === 'progress' 
                                         ? 'bg-primary text-white shadow-sm' 
                                         : 'text-on-surface-variant hover:text-on-surface hover:bg-white/40'
@@ -161,7 +171,7 @@ export default function ProfilePage() {
                         )}
                         <button
                             onClick={() => setActiveTab('settings')}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                                 activeTab === 'settings' 
                                     ? 'bg-primary text-white shadow-sm' 
                                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/40'
@@ -243,7 +253,7 @@ export default function ProfilePage() {
                             <h2 className="text-lg font-bold text-on-surface">Chỉnh sửa hồ sơ cá nhân</h2>
 
                             {msg && (
-                                <div className={`rounded-xl p-4 text-xs font-semibold border ${
+                                <div className={`rounded-2xl p-4 text-xs font-semibold border ${
                                     msg.type === 'success'
                                         ? 'bg-primary/10 border-primary/20 text-primary'
                                         : 'bg-red-50 border-red-200/50 text-red-600'
@@ -261,7 +271,7 @@ export default function ProfilePage() {
                                         id="fullName"
                                         type="text"
                                         required
-                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
+                                        className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         value={fullName}
                                         onChange={(e) => setFullName(e.target.value)}
                                     />
@@ -273,7 +283,7 @@ export default function ProfilePage() {
                                     </label>
                                     <select
                                         id="gender"
-                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
+                                        className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         value={gender}
                                         onChange={(e) => setGender(e.target.value)}
                                     >
@@ -291,7 +301,7 @@ export default function ProfilePage() {
                                     <input
                                         id="dob"
                                         type="date"
-                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
+                                        className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         value={dob}
                                         onChange={(e) => setDob(e.target.value)}
                                     />
@@ -304,7 +314,7 @@ export default function ProfilePage() {
                                     <input
                                         id="phone"
                                         type="text"
-                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
+                                        className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         placeholder="0901234567"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
@@ -318,7 +328,7 @@ export default function ProfilePage() {
                                     <input
                                         id="avatarUrl"
                                         type="text"
-                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
+                                        className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none"
                                         placeholder="https://image-url.com/avatar.jpg"
                                         value={avatarUrl}
                                         onChange={(e) => setAvatarUrl(e.target.value)}
@@ -330,9 +340,10 @@ export default function ProfilePage() {
                                         Tiểu sử bản thân (Bio)
                                     </label>
                                     <textarea
+                                        ref={bioRef}
                                         id="bio"
                                         rows={4}
-                                        className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none resize-none"
+                                        className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-inner transition-all outline-none resize-none overflow-hidden"
                                         placeholder="Nhập giới thiệu ngắn về bản thân..."
                                         value={bio}
                                         onChange={(e) => setBio(e.target.value)}

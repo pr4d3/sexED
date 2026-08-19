@@ -7,7 +7,7 @@ from models.role import Role
 from repositories import course_repository
 from schemas.course_schema import (
     CourseListResponse, CourseIntroResponse, CourseEnrollResponse, CourseLearningResponse,
-    CourseOutroResponse, CourseCreate, CourseCreateResponse, LessonCreate
+    CourseOutroResponse, CourseCreate, CourseCreateResponse, LessonCreate, LessonReorder
 )
 from schemas.auth_schema import StandardResponse
 from services import course_service
@@ -52,9 +52,21 @@ async def get_course_learning(course_id: UUID, current_user: User = Depends(get_
 
 @router.get("/{course_id}/lessons/{lesson_id}", status_code=status.HTTP_200_OK)
 async def get_lesson_detail(course_id: UUID, lesson_id: UUID, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    enrollment = await course_repository.get_enrollment(db, current_user.id, course_id)
-    if not enrollment:
-        raise HTTPException(status_code=400, detail="Học viên chưa đăng ký tham gia khóa học này.")
+    role_result = await db.execute(select(Role).where(Role.id == current_user.role_id))
+    user_role = role_result.scalars().first()
+    is_admin = user_role and user_role.role_code == "ADMIN"
+    is_instructor = user_role and user_role.role_code == "INSTRUCTOR"
+    
+    course = await course_repository.get_course_by_id(db, course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Khóa học không tồn tại.")
+        
+    is_owner = is_admin or (is_instructor and course.instructor_id == current_user.id)
+    
+    if not is_owner:
+        enrollment = await course_repository.get_enrollment(db, current_user.id, course_id)
+        if not enrollment:
+            raise HTTPException(status_code=400, detail="Học viên chưa đăng ký tham gia khóa học này.")
         
     lesson = await course_repository.get_lesson_by_id(db, lesson_id)
     if not lesson or lesson.course_id != course_id:
@@ -68,7 +80,8 @@ async def get_lesson_detail(course_id: UUID, lesson_id: UUID, current_user: User
             "content_type": lesson.content_type,
             "video_url": lesson.video_url,
             "content_body": lesson.content_body,
-            "duration_minutes": lesson.duration_minutes
+            "duration_minutes": lesson.duration_minutes,
+            "order_index": lesson.order_index
         }
     }
 
@@ -133,6 +146,20 @@ async def add_lesson(course_id: UUID, lesson_data: LessonCreate, current_user: U
     result = await course_service.add_lesson_to_course(db, current_user.id, course_id, lesson_data, is_admin)
     return StandardResponse(success=True, message="Thêm bài học mới thành công", data=result)
 
+@router.put("/{course_id}/lessons/reorder", response_model=StandardResponse, status_code=status.HTTP_200_OK)
+async def reorder_lessons(course_id: UUID, reorder_data: LessonReorder, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    is_admin = False
+    from sqlalchemy import select
+    role_result = await db.execute(select(Role).where(Role.id == current_user.role_id))
+    user_role = role_result.scalars().first()
+    if user_role and user_role.role_code == "ADMIN":
+        is_admin = True
+    elif not user_role or user_role.role_code != "INSTRUCTOR":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+        
+    await course_service.reorder_lessons_in_course(db, current_user.id, course_id, reorder_data.lesson_ids, is_admin)
+    return StandardResponse(success=True, message="Sắp xếp thứ tự bài học thành công")
+
 @router.put("/{course_id}/lessons/{lesson_id}", response_model=StandardResponse, status_code=status.HTTP_200_OK)
 async def update_lesson(course_id: UUID, lesson_id: UUID, lesson_data: LessonCreate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     is_admin = False
@@ -160,3 +187,28 @@ async def delete_lesson(course_id: UUID, lesson_id: UUID, current_user: User = D
         
     await course_service.delete_lesson_from_course(db, current_user.id, course_id, lesson_id, is_admin)
     return StandardResponse(success=True, message="Xóa bài học thành công")
+
+@router.put("/{course_id}/publish", response_model=StandardResponse, status_code=status.HTTP_200_OK)
+async def publish_course(course_id: UUID, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    role_result = await db.execute(select(Role).where(Role.id == current_user.role_id))
+    user_role = role_result.scalars().first()
+    is_admin = user_role and user_role.role_code == "ADMIN"
+    is_instructor = user_role and user_role.role_code == "INSTRUCTOR"
+    if not is_admin and not is_instructor:
+        raise HTTPException(status_code=403, detail="Không đủ quyền thực hiện thao tác này.")
+        
+    course = await course_repository.get_course_by_id(db, course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Khóa học không tồn tại.")
+        
+    if not is_admin and course.instructor_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Bạn không sở hữu khóa học này.")
+        
+    course.is_published = not course.is_published
+    await course_repository.update_course(db, course)
+    
+    status_text = "Xuất bản" if course.is_published else "Hạ xuống bản nháp"
+    return StandardResponse(
+        success=True,
+        message=f"{status_text} khóa học thành công."
+    )
