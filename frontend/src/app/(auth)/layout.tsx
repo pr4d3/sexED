@@ -35,8 +35,8 @@ export default function AuthLayout({
             </div>
 
             {/* Right Side: Auth Forms */}
-            <div className="w-full lg:w-1/2 flex justify-center items-center min-h-[calc(100vh-2rem)] lg:h-full py-8 lg:py-0 overflow-y-auto">
-                <div className="w-full max-w-md glass-panel rounded-[2rem] p-8 flex flex-col gap-6 shadow-md border border-white/50 bg-white/70 backdrop-blur-md">
+            <div className="w-full lg:w-1/2 flex justify-center items-center py-6 lg:py-12 overflow-y-auto min-h-[calc(100vh-3rem)]">
+                <div className="w-full max-w-md glass-panel rounded-[2rem] p-6 lg:p-8 flex flex-col gap-5 lg:gap-6 shadow-md border border-white/50 bg-white/70 backdrop-blur-md">
                     {/* Branding */}
                     <div className="text-center mb-2">
                         <h2 className="text-2xl font-extrabold text-primary">Khởi đầu Hành trình</h2>
