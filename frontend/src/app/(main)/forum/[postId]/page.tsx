@@ -178,8 +178,6 @@ export default function PostDetailPage() {
 
   const isAdmin = user?.role === "ADMIN";
 
-
-
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12 space-y-8">
       <Link
@@ -269,7 +267,7 @@ export default function PostDetailPage() {
               type="submit"
               className="px-6 py-2.5 bg-primary text-white font-bold rounded-full hover:bg-primary/90 transition-colors shadow-sm text-sm cursor-pointer"
             >
-              Gửi bình luận
+              Bình luận
             </button>
           </form>
         ) : (
@@ -443,7 +441,7 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                 type="submit"
                 className="px-4 py-2 bg-primary text-white font-bold rounded-full hover:bg-primary/90 transition-colors shadow-sm text-xs cursor-pointer"
               >
-                Gửi phản hồi
+                Phản hồi
               </button>
             </div>
           </form>
