@@ -45,40 +45,42 @@ export default function LoginPage() {
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        <div className="flex flex-col gap-1.5">
-          <label
-            className="text-xs font-semibold text-on-surface ml-1"
-            htmlFor="username"
-          >
-            Tên đăng nhập hoặc Email
-          </label>
+        {/* Username/Email Input Container */}
+        <div className="relative">
           <input
             id="username"
             type="text"
             required
-            className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-sm text-on-surface placeholder:text-outline backdrop-blur-sm shadow-inner"
-            placeholder="username hoặc email"
+            placeholder=" "
+            className="peer block w-full px-5 pt-[22px] pb-[10px] rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-all text-sm text-on-surface placeholder:text-transparent backdrop-blur-sm shadow-inner"
             value={usernameOrEmail}
             onChange={(e) => setUsernameOrEmail(e.target.value)}
           />
+          <label
+            htmlFor="username"
+            className="absolute left-5 top-[16px] text-sm transition-all duration-300 transform origin-[0] pointer-events-none peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-[0.8] peer-focus:-translate-y-[10px] scale-[0.8] -translate-y-[10px] text-on-surface-variant/70 peer-focus:text-primary font-medium"
+          >
+            Tên đăng nhập hoặc Email
+          </label>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            className="text-xs font-semibold text-on-surface ml-1"
-            htmlFor="password"
-          >
-            Mật khẩu
-          </label>
+        {/* Password Input Container */}
+        <div className="relative">
           <input
             id="password"
             type="password"
             required
-            className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-sm text-on-surface placeholder:text-outline backdrop-blur-sm shadow-inner"
-            placeholder="Nhập mật khẩu"
+            placeholder=" "
+            className="peer block w-full px-5 pt-[22px] pb-[10px] rounded-2xl bg-white/50 border border-white/60 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-all text-sm text-on-surface placeholder:text-transparent backdrop-blur-sm shadow-inner"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <label
+            htmlFor="password"
+            className="absolute left-5 top-[16px] text-sm transition-all duration-300 transform origin-[0] pointer-events-none peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-[0.8] peer-focus:-translate-y-[10px] scale-[0.8] -translate-y-[10px] text-on-surface-variant/70 peer-focus:text-primary font-medium"
+          >
+            Mật khẩu
+          </label>
         </div>
 
         <div className="flex items-center justify-between mt-2 px-1">
