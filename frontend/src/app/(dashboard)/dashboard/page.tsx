@@ -1144,11 +1144,11 @@ export default function DashboardOverviewPage() {
                       <strong className="text-primary font-bold">
                         {c.completed_count}
                       </strong>{" "}
-                      tốt nghiệp /{" "}
+                      Hoàn thành /{" "}
                       <strong className="text-secondary font-bold">
                         {c.in_progress_count}
                       </strong>{" "}
-                      đang học
+                      Đang học
                     </td>
                     <td className="py-4 px-4">
                       <span
@@ -1228,7 +1228,7 @@ export default function DashboardOverviewPage() {
                   className="text-xs font-semibold text-on-surface ml-1"
                   htmlFor="cAudience"
                 >
-                  Đối tượng hướng đến
+                  Dành cho
                 </label>
                 <select
                   id="cAudience"
@@ -1236,8 +1236,8 @@ export default function DashboardOverviewPage() {
                   value={newAudience}
                   onChange={(e) => setNewAudience(e.target.value as any)}
                 >
-                  <option value="BOTH">Tất cả đối tượng</option>
-                  <option value="CHILD">Học sinh / Trẻ nhỏ</option>
+                  <option value="BOTH">Mọi người</option>
+                  <option value="CHILD">Trẻ nhỏ</option>
                   <option value="PARENT">Phụ huynh</option>
                 </select>
               </div>
