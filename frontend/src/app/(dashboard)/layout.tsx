@@ -60,6 +60,18 @@ export default function DashboardLayout({
                             <span className="material-symbols-outlined text-[18px]">group</span>
                             Theo dõi học viên
                         </Link>
+
+                        <Link
+                            href="/game"
+                            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition-all ${
+                                isLinkActive('/game') 
+                                    ? 'bg-primary text-white shadow-sm' 
+                                    : 'text-on-surface-variant hover:text-on-surface hover:bg-white/50'
+                            }`}
+                        >
+                            <span className="material-symbols-outlined text-[18px]">smart_toy</span>
+                            Phòng Chơi AI Roleplay
+                        </Link>
                     </div>
                 </div>
 

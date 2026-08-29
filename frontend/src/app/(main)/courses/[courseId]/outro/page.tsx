@@ -137,6 +137,31 @@ export default function CourseOutroPage() {
                         </div>
                     </section>
 
+                    {/* AI Roleplay Simulation Recommendation Box */}
+                    <section className="bg-gradient-to-r from-primary/10 via-tertiary-fixed/30 to-secondary-fixed/20 rounded-3xl p-6 border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-2xl bg-white text-primary flex items-center justify-center shadow-sm flex-shrink-0">
+                                <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>smart_toy</span>
+                            </div>
+                            <div className="text-left space-y-1">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm font-extrabold text-on-surface">Thực hành phản xạ với AI Roleplay</h3>
+                                    <span className="px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase">Đề xuất</span>
+                                </div>
+                                <p className="text-xs text-on-surface-variant leading-relaxed font-light">
+                                    Áp dụng kiến thức vừa học vào 4 phòng giả lập tình huống thực tế cùng AI để nhận chứng nhận và đánh giá phản xạ y khoa!
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => router.push('/game')}
+                            className="w-full md:w-auto flex-shrink-0 h-11 px-6 rounded-full bg-primary text-white text-xs font-bold shadow-md hover:shadow-lg hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                            <span>Vào Phòng Chơi AI</span>
+                            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        </button>
+                    </section>
+
                     {/* Survey Box */}
                     <div className="bg-primary/5 rounded-3xl p-6 border border-primary/20 space-y-4 text-left">
                         <h4 className="font-bold text-primary text-sm">Phiếu Khảo Sát Đóng Góp Đề Tài Khoa Học</h4>

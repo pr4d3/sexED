@@ -169,6 +169,275 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured AI Roleplay Simulation Hub Section */}
+      <section className="py-20 px-4 md:px-16 relative overflow-hidden bg-gradient-to-b from-transparent via-primary-container/10 to-transparent">
+        <div className="max-w-7xl mx-auto flex flex-col gap-12">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-primary-fixed text-on-primary-fixed-variant rounded-full w-fit shadow-sm">
+                <span
+                  className="material-symbols-outlined text-[16px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  smart_toy
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  Mô phỏng Phản xạ AI
+                </span>
+              </div>
+              <h2 className="text-2xl md:text-4xl font-extrabold text-on-surface tracking-tight">
+                Phòng Chơi Tương Tác &amp; Giả Lập Tình Huống
+              </h2>
+              <p className="text-sm md:text-base text-on-surface-variant font-light max-w-2xl leading-relaxed">
+                Rèn luyện kỹ năng thực tế với hệ thống AI Roleplay được trang bị
+                tri thức y văn (RAG). Nhận phản hồi cảm xúc chân thật, tính điểm
+                an toàn và đánh giá năng lực khoa học tức thì.
+              </p>
+            </div>
+            <Link
+              href="/game"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-full text-xs font-bold hover:opacity-90 shadow-md transition-all self-start md:self-auto shrink-0"
+            >
+              Khám phá Tất cả Phòng chơi
+              <span className="material-symbols-outlined text-[16px]">
+                arrow_forward
+              </span>
+            </Link>
+          </div>
+
+          {/* 4 Featured AI Roleplay Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Room 1 */}
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-white/60 shadow-sm hover-shadow transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-200/80 text-[10px] font-extrabold uppercase tracking-wider">
+                    An toàn mạng
+                  </span>
+                  <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Trực tuyến
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"
+                    alt="Quân Kool"
+                    className="w-12 h-12 rounded-2xl object-cover border-2 border-primary/20"
+                  />
+                  <div>
+                    <h3 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">
+                      Quân Kool
+                    </h3>
+                    <p className="text-[10px] text-on-surface-variant font-medium">
+                      Bạn quen qua mạng xã hội
+                    </p>
+                  </div>
+                </div>
+                <h4 className="text-xs font-bold text-on-surface line-clamp-1">
+                  Kẻ ẩn danh &amp; Ranh giới an toàn
+                </h4>
+                <p className="text-xs text-on-surface-variant font-light leading-relaxed line-clamp-3">
+                  Ứng biến khi đối mặt với những lời mời riêng tư, gạ gẫm gửi
+                  hình ảnh nhạy cảm và bảo vệ quyền riêng tư cá nhân.
+                </p>
+              </div>
+              <Link
+                href="/game"
+                className="mt-6 pt-3 border-t border-outline-variant/20 flex items-center justify-between text-xs font-bold text-primary group-hover:underline"
+              >
+                <span>Vào thử thách</span>
+                <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
+                  arrow_forward
+                </span>
+              </Link>
+            </div>
+
+            {/* Room 2 */}
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-white/60 shadow-sm hover-shadow transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-extrabold uppercase tracking-wider">
+                    Y khoa tuổi dậy thì
+                  </span>
+                  <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Trực tuyến
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src="https://images.unsplash.com/photo-1594824813501-4475e0a298a0?w=150"
+                    alt="BS. Minh Trang"
+                    className="w-12 h-12 rounded-2xl object-cover border-2 border-primary/20"
+                  />
+                  <div>
+                    <h3 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">
+                      BS. Minh Trang
+                    </h3>
+                    <p className="text-[10px] text-on-surface-variant font-medium">
+                      Bác sĩ tư vấn sức khỏe
+                    </p>
+                  </div>
+                </div>
+                <h4 className="text-xs font-bold text-on-surface line-clamp-1">
+                  Anh/Chị Cố vấn dậy thì
+                </h4>
+                <p className="text-xs text-on-surface-variant font-light leading-relaxed line-clamp-3">
+                  Không gian riêng tư, thân thiện và chuẩn y khoa để giải đáp
+                  những băn khoăn thầm kín về sinh lý và tâm lý.
+                </p>
+              </div>
+              <Link
+                href="/game"
+                className="mt-6 pt-3 border-t border-outline-variant/20 flex items-center justify-between text-xs font-bold text-primary group-hover:underline"
+              >
+                <span>Vào thử thách</span>
+                <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
+                  arrow_forward
+                </span>
+              </Link>
+            </div>
+
+            {/* Room 3 */}
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-white/60 shadow-sm hover-shadow transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-extrabold uppercase tracking-wider">
+                    Tâm lý &amp; Thấu cảm
+                  </span>
+                  <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Trực tuyến
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150"
+                    alt="Bảo Khang"
+                    className="w-12 h-12 rounded-2xl object-cover border-2 border-primary/20"
+                  />
+                  <div>
+                    <h3 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">
+                      Bảo Khang (15 tuổi)
+                    </h3>
+                    <p className="text-[10px] text-on-surface-variant font-medium">
+                      Học sinh lớp 9
+                    </p>
+                  </div>
+                </div>
+                <h4 className="text-xs font-bold text-on-surface line-clamp-1">
+                  Đổi vai thấu hiểu: Con cái &amp; Cha mẹ
+                </h4>
+                <p className="text-xs text-on-surface-variant font-light leading-relaxed line-clamp-3">
+                  Trải nghiệm góc nhìn của phụ huynh khi con có biểu hiện cảm
+                  nắng hoặc đóng kín cửa phòng để xây dựng đối thoại tích cực.
+                </p>
+              </div>
+              <Link
+                href="/game"
+                className="mt-6 pt-3 border-t border-outline-variant/20 flex items-center justify-between text-xs font-bold text-primary group-hover:underline"
+              >
+                <span>Vào thử thách</span>
+                <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
+                  arrow_forward
+                </span>
+              </Link>
+            </div>
+
+            {/* Room 4 */}
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-white/60 shadow-sm hover-shadow transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant text-[10px] font-extrabold uppercase tracking-wider">
+                    Phòng chống quấy rối
+                  </span>
+                  <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Trực tuyến
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150"
+                    alt="Linh Chi"
+                    className="w-12 h-12 rounded-2xl object-cover border-2 border-primary/20"
+                  />
+                  <div>
+                    <h3 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">
+                      Linh Chi
+                    </h3>
+                    <p className="text-[10px] text-on-surface-variant font-medium">
+                      Bạn cùng trường
+                    </p>
+                  </div>
+                </div>
+                <h4 className="text-xs font-bold text-on-surface line-clamp-1">
+                  Giải cứu tình huống học đường
+                </h4>
+                <p className="text-xs text-on-surface-variant font-light leading-relaxed line-clamp-3">
+                  Hỗ trợ bạn bè khi bị tung tin đồn hoặc đụng chạm không an
+                  toàn, tìm kiếm sự can thiệp đúng đắn từ thầy cô và người lớn.
+                </p>
+              </div>
+              <Link
+                href="/game"
+                className="mt-6 pt-3 border-t border-outline-variant/20 flex items-center justify-between text-xs font-bold text-primary group-hover:underline"
+              >
+                <span>Vào thử thách</span>
+                <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
+                  arrow_forward
+                </span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Highlights Bar */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+            <div className="flex items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-xs">
+              <span className="material-symbols-outlined text-primary text-[24px]">
+                bolt
+              </span>
+              <div>
+                <h4 className="text-xs font-bold text-on-surface">
+                  Truyền phát Real-time (SSE)
+                </h4>
+                <p className="text-[11px] text-on-surface-variant font-light">
+                  Phản hồi mượt mà từng từ kèm biểu cảm NPC
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-xs">
+              <span className="material-symbols-outlined text-primary text-[24px]">
+                menu_book
+              </span>
+              <div>
+                <h4 className="text-xs font-bold text-on-surface">
+                  RAG Vector Y Văn Chuẩn
+                </h4>
+                <p className="text-[11px] text-on-surface-variant font-light">
+                  Tích hợp giáo trình y khoa đối chiếu liên tục
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-xs">
+              <span className="material-symbols-outlined text-primary text-[24px]">
+                analytics
+              </span>
+              <div>
+                <h4 className="text-xs font-bold text-on-surface">
+                  Đánh Giá Khoa Học Tức Thì
+                </h4>
+                <p className="text-[11px] text-on-surface-variant font-light">
+                  Chấm điểm an toàn &amp; phân tích tâm lý sau mỗi ván
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Course Switcher Section */}
       <section className="py-24 px-4 md:px-16">
         <div className="max-w-7xl mx-auto flex flex-col items-center">

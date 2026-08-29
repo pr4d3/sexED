@@ -171,3 +171,80 @@ INSERT INTO roles (role_code, role_name, description) VALUES
     ('INSTRUCTOR', 'Giảng viên', 'Giảng viên, tạo và quản lý khóa học, bài giảng'),
     ('STUDENT_PARENT', 'Phụ huynh', 'Học viên đối tượng Phụ huynh, học nội dung đồng hành cùng con'),
     ('STUDENT_CHILD', 'Trẻ nhỏ', 'Học viên đối tượng Trẻ nhỏ, tiếp cận bài học sinh động');
+
+-- ==========================================
+-- 6. AI ROLEPLAY & RAG SERVICE
+-- ==========================================
+
+-- Bật extension pgvector
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Bảng AI Scenarios (4 kịch bản phòng chơi)
+CREATE TABLE IF NOT EXISTS ai_scenarios (
+    id SERIAL PRIMARY KEY,
+    room_code VARCHAR(50) UNIQUE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    npc_name VARCHAR(100) NOT NULL,
+    npc_avatar_url VARCHAR(500),
+    initial_score INTEGER NOT NULL DEFAULT 50,
+    target_audience VARCHAR(20) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT true
+);
+
+-- Bảng AI Sessions (Lưu phiên chơi của người dùng)
+CREATE TABLE IF NOT EXISTS ai_sessions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    scenario_id INTEGER NOT NULL REFERENCES ai_scenarios(id) ON DELETE CASCADE,
+    current_score INTEGER NOT NULL DEFAULT 50,
+    current_emotion VARCHAR(30) NOT NULL DEFAULT 'neutral',
+    recent_summary TEXT,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bảng AI Messages (Lưu lịch sử tin nhắn)
+CREATE TABLE IF NOT EXISTS ai_messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    session_id UUID NOT NULL REFERENCES ai_sessions(id) ON DELETE CASCADE,
+    sender VARCHAR(10) NOT NULL,
+    dialogue TEXT NOT NULL,
+    action VARCHAR(255),
+    emotion VARCHAR(30),
+    score_change INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bảng AI Knowledge Vectors (Kho tri thức phục vụ RAG)
+CREATE TABLE IF NOT EXISTS ai_knowledge_vectors (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    category VARCHAR(50) NOT NULL,
+    topic VARCHAR(150) NOT NULL,
+    content_chunk TEXT NOT NULL,
+    embedding vector(768) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bảng AI Game Evaluations (Đánh giá kết quả cuối màn chơi)
+CREATE TABLE IF NOT EXISTS ai_game_evaluations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    session_id UUID UNIQUE NOT NULL REFERENCES ai_sessions(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    scenario_id INTEGER NOT NULL REFERENCES ai_scenarios(id) ON DELETE CASCADE,
+    final_score INTEGER NOT NULL,
+    result_outcome VARCHAR(50) NOT NULL,
+    total_turns INTEGER NOT NULL,
+    duration_seconds INTEGER NOT NULL,
+    ai_feedback_summary TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Chỉ mục B-Tree truyền thống
+CREATE INDEX IF NOT EXISTS idx_ai_messages_session_created ON ai_messages(session_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_sessions_user_status ON ai_sessions(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_ai_evaluations_scenario ON ai_game_evaluations(scenario_id, result_outcome);
+
+-- Chỉ mục HNSW cho pgvector
+CREATE INDEX IF NOT EXISTS idx_ai_knowledge_vectors_embedding ON ai_knowledge_vectors USING hnsw (embedding vector_cosine_ops);
+

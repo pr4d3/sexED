@@ -19,9 +19,20 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [toasts, setToasts] = useState<Toast[]>([]);
 
-    const showToast = useCallback((message: string, type: ToastType = 'info') => {
+    const showToast = useCallback((message: any, type: ToastType = 'info') => {
+        let text = 'Thông báo';
+        if (typeof message === 'string') {
+            text = message;
+        } else if (message instanceof Error) {
+            text = message.message;
+        } else if (message && typeof message === 'object') {
+            text = message.message || message.msg || message.detail || JSON.stringify(message);
+        } else if (message !== undefined && message !== null) {
+            text = String(message);
+        }
+
         const id = Math.random().toString(36).substring(2, 9);
-        setToasts((prev) => [...prev, { id, message, type }]);
+        setToasts((prev) => [...prev, { id, message: text, type }]);
 
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id));

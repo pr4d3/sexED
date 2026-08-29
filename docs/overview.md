@@ -15,7 +15,63 @@ _(Dự án Nghiên cứu Khoa học về Giáo dục Giới tính tại Việt N
 
 ---
 
-## 2. KIẾN TRÚC VAI TRÒ & PHÂN QUYỀN (ROLES & PERMISSIONS)
+## 2. SƠ ĐỒ KIẾN TRÚC HỆ THỐNG TỔNG THỂ (SYSTEM ARCHITECTURE DIAGRAM)
+
+```text
+                                  [NGƯỜI DÙNG / TRÌNH DUYỆT]
+                                               │
+                                               ▼
+                     ┌──────────────────────────────────────────────────┐
+                     │          FRONTEND CLIENT (Vercel Cloud)          │
+                     │          Next.js (App Router) + TailwindCSS      │
+                     │  - Trang chủ & Giới thiệu nghiên cứu             │
+                     │  - Khóa học (Intro -> Learn -> Outro)            │
+                     │  - Profile học viên & Dashboard giảng viên       │
+                     │  - Diễn đàn cộng đồng (Kiểm duyệt Admin)         │
+                     │  - Giao diện 4 phòng chơi AI Roleplay            │
+                     └─────────────┬──────────────────────┬─────────────┘
+                                   │                      │
+                  (REST API / JWT) │                      │ (Real-time SSE Stream)
+                                   ▼                      ▼
+┌──────────────────────────────────────────────┐  ┌──────────────────────────────────────────────┐
+│       MAIN WEB BACKEND (Render Cloud)        │  │     AI ROLEPLAY SERVICE (Render Cloud)       │
+│        Python FastAPI (Layered Arch)         │  │    Python FastAPI + Dynamic Context Engine   │
+│  - Auth & RBAC (4 Roles)                     │  │  - Sliding Window (4-6 turns) + Summary      │
+│  - User Profile & Progress Tracking          │  │  - 4 Persona System Prompts (In-char Refusal)│
+│  - Instructor Dashboard & Analytics          │  │  - JSON Schema Structured Outputs            │
+│  - Courses & Lessons Management              │  │  - RAG Retriever (pgvector Cosine Search)    │
+│  - Forum & Admin Moderation Flow             │  │  - Real-time State & Score Tracking          │
+└──────────────────────┬───────────────────────┘  └──────────────────────┬───────────────────────┘
+                       │                                                 │
+                       │ 🔐 DÙNG CHUNG JWT AUTH (SSO)                    │
+                       │ (Cùng Secret Key & Phân quyền Role)             │
+                       │                                                 │
+                       └──────────────────────┬──────────────────────────┘
+                                              │
+                                              ▼ (Transaction Pooler: Port 6543)
+┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                           CENTRAL DATABASE CLOUD (Supabase PostgreSQL)                         │
+│                                                                                                │
+│  [Nhóm Bảng Web Chính]                     [Nhóm Bảng AI Roleplay & RAG]                       │
+│  - roles, users, user_sessions             - ai_scenarios (4 Kịch bản phòng chơi)              │
+│  - user_profiles                           - ai_sessions (Lưu State & Memory Summary)          │
+│  - courses, lessons                        - ai_messages (Lịch sử chat & Cảm xúc)              │
+│  - course_enrollments, lesson_progress     - ai_knowledge_vectors (pgvector HNSW Index)        │
+│  - forum_categories, posts, comments       - ai_game_evaluations (Số liệu nghiên cứu khoa học) │
+│  - site_settings                                                                               │
+└─────────────────────────────────────────────┬──────────────────────────────────────────────────┘
+                                              │
+                                              ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                       CLOUD MEDIA STORAGE (Supabase Storage / Cloudinary)                      │
+│  - Avatar người dùng & Giảng viên           - Thumbnail bài giảng & Kịch bản                   │
+│  - Video bài giảng giáo dục giới tính       - Tài liệu đính kèm & File log nén                 │
+└────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 3. KIẾN TRÚC VAI TRÒ & PHÂN QUYỀN (ROLES & PERMISSIONS)
 
 Hệ thống quản lý 4 nhóm vai trò độc lập (Role-Based Access Control - RBAC):
 
@@ -37,7 +93,7 @@ Hệ thống quản lý 4 nhóm vai trò độc lập (Role-Based Access Control
 
 ---
 
-## 3. CẤU TRÚC ĐIỀU HƯỚNG TRANG & PHÒNG CHƠI (SITEMAP)
+## 4. CẤU TRÚC ĐIỀU HƯỚNG TRANG & PHÒNG CHƠI (SITEMAP)
 
 - **Trang Công khai (Public Pages):**
   - `Trang Chủ (Home Page - /)`: Giới thiệu thông điệp, chuyển đổi khóa học theo tab Phụ huynh / Trẻ nhỏ, diễn đàn mới nhất.
@@ -60,9 +116,9 @@ Hệ thống quản lý 4 nhóm vai trò độc lập (Role-Based Access Control
 
 ---
 
-## 4. TECH STACK & HẠ TẦNG CLOUD (CHẠY THỰC TẾ 24/7)
+## 5. TECH STACK & HẠ TẦNG CLOUD (CHẠY THỰC TẾ 24/7)
 
-### 4.1. Application Stack & Kiến trúc
+### 5.1. Application Stack & Kiến trúc
 
 - **Kiến trúc Backend Web:** **Layered Architecture (Kiến trúc phân tầng)**
   - _Controller/Router Layer_ $\rightarrow$ _Service Layer_ $\rightarrow$ _Repository Layer_ $\rightarrow$ _Database_.
@@ -74,12 +130,12 @@ Hệ thống quản lý 4 nhóm vai trò độc lập (Role-Based Access Control
 - **Frontend Phase 2 (MVP Vận hành):** `HTML5` + `CSS` (Giao diện cơ bản kiểm thử kết nối API).
 - **Frontend Phase 3 (Hoàn thiện UI/UX):** `Next.js (App Router)` + `TailwindCSS` + `Shadcn/ui` (Giao diện hiện đại, tối ưu SEO và trải nghiệm người dùng).
 
-### 4.2. Hạ tầng Đám mây (Cloud Infrastructure)
+### 5.2. Hạ tầng Đám mây (Cloud Infrastructure)
 
 - **Backend Cloud Hosting:** `Render (render.com Web Service)`
   - Kết nối tự động qua GitHub Repository (Root Directory: `backend/`).
   - Cung cấp sẵn chứng chỉ bảo mật HTTPS tự động: `https://[ten-service].onrender.com`.
-- **Frontend Cloud Hosting:** `Vercel (vercel.com)`
+- **Frontend Cloud Hosting (Phase 3):** `Vercel (vercel.com)`
   - Nền tảng tối ưu nhất thế giới cho Next.js, tự động CI/CD từ GitHub.
 - **Database Cloud Engine:** `Supabase (Managed PostgreSQL)`
   - Hoạt động 24/7 trên Cloud, sử dụng cổng **Transaction Pooler (Port 6543)** chịu tải 100–300 người dùng đồng thời.
@@ -88,9 +144,9 @@ Hệ thống quản lý 4 nhóm vai trò độc lập (Role-Based Access Control
 
 ---
 
-## 5. LỘ TRÌNH PHÁT TRIỂN (ROADMAP)
+## 6. LỘ TRÌNH PHÁT TRIỂN (ROADMAP)
 
-- **Phase 1 (Phân hệ Web):** Thiết kế toàn bộ Database Schema nền tảng (12 bảng dữ liệu chia theo 6 Feature Docs).
-- **Phase 2 (Phân hệ Web):** Xây dựng Core Backend (FastAPI theo Layered Architecture) + Deploy Render + HTML/CSS cơ bản kiểm thử toàn hệ thống.
-- **Phase 3 (Phân hệ Web):** Xây dựng giao diện Frontend hoàn chỉnh (Next.js + TailwindCSS + Shadcn/ui) + Deploy Vercel.
-- **Phase 4 (Phân hệ Độc lập):** Xây dựng Phân hệ AI Roleplay & RAG Service (SSE Streaming, Dynamic Context Engine, 4 Persona Prompts, Database pgvector).
+- **Phase 1 (Hoàn thành):** Thiết kế toàn bộ Database Schema nền tảng (12 bảng dữ liệu chia theo 6 Feature Docs).
+- **Phase 2 (Hoàn thành):** Xây dựng Core Backend (FastAPI theo Layered Architecture) + Deploy Render + HTML/CSS cơ bản kiểm thử toàn hệ thống.
+- **Phase 3 (Hoàn thành):** Xây dựng giao diện Frontend hoàn chỉnh (Next.js + TailwindCSS + Shadcn/ui) + Deploy Vercel.
+- **Phase 4 (Hoàn thành Docs):** Xây dựng Phân hệ AI Roleplay & RAG Service (SSE Streaming, Dynamic Context Engine, 4 Persona Prompts, Database pgvector).

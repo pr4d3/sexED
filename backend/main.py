@@ -4,7 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core.database import engine
 from core.config import settings
-from routers import auth_router, user_router, course_router, forum_router, dashboard_router, general_router
+from routers import auth_router, user_router, course_router, forum_router, dashboard_router, general_router, roleplay_router
+
 
 # Khởi tạo logging
 logging.basicConfig(level=logging.INFO)
@@ -71,3 +72,7 @@ app.include_router(course_router.router)
 app.include_router(forum_router.router)
 app.include_router(dashboard_router.router)
 app.include_router(general_router.router)
+app.include_router(roleplay_router.router)
+
+
+

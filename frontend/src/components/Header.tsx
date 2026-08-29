@@ -34,6 +34,11 @@ export default function Header() {
                     <Link href="/courses" className={`text-sm transition-colors ${isLinkActive('/courses') ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary font-medium'}`}>
                         Khóa Học
                     </Link>
+                    <Link href="/game" className={`text-sm transition-all flex items-center gap-1.5 ${isLinkActive('/game') ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary font-medium'}`}>
+                        <span className="material-symbols-outlined text-[18px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>smart_toy</span>
+                        Phòng Chơi AI
+                        <span className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-black tracking-wide border border-primary/20">MỚI</span>
+                    </Link>
                     <Link href="/forum" className={`text-sm transition-colors ${isLinkActive('/forum') ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary font-medium'}`}>
                         Diễn Đàn
                     </Link>
