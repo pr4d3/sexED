@@ -244,6 +244,30 @@ export default function ProfilePage() {
                                     ))}
                                 </div>
                             )}
+
+                            {/* Featured AI Roleplay Hub Card */}
+                            <div className="bg-gradient-to-br from-primary-fixed/30 via-secondary-fixed/20 to-tertiary-fixed/30 rounded-3xl p-6 border border-primary/20 flex flex-col sm:flex-row items-center gap-6 justify-between shadow-sm">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-white text-primary flex items-center justify-center shadow-sm flex-shrink-0">
+                                        <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>smart_toy</span>
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-extrabold text-on-surface text-sm">Phòng Chơi &amp; Mô Phỏng AI</h3>
+                                            <span className="px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase">4 Kịch bản</span>
+                                        </div>
+                                        <p className="text-xs text-on-surface-variant leading-relaxed font-light mt-0.5">
+                                            Rèn luyện phản xạ với AI, nhận điểm an toàn và báo cáo đánh giá khoa học y tế.
+                                        </p>
+                                    </div>
+                                </div>
+                                <Link
+                                    href="/game"
+                                    className="w-full sm:w-auto inline-flex h-10 items-center justify-center rounded-full bg-primary px-6 text-xs font-bold text-white shadow-md hover:shadow-lg hover:opacity-95 transition-all flex-shrink-0"
+                                >
+                                    Vào phòng chơi
+                                </Link>
+                            </div>
                         </div>
                     )}
 

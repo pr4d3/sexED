@@ -9,24 +9,73 @@ import { ForumPostDetailSkeleton } from "@/components/Skeleton";
 import { useToast } from "@/context/ToastContext";
 import {
   ArrowLeft,
-  MessageSquare,
+  MessageCircle,
   ShieldAlert,
   Reply,
   Trash2,
   EyeOff,
+  Eye,
+  Heart,
+  Share2,
+  UserX,
+  Send,
+  CornerDownRight,
+  Sparkles,
+  BarChart2,
 } from "lucide-react";
+
+interface CommentAuthor {
+  id: string | null;
+  full_name: string;
+  role: string;
+  avatar_url: string | null;
+}
 
 interface Comment {
   id: string;
   content: string;
   parent_comment_id: string | null;
   status: "PUBLISHED" | "HIDDEN" | "DELETED";
-  author: {
-    full_name: string;
-    role: string;
-  };
+  is_anonymous: boolean;
+  author: CommentAuthor;
+  reply_to_author?: CommentAuthor | null;
   created_at: string;
   replies: Comment[];
+}
+
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return "vừa xong";
+  if (diffInSeconds < 3600)
+    return `${Math.floor(diffInSeconds / 60)} phút trước`;
+  if (diffInSeconds < 86400)
+    return `${Math.floor(diffInSeconds / 3600)} giờ trước`;
+  if (diffInSeconds < 604800)
+    return `${Math.floor(diffInSeconds / 86400)} ngày trước`;
+  return date.toLocaleDateString("vi-VN");
+}
+
+function formatCompactNumber(num: number): string {
+  if (!num) return "0";
+  if (num >= 1000000)
+    return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+  return num.toString();
+}
+
+function flattenReplies(comment: Comment): Comment[] {
+  let list: Comment[] = [];
+  if (!comment.replies || comment.replies.length === 0) return list;
+  for (const child of comment.replies) {
+    list.push(child);
+    if (child.replies && child.replies.length > 0) {
+      list = list.concat(flattenReplies(child));
+    }
+  }
+  return list;
 }
 
 export default function PostDetailPage() {
@@ -40,13 +89,23 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
+
+  // Main comment form state
   const [mainComment, setMainComment] = useState("");
+  const [mainAnonymous, setMainAnonymous] = useState(false);
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   // Active comment id for replies
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
+  const [replyAnonymous, setReplyAnonymous] = useState(false);
+
+  // Real like state for this post
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
 
   const mainCommentRef = useRef<HTMLTextAreaElement>(null);
+  const viewRecordedRef = useRef(false);
 
   useEffect(() => {
     if (mainCommentRef.current) {
@@ -60,6 +119,12 @@ export default function PostDetailPage() {
   useEffect(() => {
     if (!postId) return;
     fetchPostDetail();
+
+    // Record view exactly once on mount
+    if (!viewRecordedRef.current) {
+      viewRecordedRef.current = true;
+      api.post(`/forum/posts/${postId}/view`, {}).catch(() => {});
+    }
   }, [postId]);
 
   const fetchPostDetail = async () => {
@@ -67,6 +132,8 @@ export default function PostDetailPage() {
       const res = await api.get(`/forum/posts/${postId}`);
       if (res.success) {
         setPost(res.data);
+        setIsLiked(Boolean(res.data.is_liked));
+        setLikesCount(res.data.likes_count || 0);
       }
     } catch (err: any) {
       setError(err.message || "Lỗi khi tải chi tiết bài viết");
@@ -75,38 +142,102 @@ export default function PostDetailPage() {
     }
   };
 
+  const handleToggleLike = async () => {
+    if (!user) {
+      showToast("Vui lòng đăng nhập để thích bài viết!", "info");
+      router.push("/login");
+      return;
+    }
+
+    const nextLiked = !isLiked;
+    setIsLiked(nextLiked);
+    setLikesCount((prev) => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
+
+    try {
+      const res = await api.post(`/forum/posts/${postId}/like`, {});
+      if (res.success) {
+        setIsLiked(res.data.liked);
+        setLikesCount(res.data.likes_count);
+      }
+    } catch (err: any) {
+      showToast(err.message || "Lỗi khi thích bài viết", "error");
+      fetchPostDetail();
+    }
+  };
+
   const handleCommentSubmit = async (
     e: React.FormEvent,
     parentId: string | null,
+    isAnon: boolean = false,
   ) => {
     e.preventDefault();
     const content = parentId ? replyContent : mainComment;
     if (!content.trim()) return;
 
+    setSubmittingComment(true);
     try {
       const res = await api.post(`/forum/posts/${postId}/comments`, {
-        content,
+        content: content.trim(),
         parent_comment_id: parentId,
+        is_anonymous: isAnon,
       });
       if (res.success) {
-        showToast("Gửi bình luận thành công!", "success");
+        showToast("Gửi phản hồi thành công!", "success");
         if (parentId) {
           setReplyToId(null);
           setReplyContent("");
+          setReplyAnonymous(false);
         } else {
           setMainComment("");
+          setMainAnonymous(false);
         }
-        fetchPostDetail(); // reload comments
+        fetchPostDetail();
       }
     } catch (err: any) {
-      showToast(err.message || "Lỗi khi gửi bình luận", "error");
+      showToast(err.message || "Lỗi khi gửi phản hồi", "error");
+    } finally {
+      setSubmittingComment(false);
     }
   };
 
-  const handleModeratePost = async (action: "HIDE" | "DELETE") => {
+  const handleDeleteComment = async (commentId: string) => {
     if (
       !confirm(
-        `Bạn chắc chắn muốn [${action === "HIDE" ? "Ẩn" : "Xóa"}] bài viết này?`,
+        "Bạn có chắc chắn muốn xóa bình luận này? Các phản hồi bên dưới cũng sẽ bị xóa.",
+      )
+    ) {
+      return;
+    }
+    try {
+      const res = await api.delete(`/forum/comments/${commentId}`);
+      if (res.success) {
+        showToast("Đã xóa bình luận thành công!", "success");
+        fetchPostDetail();
+      }
+    } catch (err: any) {
+      showToast(err.message || "Lỗi khi xóa bình luận", "error");
+    }
+  };
+
+  const handleDeleteMyPost = async () => {
+    if (!confirm("Bạn có chắc chắn muốn xóa bài viết này không?")) {
+      return;
+    }
+    try {
+      const res = await api.delete(`/forum/posts/${postId}`);
+      if (res.success) {
+        showToast("Đã xóa bài viết thành công!", "success");
+        router.push("/forum");
+      }
+    } catch (err: any) {
+      showToast(err.message || "Không thể xóa bài viết", "error");
+    }
+  };
+
+  const handleModeratePost = async (action: "HIDE" | "DELETE" | "UNHIDE") => {
+    if (
+      !confirm(
+        `Bạn chắc chắn muốn [${action === "HIDE" ? "Ẩn" : action === "DELETE" ? "Xóa" : "Hiện"}] bài viết này?`,
       )
     )
       return;
@@ -125,11 +256,11 @@ export default function PostDetailPage() {
 
   const handleModerateComment = async (
     commentId: string,
-    action: "HIDE" | "DELETE",
+    action: "HIDE" | "DELETE" | "UNHIDE",
   ) => {
     if (
       !confirm(
-        `Bạn chắc chắn muốn [${action === "HIDE" ? "Ẩn" : "Xóa"}] bình luận này?`,
+        `Bạn chắc chắn muốn [${action === "HIDE" ? "Ẩn" : action === "DELETE" ? "Xóa" : "Hiện"}] bình luận này?`,
       )
     )
       return;
@@ -146,10 +277,18 @@ export default function PostDetailPage() {
     }
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showToast("Đã sao chép liên kết bài viết vào bộ nhớ tạm!", "success");
+  };
+
   const countComments = (commentsList: Comment[]): number => {
-    let count = commentsList.length;
+    let count = 0;
     for (const c of commentsList) {
-      if (c.replies) {
+      if (c.status === "PUBLISHED") {
+        count += 1;
+      }
+      if (c.replies && c.replies.length > 0) {
         count += countComments(c.replies);
       }
     }
@@ -162,308 +301,616 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="text-center py-20 max-w-md mx-auto space-y-4">
-        <p className="text-red-400 font-semibold">
-          {error || "Không tìm thấy bài viết"}
-        </p>
-        <button
-          onClick={() => router.push("/forum")}
-          className="inline-flex h-9 items-center justify-center rounded-md bg-white/5 border border-white/10 px-4 text-xs font-semibold text-white"
-        >
-          Quay lại diễn đàn
-        </button>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-xl border border-outline-variant/30 text-center max-w-md shadow-xs space-y-4">
+          <p className="text-on-surface font-bold text-base">
+            {error || "Bài viết không tồn tại hoặc đã bị gỡ."}
+          </p>
+          <Link
+            href="/forum"
+            className="inline-flex items-center gap-2 px-5 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary/90 transition-colors shadow-xs"
+          >
+            <ArrowLeft className="h-4 w-4" /> Quay lại Diễn đàn
+          </Link>
+        </div>
       </div>
     );
   }
 
-  const isAdmin = user?.role === "ADMIN";
+  const isAdmin = user && user.role === "ADMIN";
+  const isPostOwner = Boolean(
+    post?.is_owner ||
+    (user &&
+      post?.author?.id &&
+      String(post.author.id).toLowerCase() === String(user.id).toLowerCase()),
+  );
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-12 space-y-8">
-      <Link
-        href="/forum"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors mb-6"
-      >
-        <span className="material-symbols-outlined text-sm">arrow_back</span>
-        Quay lại Diễn đàn
-      </Link>
+    <div className="min-h-screen bg-background text-on-surface pb-24">
+      {/* Top navigation bar */}
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-2">
+        <div className="flex items-center justify-between">
+          <Link
+            href="/forum"
+            className="inline-flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Diễn đàn</span>
+          </Link>
 
-      <article className="glass-panel p-8 rounded-2xl border border-outline-variant/30 space-y-6 shadow-sm">
-        {/* Header */}
-        <div className="space-y-4 border-b border-outline-variant/20 pb-6">
-          <div className="flex justify-between items-start gap-4">
-            <span className="inline-flex px-2.5 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
-              {post.category_name}
-            </span>
+          <span className="text-xs font-bold text-on-surface truncate max-w-[200px] sm:max-w-xs text-center">
+            Bài đăng của {post?.author?.full_name || "thành viên"}
+          </span>
 
-            {isAdmin && (
-              <div className="flex gap-3 text-xs font-semibold text-red-500 border border-red-500/20 bg-red-500/5 px-3 py-1.5 rounded-lg">
-                <span className="flex items-center gap-1 text-on-surface-variant font-bold uppercase text-[9px] mr-1">
-                  <ShieldAlert className="h-3.5 w-3.5" />
-                  Admin:
+          <button
+            onClick={handleShare}
+            className="p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant transition-colors cursor-pointer"
+            title="Chia sẻ"
+          >
+            <Share2 className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Single Continuous Card (Threads Style) */}
+      <div className="max-w-2xl mx-auto px-4 pt-2">
+        <div className="bg-white rounded-2xl border border-outline-variant/30 shadow-xs overflow-hidden">
+          {/* Top Section: Main Post */}
+          <article className="p-5 sm:p-6 space-y-4 border-b border-outline-variant/20">
+            {/* Author Header */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                {post.is_anonymous ? (
+                  <div className="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
+                    <UserX className="w-5 h-5" />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-base shadow-xs flex-shrink-0">
+                    {post.author.full_name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-bold text-on-surface">
+                      {post.author.full_name}
+                    </span>
+
+                    {post.is_anonymous ? (
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary/10 text-primary border border-primary/20 uppercase">
+                        Ẩn danh
+                      </span>
+                    ) : (
+                      <span
+                        className={`px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider ${
+                          post.author.role === "ADMIN"
+                            ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                            : post.author.role === "INSTRUCTOR"
+                              ? "bg-primary/10 text-primary border border-primary/20"
+                              : "bg-surface-container text-on-surface-variant"
+                        }`}
+                      >
+                        {post.author.role === "ADMIN"
+                          ? "Admin"
+                          : post.author.role === "INSTRUCTOR"
+                            ? "Chuyên gia"
+                            : "Thành viên"}
+                      </span>
+                    )}
+                  </div>
+
+                  <span className="text-[11px] text-on-surface-variant/60 block mt-0.5">
+                    {formatRelativeTime(post.created_at)} •{" "}
+                    {new Date(post.created_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-md bg-surface-container-low text-[11px] font-semibold text-on-surface-variant border border-outline-variant/20">
+                  {post.category_name}
                 </span>
-                <button
-                  onClick={() => handleModeratePost("HIDE")}
-                  className="hover:underline cursor-pointer"
-                >
-                  Ẩn bài
-                </button>
-                <span>|</span>
+                {post.status === "HIDDEN" && (
+                  <span className="px-2.5 py-0.5 rounded-md bg-red-500/10 text-red-500 text-[10px] font-bold border border-red-500/25">
+                    Đã ẩn
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Post Content */}
+            <div className="space-y-2">
+              <h1 className="text-lg sm:text-xl font-bold text-on-surface leading-snug">
+                {post.title}
+              </h1>
+              <div className="text-on-surface-variant text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
+                {post.content}
+              </div>
+            </div>
+
+            {/* Admin Control Bar (if Admin) */}
+            {isAdmin && (
+              <div className="flex items-center gap-3 pt-2 text-xs font-semibold text-red-500 border-t border-outline-variant/15">
+                <span className="flex items-center gap-1 font-bold uppercase text-[10px] text-on-surface-variant">
+                  <ShieldAlert className="h-3.5 w-3.5" />
+                  Kiểm duyệt:
+                </span>
+                {post.status !== "HIDDEN" ? (
+                  <button
+                    onClick={() => handleModeratePost("HIDE")}
+                    className="hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <EyeOff className="w-3.5 h-3.5" /> Ẩn bài
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleModeratePost("UNHIDE")}
+                    className="hover:underline cursor-pointer text-green-500 flex items-center gap-1"
+                  >
+                    <Eye className="w-3.5 h-3.5" /> Hiện bài
+                  </button>
+                )}
+                <span>•</span>
                 <button
                   onClick={() => handleModeratePost("DELETE")}
-                  className="hover:underline cursor-pointer"
+                  className="hover:underline cursor-pointer flex items-center gap-1"
                 >
-                  Xóa bài
+                  <Trash2 className="w-3.5 h-3.5" /> Xóa bài
                 </button>
               </div>
             )}
-          </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-on-surface leading-tight leading-snug">
-            {post.title}
-          </h1>
+            {/* Bottom Action Bar (Threads / X Style) */}
+            <div className="pt-3 flex items-center justify-between text-on-surface-variant/70 border-t border-outline-variant/15 text-xs">
+              <div className="flex items-center gap-6">
+                {/* Replies count */}
+                <span className="flex items-center gap-1.5 font-semibold text-on-surface">
+                  <MessageCircle className="w-4 h-4 text-primary" />
+                  <span>{countComments(post.comments)} phản hồi</span>
+                </span>
 
-          <div className="flex items-center gap-3 text-xs text-on-surface-variant mt-2">
-            <span>
-              Đăng bởi:{" "}
-              <strong className="text-on-surface font-semibold">
-                {post.author.full_name}
-              </strong>
-            </span>
-            <span>•</span>
-            <span>{new Date(post.created_at).toLocaleDateString("vi-VN")}</span>
-          </div>
-        </div>
+                {/* Likes button */}
+                <button
+                  onClick={handleToggleLike}
+                  className={`flex items-center gap-1.5 font-semibold transition-all cursor-pointer ${
+                    isLiked ? "text-red-500" : "hover:text-red-500"
+                  }`}
+                  title={isLiked ? "Bỏ thích" : "Thích"}
+                >
+                  <Heart
+                    className={`w-4 h-4 transition-transform active:scale-125 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+                  />
+                  <span className={isLiked ? "font-bold text-red-500" : ""}>
+                    {formatCompactNumber(likesCount)}
+                  </span>
+                </button>
 
-        {/* Body */}
-        <div className="text-on-surface-variant text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
-          {post.content}
-        </div>
-      </article>
+                {/* Views count (X-style) */}
+                <div
+                  className="flex items-center gap-1.5 text-on-surface-variant/60 select-none"
+                  title={`${post.views_count || 0} lượt xem`}
+                >
+                  <BarChart2 className="w-4 h-4" />
+                  <span>{formatCompactNumber(post.views_count || 0)}</span>
+                </div>
 
-      {/* Comments block */}
-      <div className="space-y-8">
-        <h3 className="text-lg font-bold text-on-surface flex items-center gap-2 border-t border-outline-variant/30 pt-8">
-          <MessageSquare className="h-5 w-5 text-primary" />Ý kiến thảo luận (
-          {countComments(post.comments)})
-        </h3>
+                {/* Share */}
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"
+                  title="Sao chép liên kết"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
 
-        {/* Main Comment Input Form (only if logged in) */}
-        {user ? (
-          <form
-            onSubmit={(e) => handleCommentSubmit(e, null)}
-            className="space-y-3"
-          >
-            <textarea
-              ref={mainCommentRef}
-              className="w-full rounded-2xl border border-outline-variant/30 bg-white px-4 py-3 text-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-inner resize-none overflow-hidden"
-              rows={3}
-              required
-              placeholder="Chia sẻ suy nghĩ, ý kiến đóng góp khoa học của bạn..."
-              value={mainComment}
-              onChange={(e) => setMainComment(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-primary text-white font-bold rounded-full hover:bg-primary/90 transition-colors shadow-sm text-sm cursor-pointer"
-            >
-              Bình luận
-            </button>
-          </form>
-        ) : (
-          <div className="rounded-2xl border border-outline-variant/30 bg-surface-container/50 p-4 text-center text-sm text-on-surface-variant">
-            Vui lòng{" "}
-            <Link
-              href="/login"
-              className="font-semibold text-primary hover:underline"
-            >
-              Đăng nhập
-            </Link>{" "}
-            để đóng góp ý kiến thảo luận.
-          </div>
-        )}
+                {/* Delete Post for Author */}
+                {isPostOwner && !isAdmin && (
+                  <button
+                    onClick={handleDeleteMyPost}
+                    className="flex items-center gap-1.5 text-red-500 hover:text-red-600 transition-colors cursor-pointer font-semibold"
+                    title="Xóa bài viết của bạn"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Xóa bài</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </article>
 
-        {/* Comments List tree */}
-        <div className="space-y-6">
-          {post.comments.length === 0 ? (
-            <p className="text-sm text-on-surface-variant py-4">
-              Chưa có ý kiến phản hồi nào.
-            </p>
+          {/* Middle Section: Integrated Reply Box */}
+          {user ? (
+            <div className="p-4 sm:p-5 border-b border-outline-variant/20 bg-surface-container-lowest/30">
+              <form
+                onSubmit={(e) => handleCommentSubmit(e, null, mainAnonymous)}
+                className="flex gap-3"
+              >
+                <div className="flex-shrink-0">
+                  {mainAnonymous ? (
+                    <div className="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs">
+                      <UserX className="w-4 h-4" />
+                    </div>
+                  ) : (
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs">
+                      {user.full_name
+                        ? user.full_name.charAt(0).toUpperCase()
+                        : "U"}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-on-surface">
+                      {mainAnonymous ? (
+                        <span className="text-primary flex items-center gap-1">
+                          <UserX className="w-3 h-3" />
+                          Người dùng ẩn danh (Bạn)
+                        </span>
+                      ) : (
+                        user.full_name
+                      )}
+                    </span>
+
+                    {/* Anonymous Mode Button */}
+                    <button
+                      type="button"
+                      onClick={() => setMainAnonymous(!mainAnonymous)}
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                        mainAnonymous
+                          ? "bg-primary text-white shadow-xs"
+                          : "bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-outline-variant/30"
+                      }`}
+                    >
+                      <UserX className="w-3 h-3" />
+                      {mainAnonymous ? "Ẩn danh" : "Bình luận ẩn danh"}
+                    </button>
+                  </div>
+
+                  <textarea
+                    ref={mainCommentRef}
+                    rows={2}
+                    value={mainComment}
+                    onChange={(e) => setMainComment(e.target.value)}
+                    placeholder={`Phản hồi bài viết của ${post.author.full_name}...`}
+                    required
+                    className="w-full text-xs sm:text-sm bg-transparent border-0 resize-none focus:outline-none placeholder:text-on-surface-variant/40 text-on-surface"
+                  />
+
+                  <div className="flex justify-end pt-1">
+                    <button
+                      type="submit"
+                      disabled={submittingComment || !mainComment.trim()}
+                      className="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
+                    >
+                      <Send className="w-3 h-3" />
+                      {submittingComment ? "Đang gửi..." : "Gửi phản hồi"}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
           ) : (
-            post.comments.map((comment: Comment) => (
-              <CommentNode
-                key={comment.id}
-                comment={comment}
-                user={user}
-                isAdmin={isAdmin}
-                replyToId={replyToId}
-                replyContent={replyContent}
-                setReplyToId={setReplyToId}
-                setReplyContent={setReplyContent}
-                handleCommentSubmit={handleCommentSubmit}
-                handleModerateComment={handleModerateComment}
-              />
-            ))
+            <div className="p-4 text-center border-b border-outline-variant/20 bg-surface-container-lowest flex items-center justify-between gap-4 flex-wrap">
+              <span className="text-xs text-on-surface-variant font-medium">
+                Vui lòng đăng nhập để tham gia thảo luận cùng mọi người.
+              </span>
+              <Link
+                href="/login"
+                className="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-xs"
+              >
+                Đăng nhập
+              </Link>
+            </div>
           )}
+
+          {/* Bottom Section: Comments Chain inside the Single Card */}
+          <div className="divide-y divide-outline-variant/15">
+            {post.comments.length === 0 ? (
+              <div className="text-center py-12 px-4 space-y-1">
+                <MessageCircle className="w-7 h-7 text-on-surface-variant/40 mx-auto" />
+                <p className="text-xs font-bold text-on-surface">
+                  Chưa có bình luận nào
+                </p>
+                <p className="text-[11px] text-on-surface-variant/60">
+                  Hãy mở đầu cuộc trò chuyện!
+                </p>
+              </div>
+            ) : (
+              post.comments.map((rootComment: Comment) => {
+                const allReplies = flattenReplies(rootComment);
+
+                return (
+                  <div
+                    key={rootComment.id}
+                    className="p-4 sm:p-5 transition-colors hover:bg-slate-50/30"
+                  >
+                    {/* Top Level / Root Comment */}
+                    <CommentItem
+                      comment={rootComment}
+                      user={user}
+                      isAdmin={Boolean(isAdmin)}
+                      isReply={false}
+                      replyToId={replyToId}
+                      replyContent={replyContent}
+                      replyAnonymous={replyAnonymous}
+                      setReplyToId={setReplyToId}
+                      setReplyContent={setReplyContent}
+                      setReplyAnonymous={setReplyAnonymous}
+                      handleCommentSubmit={handleCommentSubmit}
+                      handleDeleteComment={handleDeleteComment}
+                      handleModerateComment={handleModerateComment}
+                    />
+
+                    {/* TikTok-Style 1-Level Indented Replies Column */}
+                    {allReplies.length > 0 && (
+                      <div className="mt-3 ml-6 sm:ml-10 border-l-2 border-outline-variant/30 pl-3 sm:pl-4 space-y-3">
+                        {allReplies.map((reply) => (
+                          <CommentItem
+                            key={reply.id}
+                            comment={reply}
+                            user={user}
+                            isAdmin={Boolean(isAdmin)}
+                            isReply={true}
+                            replyToId={replyToId}
+                            replyContent={replyContent}
+                            replyAnonymous={replyAnonymous}
+                            setReplyToId={setReplyToId}
+                            setReplyContent={setReplyContent}
+                            setReplyAnonymous={setReplyAnonymous}
+                            handleCommentSubmit={handleCommentSubmit}
+                            handleDeleteComment={handleDeleteComment}
+                            handleModerateComment={handleModerateComment}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-interface CommentNodeProps {
+interface CommentItemProps {
   comment: Comment;
   isReply?: boolean;
   user: any;
   isAdmin: boolean;
   replyToId: string | null;
   replyContent: string;
+  replyAnonymous: boolean;
   setReplyToId: (id: string | null) => void;
   setReplyContent: (content: string) => void;
-  handleCommentSubmit: (e: React.FormEvent, parentId: string | null) => void;
-  handleModerateComment: (commentId: string, action: "HIDE" | "DELETE") => void;
+  setReplyAnonymous: (anon: boolean) => void;
+  handleCommentSubmit: (
+    e: React.FormEvent,
+    parentId: string | null,
+    isAnon: boolean,
+  ) => void;
+  handleDeleteComment: (commentId: string) => void;
+  handleModerateComment: (
+    commentId: string,
+    action: "HIDE" | "DELETE" | "UNHIDE",
+  ) => void;
 }
 
-const CommentNode: React.FC<CommentNodeProps> = ({
+const CommentItem: React.FC<CommentItemProps> = ({
   comment,
   isReply = false,
   user,
   isAdmin,
   replyToId,
   replyContent,
+  replyAnonymous,
   setReplyToId,
   setReplyContent,
+  setReplyAnonymous,
   handleCommentSubmit,
+  handleDeleteComment,
   handleModerateComment,
 }) => {
-  const commentDate = new Date(comment.created_at);
   const showReplyForm = replyToId === comment.id;
+  const isOwner =
+    user && comment.author.id && String(comment.author.id) === String(user.id);
 
   return (
-    <div className="space-y-4">
-      <div
-        className={`bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 space-y-3 ${isReply ? "ml-8 sm:ml-12 border-l-2 border-l-primary shadow-sm" : "shadow-sm"}`}
-      >
-        <div className="flex justify-between items-start text-xs text-on-surface-variant border-b border-outline-variant/10 pb-2">
-          <div className="flex items-center gap-2">
-            <strong className="text-on-surface font-semibold">
-              {comment.author.full_name}
-            </strong>
-            <span className="text-[10px] uppercase font-bold text-primary">
-              (
-              {comment.author.role === "ADMIN"
-                ? "Admin"
-                : comment.author.role === "INSTRUCTOR"
-                  ? "Giảng viên"
-                  : "Học viên"}
-              )
-            </span>
-            <span>•</span>
-            <span>
-              {commentDate.toLocaleDateString("vi-VN")}{" "}
-              {commentDate.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+    <div
+      className={`space-y-2 ${
+        comment.status === "HIDDEN" ? "opacity-60 grayscale-[0.2]" : ""
+      }`}
+    >
+      {/* Comment Author Header */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2.5">
+          {comment.is_anonymous ? (
+            <div className="w-8 h-8 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
+              <UserX className="w-4 h-4" />
+            </div>
+          ) : (
+            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs flex-shrink-0">
+              {comment.author.full_name.charAt(0).toUpperCase()}
+            </div>
+          )}
+
+          <div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-xs font-bold text-on-surface">
+                {comment.author.full_name}
+              </span>
+
+              {/* TikTok Style Target Author Indicator */}
+              {comment.reply_to_author && isReply && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-on-surface-variant/70 font-medium">
+                  <span className="text-on-surface-variant/40">▸</span>
+                  <span className="text-primary font-semibold">
+                    {comment.reply_to_author.full_name}
+                  </span>
+                </span>
+              )}
+
+              {comment.is_anonymous ? (
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-primary/10 text-primary border border-primary/20 uppercase">
+                  Ẩn danh
+                </span>
+              ) : (
+                <span
+                  className={`px-1.5 py-0.2 rounded text-[8px] font-bold uppercase tracking-wider ${
+                    comment.author.role === "ADMIN"
+                      ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                      : comment.author.role === "INSTRUCTOR"
+                        ? "bg-primary/10 text-primary border border-primary/20"
+                        : "bg-surface-container text-on-surface-variant"
+                  }`}
+                >
+                  {comment.author.role === "ADMIN"
+                    ? "Admin"
+                    : comment.author.role === "INSTRUCTOR"
+                      ? "Chuyên gia"
+                      : "Thành viên"}
+                </span>
+              )}
+            </div>
+
+            <span className="text-[10px] text-on-surface-variant/60 block">
+              {formatRelativeTime(comment.created_at)}
             </span>
           </div>
-          {comment.status !== "PUBLISHED" && (
-            <span className="text-[10px] text-red-500 font-bold border border-red-500/20 bg-red-500/10 px-1.5 py-0.5 rounded uppercase">
-              {comment.status}
-            </span>
-          )}
         </div>
 
-        <p className="text-on-surface text-sm leading-relaxed">
-          {comment.content}
-        </p>
+        {comment.status !== "PUBLISHED" && (
+          <span className="text-[9px] text-red-500 font-bold border border-red-500/20 bg-red-500/10 px-1.5 py-0.5 rounded uppercase">
+            {comment.status}
+          </span>
+        )}
+      </div>
 
-        <div className="flex gap-4 text-xs font-semibold">
+      {/* Comment Content */}
+      <p className="text-xs sm:text-sm text-on-surface leading-relaxed pl-1">
+        {comment.content}
+      </p>
+
+      {/* Comment Actions Toolbar */}
+      <div className="flex items-center justify-between pt-1 text-xs text-on-surface-variant/70 border-t border-outline-variant/15">
+        <div className="flex items-center gap-4">
           {user && (
             <button
               onClick={() => {
                 setReplyToId(showReplyForm ? null : comment.id);
                 setReplyContent("");
+                setReplyAnonymous(false);
               }}
-              className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+              className="flex items-center gap-1 font-semibold hover:text-primary transition-colors cursor-pointer text-[11px]"
             >
-              <Reply className="h-3.5 w-3.5" />
-              Trả lời
+              <Reply className="w-3.5 h-3.5" />
+              <span>Trả lời</span>
             </button>
           )}
-          {isAdmin && (
-            <div className="flex gap-3 text-red-400">
+
+          {/* Self Delete Button (for Owner) */}
+          {isOwner && !isAdmin && (
+            <button
+              onClick={() => handleDeleteComment(comment.id)}
+              className="flex items-center gap-1 font-semibold text-red-400 hover:text-red-500 transition-colors cursor-pointer text-[11px]"
+              title="Xóa bình luận của bạn"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Xóa</span>
+            </button>
+          )}
+        </div>
+
+        {/* Admin Moderation Actions */}
+        {isAdmin && (
+          <div className="flex items-center gap-3 text-[11px] font-semibold text-red-400">
+            {comment.status !== "HIDDEN" ? (
               <button
                 onClick={() => handleModerateComment(comment.id, "HIDE")}
                 className="flex items-center gap-1 hover:underline cursor-pointer"
               >
-                <EyeOff className="h-3.5 w-3.5" />
-                Ẩn
+                <EyeOff className="w-3.5 h-3.5" />
+                <span>Ẩn</span>
               </button>
+            ) : (
               <button
-                onClick={() => handleModerateComment(comment.id, "DELETE")}
-                className="flex items-center gap-1 hover:underline cursor-pointer"
+                onClick={() => handleModerateComment(comment.id, "UNHIDE")}
+                className="flex items-center gap-1 hover:underline cursor-pointer text-green-500"
               >
-                <Trash2 className="h-3.5 w-3.5" />
-                Xóa
+                <Eye className="w-3.5 h-3.5" />
+                <span>Hiện</span>
               </button>
-            </div>
-          )}
-        </div>
-
-        {/* Nested reply input */}
-        {showReplyForm && (
-          <form
-            onSubmit={(e) => handleCommentSubmit(e, comment.id)}
-            className="space-y-2 pt-2 border-t border-outline-variant/10"
-          >
-            <textarea
-              className="w-full rounded-2xl border border-outline-variant/30 bg-surface px-4 py-2 text-xs text-on-surface placeholder:text-outline focus:border-primary focus:outline-none resize-none overflow-hidden"
-              rows={2}
-              required
-              placeholder="Viết phản hồi thảo luận y khoa..."
-              value={replyContent}
-              onChange={(e) => {
-                setReplyContent(e.target.value);
-                e.target.style.height = "auto";
-                e.target.style.height = `${e.target.scrollHeight}px`;
-              }}
-            />
-            <div className="flex gap-2 justify-end">
-              <button
-                type="button"
-                onClick={() => setReplyToId(null)}
-                className="px-4 py-2 bg-surface-container text-on-surface-variant font-semibold rounded-full hover:bg-surface-container-high transition-colors text-xs cursor-pointer"
-              >
-                Hủy
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-primary text-white font-bold rounded-full hover:bg-primary/90 transition-colors shadow-sm text-xs cursor-pointer"
-              >
-                Phản hồi
-              </button>
-            </div>
-          </form>
+            )}
+            <button
+              onClick={() => handleDeleteComment(comment.id)}
+              className="flex items-center gap-1 hover:underline cursor-pointer text-red-500"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Xóa</span>
+            </button>
+          </div>
         )}
       </div>
 
-      {comment.replies &&
-        comment.replies.map((reply) => (
-          <CommentNode
-            key={reply.id}
-            comment={reply}
-            isReply={true}
-            user={user}
-            isAdmin={isAdmin}
-            replyToId={replyToId}
-            replyContent={replyContent}
-            setReplyToId={setReplyToId}
-            setReplyContent={setReplyContent}
-            handleCommentSubmit={handleCommentSubmit}
-            handleModerateComment={handleModerateComment}
+      {/* Nested Reply Form */}
+      {showReplyForm && (
+        <form
+          onSubmit={(e) => handleCommentSubmit(e, comment.id, replyAnonymous)}
+          className="pt-2 space-y-2 border-t border-outline-variant/15"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-on-surface-variant flex items-center gap-1">
+              <CornerDownRight className="w-3.5 h-3.5 text-primary" />
+              Trả lời {comment.author.full_name}:
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setReplyAnonymous(!replyAnonymous)}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                replyAnonymous
+                  ? "bg-primary text-white shadow-xs"
+                  : "bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-outline-variant/30"
+              }`}
+            >
+              <UserX className="w-3 h-3" />
+              {replyAnonymous ? "Ẩn danh" : "Trả lời ẩn danh"}
+            </button>
+          </div>
+
+          <textarea
+            rows={2}
+            required
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            placeholder="Viết phản hồi của bạn..."
+            className="w-full text-xs bg-surface-container-low/80 p-2.5 rounded-lg border border-outline-variant/30 focus:outline-none focus:border-primary text-on-surface resize-none"
           />
-        ))}
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setReplyToId(null)}
+              className="px-3 py-1 text-xs font-semibold text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={!replyContent.trim()}
+              className="px-4 py-1 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-all shadow-xs disabled:opacity-40 cursor-pointer"
+            >
+              Gửi
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 };

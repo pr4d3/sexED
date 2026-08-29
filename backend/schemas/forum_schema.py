@@ -31,6 +31,11 @@ class PostListData(BaseModel):
     short_content: str
     author: PostAuthorInfo
     comment_count: int
+    views_count: int = 0
+    likes_count: int = 0
+    is_liked: bool = False
+    is_anonymous: bool = False
+    is_owner: bool = False
     status: str
     created_at: datetime
 
@@ -49,8 +54,10 @@ class CommentNode(BaseModel):
     parent_comment_id: Optional[UUID] = None
     content: str
     status: str
+    is_anonymous: bool = False
     created_at: datetime
     author: CommentAuthorInfo
+    reply_to_author: Optional[CommentAuthorInfo] = None
     replies: list['CommentNode'] = []
 
 class PostDetailData(BaseModel):
@@ -60,6 +67,11 @@ class PostDetailData(BaseModel):
     title: str
     content: str
     status: str
+    views_count: int = 0
+    likes_count: int = 0
+    is_liked: bool = False
+    is_anonymous: bool = False
+    is_owner: bool = False
     created_at: datetime
     author: PostAuthorInfo
     comments: list[CommentNode]
@@ -72,11 +84,13 @@ class PostCreate(BaseModel):
     category_id: int
     title: str = Field(..., max_length=255, min_length=5)
     content: str = Field(..., min_length=10)
+    is_anonymous: bool = False
 
 class PostCreateResponseData(BaseModel):
     post_id: UUID
     title: str
     status: str
+    is_anonymous: bool = False
     created_at: datetime
 
 class PostCreateResponse(BaseModel):
@@ -87,38 +101,38 @@ class PostCreateResponse(BaseModel):
 class CommentCreate(BaseModel):
     content: str = Field(..., min_length=2)
     parent_comment_id: Optional[UUID] = None
+    is_anonymous: bool = False
 
 class CommentCreateResponseData(BaseModel):
     comment_id: UUID
     post_id: UUID
     content: str
+    parent_comment_id: Optional[UUID] = None
+    status: str
+    is_anonymous: bool = False
     created_at: datetime
-    author: PostAuthorInfo
 
 class CommentCreateResponse(BaseModel):
     success: bool
     message: str
     data: CommentCreateResponseData
 
-class ModerationAction(BaseModel):
-    action: str = Field(..., pattern="^(HIDE|DELETE|PUBLISH)$")
+class PostModerateAction(BaseModel):
+    action: str = Field(..., pattern="^(HIDE|DELETE|UNHIDE)$")
 
-class PostModerationResponseData(BaseModel):
+class CommentModerateAction(BaseModel):
+    action: str = Field(..., pattern="^(HIDE|DELETE|UNHIDE)$")
+
+class ModerateResponse(BaseModel):
+    success: bool
+    message: str
+
+class LikeToggleResponseData(BaseModel):
     post_id: UUID
-    status: str
-    moderated_by: UUID
+    liked: bool
+    likes_count: int
 
-class PostModerationResponse(BaseModel):
+class LikeToggleResponse(BaseModel):
     success: bool
     message: str
-    data: PostModerationResponseData
-
-class CommentModerationResponseData(BaseModel):
-    comment_id: UUID
-    status: str
-    moderated_by: UUID
-
-class CommentModerationResponse(BaseModel):
-    success: bool
-    message: str
-    data: CommentModerationResponseData
+    data: LikeToggleResponseData

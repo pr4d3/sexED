@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, func
-from sqlalchemy.orm import selectinload, joinedload
-from models.forum import ForumCategory, ForumPost, ForumComment
+from sqlalchemy import select, and_, or_, func, update, delete
+from sqlalchemy.orm import selectinload, joinedload, aliased
+from models.forum import ForumCategory, ForumPost, ForumComment, ForumPostLike
 from models.user import User
 from uuid import UUID
 
@@ -26,6 +26,8 @@ async def get_posts(db: AsyncSession, category_id: int = None, search: str = Non
     
     if not include_hidden_deleted:
         query = query.where(ForumPost.status == "PUBLISHED")
+    else:
+        query = query.where(ForumPost.status != "DELETED")
         
     if category_id:
         query = query.where(ForumPost.category_id == category_id)
@@ -42,9 +44,10 @@ async def get_posts(db: AsyncSession, category_id: int = None, search: str = Non
     return result.scalars().all()
 
 async def get_post_comment_count(db: AsyncSession, post_id: UUID, include_hidden_deleted: bool = False) -> int:
-    query = select(func.count(ForumComment.id)).where(ForumComment.post_id == post_id)
-    if not include_hidden_deleted:
-        query = query.where(ForumComment.status == "PUBLISHED")
+    query = select(func.count(ForumComment.id)).where(
+        ForumComment.post_id == post_id,
+        ForumComment.status != "DELETED"
+    )
     result = await db.execute(query)
     return result.scalar() or 0
 
@@ -71,6 +74,68 @@ async def update_post(db: AsyncSession, post: ForumPost) -> ForumPost:
     await db.refresh(post)
     return post
 
+async def increment_post_views(db: AsyncSession, post_id: UUID) -> None:
+    stmt = (
+        update(ForumPost)
+        .where(ForumPost.id == post_id)
+        .values(views_count=ForumPost.views_count + 1)
+    )
+    await db.execute(stmt)
+    await db.commit()
+
+async def get_user_liked_post_ids(db: AsyncSession, user_id: UUID, post_ids: list[UUID]) -> set[UUID]:
+    if not post_ids or not user_id:
+        return set()
+    stmt = select(ForumPostLike.post_id).where(
+        ForumPostLike.user_id == user_id,
+        ForumPostLike.post_id.in_(post_ids)
+    )
+    result = await db.execute(stmt)
+    return set(result.scalars().all())
+
+async def is_post_liked_by_user(db: AsyncSession, post_id: UUID, user_id: UUID) -> bool:
+    if not user_id:
+        return False
+    stmt = select(func.count(ForumPostLike.id)).where(
+        ForumPostLike.post_id == post_id,
+        ForumPostLike.user_id == user_id
+    )
+    result = await db.execute(stmt)
+    return (result.scalar() or 0) > 0
+
+async def toggle_post_like(db: AsyncSession, post_id: UUID, user_id: UUID) -> tuple[bool, int]:
+    stmt = select(ForumPostLike).where(
+        ForumPostLike.post_id == post_id,
+        ForumPostLike.user_id == user_id
+    )
+    res = await db.execute(stmt)
+    existing_like = res.scalars().first()
+    
+    if existing_like:
+        await db.delete(existing_like)
+        await db.execute(
+            update(ForumPost)
+            .where(ForumPost.id == post_id)
+            .values(likes_count=func.greatest(0, ForumPost.likes_count - 1))
+        )
+        liked = False
+    else:
+        new_like = ForumPostLike(post_id=post_id, user_id=user_id)
+        db.add(new_like)
+        await db.execute(
+            update(ForumPost)
+            .where(ForumPost.id == post_id)
+            .values(likes_count=ForumPost.likes_count + 1)
+        )
+        liked = True
+        
+    await db.commit()
+    
+    count_stmt = select(ForumPost.likes_count).where(ForumPost.id == post_id)
+    count_res = await db.execute(count_stmt)
+    current_likes = count_res.scalar() or 0
+    return liked, current_likes
+
 # Comments
 async def get_post_comments(db: AsyncSession, post_id: UUID, include_hidden_deleted: bool = False) -> list[ForumComment]:
     query = (
@@ -84,6 +149,8 @@ async def get_post_comments(db: AsyncSession, post_id: UUID, include_hidden_dele
     )
     if not include_hidden_deleted:
         query = query.where(ForumComment.status == "PUBLISHED")
+    else:
+        query = query.where(ForumComment.status != "DELETED")
         
     result = await db.execute(query)
     return result.scalars().all()
@@ -102,3 +169,28 @@ async def update_comment(db: AsyncSession, comment: ForumComment) -> ForumCommen
     await db.commit()
     await db.refresh(comment)
     return comment
+
+async def get_descendant_comment_ids(db: AsyncSession, comment_id: UUID) -> list[UUID]:
+    comment_alias = aliased(ForumComment)
+    cte = (
+        select(ForumComment.id)
+        .where(ForumComment.id == comment_id)
+        .cte(name="comment_descendants", recursive=True)
+    )
+    cte = cte.union_all(
+        select(comment_alias.id)
+        .where(comment_alias.parent_comment_id == cte.c.id)
+    )
+    result = await db.execute(select(cte.c.id))
+    return list(result.scalars().all())
+
+async def update_comments_status(db: AsyncSession, comment_ids: list[UUID], status: str, moderated_by: UUID) -> None:
+    if not comment_ids:
+        return
+    stmt = (
+        update(ForumComment)
+        .where(ForumComment.id.in_(comment_ids))
+        .values(status=status, moderated_by=moderated_by)
+    )
+    await db.execute(stmt)
+    await db.commit()

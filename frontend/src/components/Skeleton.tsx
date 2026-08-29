@@ -29,26 +29,38 @@ export const CourseCardSkeleton = () => {
 
 export const ForumPostSkeleton = () => {
     return (
-        <div className="bg-white rounded-3xl p-6 border border-outline-variant/20 soft-shadow animate-pulse flex flex-col justify-between space-y-5">
-            <div>
-                {/* Author Info Header */}
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-surface-container-high" />
-                    <div className="space-y-2">
-                        <div className="w-28 h-4 bg-surface-container-high rounded-lg" />
-                        <div className="w-20 h-3 bg-surface-container rounded-lg" />
+        <div className="p-4 sm:p-5 animate-pulse">
+            <div className="flex items-start gap-3">
+                {/* Avatar Placeholder */}
+                <div className="w-9 h-9 rounded-lg bg-surface-container-high flex-shrink-0" />
+
+                {/* Content Column */}
+                <div className="flex-1 min-w-0 space-y-2.5">
+                    {/* Author header row */}
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <div className="w-28 h-3.5 bg-surface-container-high rounded-md" />
+                            <div className="w-16 h-3 bg-surface-container rounded-md" />
+                        </div>
+                        <div className="w-14 h-4 bg-surface-container rounded-md" />
+                    </div>
+
+                    {/* Title */}
+                    <div className="w-3/4 h-4.5 bg-surface-container-high rounded-md" />
+
+                    {/* Content snippet */}
+                    <div className="space-y-1.5 pt-0.5">
+                        <div className="w-full h-3.5 bg-surface-container rounded-md" />
+                        <div className="w-4/5 h-3.5 bg-surface-container rounded-md" />
+                    </div>
+
+                    {/* Bottom Action Bar */}
+                    <div className="flex items-center gap-6 pt-2">
+                        <div className="w-14 h-3 bg-surface-container rounded-md" />
+                        <div className="w-10 h-3 bg-surface-container rounded-md" />
+                        <div className="w-10 h-3 bg-surface-container rounded-md" />
                     </div>
                 </div>
-                {/* Title and Content Placeholders */}
-                <div className="w-full h-5 bg-surface-container-high rounded-lg mb-3" />
-                <div className="w-5/6 h-4 bg-surface-container rounded-lg mb-2" />
-                <div className="w-2/3 h-4 bg-surface-container rounded-lg" />
-            </div>
-            
-            {/* Card Footer Placeholders */}
-            <div className="flex justify-between items-center pt-4 border-t border-surface-container">
-                <div className="w-16 h-4 bg-surface-container rounded"></div>
-                <div className="w-12 h-4 bg-surface-container-high rounded"></div>
             </div>
         </div>
     );
@@ -88,37 +100,101 @@ export const CourseIntroSkeleton = () => {
 
 export const ForumPostDetailSkeleton = () => {
     return (
-        <div className="container mx-auto max-w-4xl px-4 md:px-8 py-12 space-y-8 animate-pulse">
-            {/* Main Post Card */}
-            <div className="bg-white p-8 rounded-3xl border border-outline-variant/20 soft-shadow space-y-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-surface-container-high" />
-                    <div className="space-y-2">
-                        <div className="w-32 h-4 bg-surface-container-high rounded-lg" />
-                        <div className="w-24 h-3 bg-surface-container rounded-lg" />
-                    </div>
-                </div>
-                <div className="w-3/4 h-8 bg-surface-container-high rounded-xl" />
-                <div className="space-y-3">
-                    <div className="w-full h-4 bg-surface-container rounded-lg" />
-                    <div className="w-full h-4 bg-surface-container rounded-lg" />
-                    <div className="w-4/5 h-4 bg-surface-container rounded-lg" />
+        <div className="min-h-screen bg-background text-on-surface pb-24 animate-pulse">
+            {/* Top Navigation Bar */}
+            <div className="max-w-2xl mx-auto px-4 pt-6 pb-2">
+                <div className="flex items-center justify-between">
+                    <div className="w-20 h-4 bg-surface-container-high rounded-md" />
+                    <div className="w-36 h-4 bg-surface-container-high rounded-md" />
+                    <div className="w-7 h-7 bg-surface-container rounded-lg" />
                 </div>
             </div>
-            
-            {/* Comments Section */}
-            <div className="space-y-4">
-                <div className="w-28 h-6 bg-surface-container-high rounded-lg" />
-                <div className="space-y-4">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="p-6 bg-white/40 rounded-2xl border border-outline-variant/20 space-y-3">
+
+            {/* Main Single Continuous Card */}
+            <div className="max-w-2xl mx-auto px-4 pt-2">
+                <div className="bg-white rounded-2xl border border-outline-variant/30 shadow-xs overflow-hidden">
+                    {/* Top Section: Main Post */}
+                    <div className="p-5 sm:p-6 space-y-4 border-b border-outline-variant/20">
+                        {/* Author row */}
+                        <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-surface-container-high" />
-                                <div className="w-24 h-4 bg-surface-container-high rounded-lg" />
+                                <div className="w-10 h-10 rounded-lg bg-surface-container-high flex-shrink-0" />
+                                <div className="space-y-1.5">
+                                    <div className="w-32 h-4 bg-surface-container-high rounded-md" />
+                                    <div className="w-24 h-3 bg-surface-container rounded-md" />
+                                </div>
                             </div>
-                            <div className="w-5/6 h-4 bg-surface-container rounded-lg" />
+                            <div className="w-16 h-5 bg-surface-container rounded-md" />
                         </div>
-                    ))}
+
+                        {/* Title */}
+                        <div className="w-3/4 h-6 bg-surface-container-high rounded-lg" />
+
+                        {/* Content */}
+                        <div className="space-y-2">
+                            <div className="w-full h-4 bg-surface-container rounded-md" />
+                            <div className="w-full h-4 bg-surface-container rounded-md" />
+                            <div className="w-2/3 h-4 bg-surface-container rounded-md" />
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-6 pt-3 border-t border-outline-variant/15">
+                            <div className="w-16 h-3.5 bg-surface-container rounded-md" />
+                            <div className="w-12 h-3.5 bg-surface-container rounded-md" />
+                            <div className="w-12 h-3.5 bg-surface-container rounded-md" />
+                        </div>
+                    </div>
+
+                    {/* Middle Section: Reply Box Skeleton */}
+                    <div className="p-4 sm:p-5 border-b border-outline-variant/20 bg-surface-container-lowest/30 flex gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-surface-container-high flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                            <div className="flex justify-between">
+                                <div className="w-24 h-3 bg-surface-container-high rounded-md" />
+                                <div className="w-20 h-5 bg-surface-container rounded-lg" />
+                            </div>
+                            <div className="w-full h-10 bg-surface-container rounded-lg" />
+                        </div>
+                    </div>
+
+                    {/* Bottom Section: Comments Chain */}
+                    <div className="divide-y divide-outline-variant/15">
+                        {/* Root comment 1 */}
+                        <div className="p-4 sm:p-5 space-y-2">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-lg bg-surface-container-high flex-shrink-0" />
+                                <div className="space-y-1">
+                                    <div className="w-28 h-3.5 bg-surface-container-high rounded-md" />
+                                    <div className="w-16 h-2.5 bg-surface-container rounded-md" />
+                                </div>
+                            </div>
+                            <div className="w-5/6 h-3.5 bg-surface-container rounded-md pl-1" />
+                            
+                            {/* Nested reply */}
+                            <div className="mt-3 ml-6 sm:ml-10 border-l-2 border-outline-variant/30 pl-3 sm:pl-4 space-y-2">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-7 h-7 rounded-lg bg-surface-container-high flex-shrink-0" />
+                                    <div className="space-y-1">
+                                        <div className="w-32 h-3.5 bg-surface-container-high rounded-md" />
+                                        <div className="w-14 h-2.5 bg-surface-container rounded-md" />
+                                    </div>
+                                </div>
+                                <div className="w-4/5 h-3.5 bg-surface-container rounded-md pl-1" />
+                            </div>
+                        </div>
+
+                        {/* Root comment 2 */}
+                        <div className="p-4 sm:p-5 space-y-2">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-lg bg-surface-container-high flex-shrink-0" />
+                                <div className="space-y-1">
+                                    <div className="w-24 h-3.5 bg-surface-container-high rounded-md" />
+                                    <div className="w-16 h-2.5 bg-surface-container rounded-md" />
+                                </div>
+                            </div>
+                            <div className="w-3/4 h-3.5 bg-surface-container rounded-md pl-1" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

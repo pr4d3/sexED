@@ -38,6 +38,10 @@ export default function Footer() {
                     <Link className="text-on-surface-variant hover:text-primary transition-colors text-xs w-fit" href="/courses">
                         Danh sách khóa học
                     </Link>
+                    <Link className="text-on-surface-variant hover:text-primary transition-colors text-xs w-fit flex items-center gap-1.5" href="/game">
+                        <span>Phòng Chơi AI Roleplay</span>
+                        <span className="px-1 py-0.2 rounded bg-primary/10 text-primary text-[8px] font-bold">MỚI</span>
+                    </Link>
                     <Link className="text-on-surface-variant hover:text-primary transition-colors text-xs w-fit" href="/forum">
                         Diễn đàn thảo luận
                     </Link>

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from core.database import Base
@@ -22,6 +22,9 @@ class ForumPost(Base):
     author_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     title = Column(String(255), nullable=False)
     content = Column(String, nullable=False)
+    is_anonymous = Column(Boolean, default=False, nullable=False)
+    views_count = Column(Integer, default=0, nullable=False)
+    likes_count = Column(Integer, default=0, nullable=False)
     status = Column(String(20), nullable=False, default="PUBLISHED")
     moderated_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -31,6 +34,7 @@ class ForumPost(Base):
     author = relationship("User", foreign_keys=[author_id], lazy="joined")
     moderator = relationship("User", foreign_keys=[moderated_by], lazy="joined")
     comments = relationship("ForumComment", back_populates="post", cascade="all, delete-orphan", lazy="selectin")
+    likes = relationship("ForumPostLike", back_populates="post", cascade="all, delete-orphan", lazy="selectin")
 
 class ForumComment(Base):
     __tablename__ = "forum_comments"
@@ -40,6 +44,7 @@ class ForumComment(Base):
     author_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     parent_comment_id = Column(UUID(as_uuid=True), ForeignKey("forum_comments.id"))
     content = Column(String, nullable=False)
+    is_anonymous = Column(Boolean, default=False, nullable=False)
     status = Column(String(20), nullable=False, default="PUBLISHED")
     moderated_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -51,3 +56,18 @@ class ForumComment(Base):
     
     parent = relationship("ForumComment", remote_side=[id], back_populates="replies", lazy="joined")
     replies = relationship("ForumComment", back_populates="parent", cascade="all, delete-orphan", lazy="selectin")
+
+class ForumPostLike(Base):
+    __tablename__ = "forum_post_likes"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    post_id = Column(UUID(as_uuid=True), ForeignKey("forum_posts.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    post = relationship("ForumPost", back_populates="likes", lazy="joined")
+    user = relationship("User", lazy="joined")
+
+    __table_args__ = (
+        UniqueConstraint("post_id", "user_id", name="uq_forum_post_likes_post_user"),
+    )

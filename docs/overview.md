@@ -146,7 +146,7 @@ Hệ thống quản lý 4 nhóm vai trò độc lập (Role-Based Access Control
 
 ## 6. LỘ TRÌNH PHÁT TRIỂN (ROADMAP)
 
-- **Phase 1 (Hoàn thành Docs):** Thiết kế toàn bộ Database Schema nền tảng (12 bảng dữ liệu chia theo 6 Feature Docs).
-- **Phase 2 (Hoàn thành Docs):** Xây dựng Core Backend (FastAPI theo Layered Architecture) + Deploy Render + HTML/CSS cơ bản kiểm thử toàn hệ thống.
-- **Phase 3 (Hoàn thành Docs):** Xây dựng giao diện Frontend hoàn chỉnh (Next.js + TailwindCSS + Shadcn/ui) + Deploy Vercel.
+- **Phase 1 (Hoàn thành):** Thiết kế toàn bộ Database Schema nền tảng (12 bảng dữ liệu chia theo 6 Feature Docs).
+- **Phase 2 (Hoàn thành):** Xây dựng Core Backend (FastAPI theo Layered Architecture) + Deploy Render + HTML/CSS cơ bản kiểm thử toàn hệ thống.
+- **Phase 3 (Hoàn thành):** Xây dựng giao diện Frontend hoàn chỉnh (Next.js + TailwindCSS + Shadcn/ui) + Deploy Vercel.
 - **Phase 4 (Hoàn thành Docs):** Xây dựng Phân hệ AI Roleplay & RAG Service (SSE Streaming, Dynamic Context Engine, 4 Persona Prompts, Database pgvector).

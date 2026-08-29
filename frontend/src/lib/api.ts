@@ -1,6 +1,85 @@
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://sex-education-api.onrender.com/api/v1";
+const BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://sex-education-api.onrender.com/api/v1").trim();
+
+const FIELD_LABELS: Record<string, string> = {
+    category_id: 'Chủ đề',
+    title: 'Tiêu đề',
+    content: 'Nội dung',
+    email: 'Địa chỉ Email',
+    password: 'Mật khẩu',
+    full_name: 'Họ và tên',
+    parent_comment_id: 'Bình luận',
+    is_anonymous: 'Chế độ ẩn danh',
+};
+
+function formatUserFriendlyError(data: any, status: number): string {
+    if (status === 401) {
+        return 'Phiên đăng nhập đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.';
+    }
+    if (status === 403) {
+        return 'Bạn không có quyền thực hiện hành động này.';
+    }
+    if (status === 404) {
+        return typeof data.detail === 'string' ? data.detail : 'Không tìm thấy nội dung yêu cầu.';
+    }
+    if (status >= 500) {
+        return 'Hệ thống đang gặp sự cố. Vui lòng thử lại sau ít phút.';
+    }
+
+    if (typeof data.detail === 'string') {
+        const d = data.detail.toLowerCase();
+        if (d.includes('incorrect password') || d.includes('invalid credentials')) {
+            return 'Email hoặc mật khẩu không chính xác.';
+        }
+        if (d.includes('user already exists') || d.includes('email already registered')) {
+            return 'Email này đã được đăng ký tài khoản.';
+        }
+        if (d.includes('not authenticated') || d.includes('credentials')) {
+            return 'Vui lòng đăng nhập để tiếp tục.';
+        }
+        return data.detail;
+    }
+
+    // Handle FastAPI / Pydantic validation error list (HTTP 422)
+    if (Array.isArray(data.detail) && data.detail.length > 0) {
+        const first = data.detail[0];
+        if (typeof first === 'string') return first;
+
+        if (first && typeof first.msg === 'string') {
+            const fieldKey = Array.isArray(first.loc) ? String(first.loc[first.loc.length - 1]) : '';
+            const fieldName = FIELD_LABELS[fieldKey] || (fieldKey && fieldKey !== 'body' ? fieldKey : 'thông tin');
+            const msg = first.msg.toLowerCase();
+
+            if (msg.includes('field required') || msg.includes('missing')) {
+                if (fieldKey === 'category_id') return 'Vui lòng chọn chủ đề cho bài viết.';
+                return `Vui lòng nhập ${fieldName.toLowerCase()}.`;
+            }
+            if (msg.includes('at least')) {
+                const match = first.msg.match(/\d+/);
+                return `${fieldName} phải có ít nhất ${match ? match[0] : ''} ký tự.`;
+            }
+            if (msg.includes('at most') || msg.includes('max_length')) {
+                const match = first.msg.match(/\d+/);
+                return `${fieldName} không được vượt quá ${match ? match[0] : ''} ký tự.`;
+            }
+            if (msg.includes('integer') || msg.includes('type')) {
+                return `${fieldName} không đúng định dạng.`;
+            }
+            return `${fieldName}: ${first.msg}`;
+        }
+    }
+
+    if (data.detail && typeof data.detail === 'object') {
+        return data.detail.msg || data.detail.message || 'Dữ liệu gửi lên chưa hợp lệ.';
+    }
+
+    if (typeof data.message === 'string') {
+        return data.message;
+    }
+
+    return 'Có lỗi xảy ra, vui lòng thử lại sau.';
+}
 
 export const api = {
     getToken: (options?: any) => {
@@ -53,7 +132,12 @@ export const api = {
         
         delete fetchOptions.cookieOpts;
 
-        const response = await fetch(`${BASE_URL}${endpoint}`, fetchOptions);
+        let response;
+        try {
+            response = await fetch(`${BASE_URL}${endpoint}`, fetchOptions);
+        } catch (networkError: any) {
+            throw new Error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng.');
+        }
         
         let data;
         try {
@@ -67,7 +151,9 @@ export const api = {
                 api.clearAuth();
                 window.location.href = '/login';
             }
-            throw new Error(data.detail || data.message || 'Có lỗi xảy ra');
+
+            const friendlyMessage = formatUserFriendlyError(data, response.status);
+            throw new Error(friendlyMessage);
         }
         
         return data;
