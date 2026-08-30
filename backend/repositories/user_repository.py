@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
 from models.user import User
 from models.role import Role
 from models.profile import UserProfile
@@ -10,9 +10,15 @@ async def get_role_by_code(db: AsyncSession, role_code: str) -> Role:
     return result.scalars().first()
 
 async def get_user_by_email_or_username(db: AsyncSession, identifier: str) -> User:
+    if not identifier:
+        return None
+    clean_id = identifier.strip().lower()
     result = await db.execute(
         select(User).where(
-            or_(User.email == identifier, User.username == identifier)
+            or_(
+                func.lower(User.email) == clean_id,
+                func.lower(User.username) == clean_id
+            )
         )
     )
     return result.scalars().first()

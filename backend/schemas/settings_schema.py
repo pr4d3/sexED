@@ -16,8 +16,12 @@ class HomeCourseItem(BaseModel):
 class HomeRecentPost(BaseModel):
     id: str
     title: str
+    short_content: Optional[str] = None
     category_name: str
     author_name: str
+    author_avatar: Optional[str] = None
+    is_anonymous: bool = False
+    likes_count: int = 0
     comment_count: int
     created_at: datetime
 

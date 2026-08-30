@@ -21,7 +21,7 @@ export default function LoginPage() {
 
     try {
       const res = await login({
-        username_or_email: usernameOrEmail,
+        username_or_email: usernameOrEmail.trim(),
         password,
       });
 
@@ -32,15 +32,15 @@ export default function LoginPage() {
     } catch (err: any) {
       const errMsg = err.message || "Sai thông tin đăng nhập";
       setError(errMsg);
-      showToast(errMsg, "error");
     }
   };
 
   return (
     <>
       {error && (
-        <div className="rounded-2xl bg-red-50 border border-red-200/50 p-4 text-xs font-semibold text-red-600">
-          {error}
+        <div className="rounded-2xl bg-red-50 border border-red-200/60 p-4 text-xs font-semibold text-red-600 flex items-center gap-2.5 shadow-xs">
+          <span className="material-symbols-outlined text-[18px] text-red-500 shrink-0">error</span>
+          <span>{error}</span>
         </div>
       )}
 

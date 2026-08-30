@@ -233,10 +233,11 @@ export default function ProfilePage() {
                                                 </Link>
                                                 {c.status === 'COMPLETED' && (
                                                     <Link
-                                                        href={`/courses/${c.course_id}/outro`}
-                                                        className="flex-1 sm:flex-initial inline-flex h-10 items-center justify-center rounded-full border border-outline/30 bg-white/50 px-4 text-xs font-bold text-on-surface hover:bg-white transition-colors"
+                                                        href={`/courses/${c.course_id}/certificate`}
+                                                        className="flex-1 sm:flex-initial inline-flex h-10 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary px-4 text-xs font-bold hover:bg-primary/20 transition-colors gap-1"
                                                     >
-                                                        Xem tổng kết
+                                                        <span className="material-symbols-outlined text-[16px]">workspace_premium</span>
+                                                        Xem chứng chỉ
                                                     </Link>
                                                 )}
                                             </div>

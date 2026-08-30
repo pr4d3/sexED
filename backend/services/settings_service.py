@@ -48,11 +48,19 @@ async def get_home_page_data(db: AsyncSession):
     recent_posts = []
     for p in posts[:4]:
         comment_count = await forum_repository.get_post_comment_count(db, p.id, include_hidden_deleted=False)
+        is_anon = p.is_anonymous
+        author_name = "Người dùng ẩn danh" if is_anon else (p.author.full_name if p.author else "Unknown")
+        author_avatar = None if is_anon else (p.author.profile.avatar_url if p.author and p.author.profile else None)
+        short_content = (p.content[:140] + "...") if len(p.content) > 140 else p.content
         recent_posts.append({
             "id": str(p.id),
             "title": p.title,
-            "category_name": p.category.name if p.category else "Unknown",
-            "author_name": p.author.full_name if p.author else "Unknown",
+            "short_content": short_content,
+            "category_name": p.category.name if p.category else "Thảo luận chung",
+            "author_name": author_name,
+            "author_avatar": author_avatar,
+            "is_anonymous": is_anon,
+            "likes_count": p.likes_count or 0,
             "comment_count": comment_count,
             "created_at": p.created_at
         })

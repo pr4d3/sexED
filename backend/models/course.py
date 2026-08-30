@@ -16,6 +16,7 @@ class Course(Base):
     description = Column(String)
     thumbnail_url = Column(String(500))
     target_audience = Column(String(20), nullable=False, default="BOTH")
+    learning_objectives = Column(String)
     outro_content = Column(String)
     is_published = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

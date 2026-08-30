@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional, Any
 from uuid import UUID
 
@@ -8,6 +8,13 @@ class UserRegister(BaseModel):
     password: str = Field(..., min_length=6)
     full_name: str = Field(..., min_length=1, max_length=150)
     role_code: str = Field(..., pattern="^(STUDENT_PARENT|STUDENT_CHILD)$")
+
+    @field_validator("password")
+    @classmethod
+    def validate_password_no_spaces(cls, v: str) -> str:
+        if " " in v or "\t" in v or "\n" in v:
+            raise ValueError("Mật khẩu không được chứa khoảng trắng.")
+        return v
 
 class UserLogin(BaseModel):
     username_or_email: str

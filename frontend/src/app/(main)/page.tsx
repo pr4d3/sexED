@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { CourseCard } from "@/components/CourseCard";
 import { CourseCardSkeleton, ForumPostSkeleton } from "@/components/Skeleton";
 
 interface Course {
@@ -16,16 +18,34 @@ interface Course {
 interface ForumPost {
   id: string;
   title: string;
+  short_content?: string | null;
   category_name: string;
   author_name: string;
+  author_avatar?: string | null;
+  is_anonymous?: boolean;
+  likes_count?: number;
   comment_count: number;
   created_at: string;
 }
 
 export default function HomePage() {
+  const { user } = useAuth();
+  const isParent = user?.role === "STUDENT_PARENT";
+  const isChild = user?.role === "STUDENT_CHILD" || user?.role === "STUDENT";
+
   const [homeData, setHomeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"PARENT" | "CHILD">("PARENT");
+  const [activeTab, setActiveTab] = useState<"PARENT" | "CHILD">(
+    isChild ? "CHILD" : "PARENT"
+  );
+
+  useEffect(() => {
+    if (isParent) {
+      setActiveTab("PARENT");
+    } else if (isChild) {
+      setActiveTab("CHILD");
+    }
+  }, [isParent, isChild]);
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -43,11 +63,6 @@ export default function HomePage() {
     fetchHomeData();
   }, []);
 
-  const heroTitle =
-    homeData?.hero_banner?.title || "Giáo dục Giới tính Chuẩn Khoa học";
-  const heroSubtitle =
-    homeData?.hero_banner?.subtitle ||
-    "Môi trường học tập an toàn, thân thiện và chuẩn y khoa, giúp gỡ bỏ những rào cản và ngần ngại trong việc tiếp cận kiến thức giới tính.";
 
   const coursesToRender =
     activeTab === "PARENT"
@@ -74,10 +89,10 @@ export default function HomePage() {
               </span>
             </div>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-on-surface leading-tight">
-              {heroTitle}
+              Nền tảng Giáo dục Giới tính Trực tuyến An toàn &amp; Khoa học
             </h1>
             <p className="text-base md:text-lg text-on-surface-variant font-light leading-relaxed max-w-lg">
-              {heroSubtitle}
+              Môi trường học tập an toàn, thân thiện và chuẩn y khoa, giúp gỡ bỏ những rào cản và ngần ngại trong việc tiếp cận kiến thức giới tính.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <Link
@@ -443,37 +458,46 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto flex flex-col items-center">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-extrabold text-on-surface mb-4">
-              Lộ trình Học tập Chuyên biệt
+              {isParent
+                ? "Lộ trình Học tập Dành cho Phụ huynh"
+                : isChild
+                ? "Lộ trình Học tập Dành cho Học sinh"
+                : "Lộ trình Học tập Chuyên biệt"}
             </h2>
             <p className="text-sm text-on-surface-variant max-w-xl mx-auto">
-              Lựa chọn chương trình phù hợp với độ tuổi và nhu cầu để có hiệu
-              quả tiếp thu tốt nhất.
+              {isParent
+                ? "Chương trình hướng dẫn chuyên sâu giúp phụ huynh trang bị kiến thức y khoa và kỹ năng đồng hành cùng con."
+                : isChild
+                ? "Khám phá kiến thức cơ thể, giới tính và các kỹ năng phòng tránh xâm hại an toàn chuẩn khoa học."
+                : "Lựa chọn chương trình phù hợp với độ tuổi và nhu cầu để có hiệu quả tiếp thu tốt nhất."}
             </p>
           </div>
 
-          {/* Switcher Tabs */}
-          <div className="inline-flex p-1.5 bg-surface-container-high rounded-full mb-16 shadow-inner border border-outline-variant/20">
-            <button
-              onClick={() => setActiveTab("PARENT")}
-              className={`px-8 py-3 rounded-full text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === "PARENT"
-                  ? "bg-white text-on-surface shadow-sm"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              Dành cho Phụ huynh
-            </button>
-            <button
-              onClick={() => setActiveTab("CHILD")}
-              className={`px-8 py-3 rounded-full text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === "CHILD"
-                  ? "bg-white text-on-surface shadow-sm"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              Dành cho Trẻ nhỏ
-            </button>
-          </div>
+          {/* Switcher Tabs - Only visible for Guests / Admin / Instructors */}
+          {!isParent && !isChild && (
+            <div className="inline-flex p-1.5 bg-surface-container-high rounded-full mb-16 shadow-inner border border-outline-variant/20">
+              <button
+                onClick={() => setActiveTab("PARENT")}
+                className={`px-8 py-3 rounded-full text-sm font-semibold transition-all cursor-pointer ${
+                  activeTab === "PARENT"
+                    ? "bg-white text-on-surface shadow-sm"
+                    : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                Dành cho Phụ huynh
+              </button>
+              <button
+                onClick={() => setActiveTab("CHILD")}
+                className={`px-8 py-3 rounded-full text-sm font-semibold transition-all cursor-pointer ${
+                  activeTab === "CHILD"
+                    ? "bg-white text-on-surface shadow-sm"
+                    : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                Dành cho Trẻ nhỏ
+              </button>
+            </div>
+          )}
 
           {/* Course Grid */}
           {loading ? (
@@ -490,59 +514,11 @@ export default function HomePage() {
                 </div>
               ) : (
                 coursesToRender.map((course: Course) => (
-                  <Link
+                  <CourseCard
                     key={course.id}
-                    href={`/courses/${course.id}/intro`}
-                    className="glass-panel rounded-3xl overflow-hidden shadow-sm hover-shadow transition-all duration-300 flex flex-col h-full group bg-white/70 border border-white/50"
-                  >
-                    <div className="relative h-56 overflow-hidden p-2 pb-0">
-                      <img
-                        className="w-full h-full object-cover rounded-t-2xl group-hover:scale-[1.02] transition-transform duration-500 bg-surface-container"
-                        alt={course.title}
-                        src={
-                          course.thumbnail_url ||
-                          "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500"
-                        }
-                      />
-                      <div className="absolute top-6 left-6 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full text-[10px] font-bold text-primary flex items-center gap-1.5 shadow-sm">
-                        <span
-                          className="material-symbols-outlined text-[14px]"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          family_restroom
-                        </span>
-                        {activeTab === "PARENT" ? "Phụ huynh" : "Học sinh"}
-                      </div>
-                    </div>
-                    <div className="p-8 flex flex-col flex-grow">
-                      <div className="flex gap-2 mb-4">
-                        <span className="px-2.5 py-0.5 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] font-bold uppercase">
-                          Y khoa
-                        </span>
-                        <span className="px-2.5 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-[10px] font-bold uppercase">
-                          Kiến thức
-                        </span>
-                      </div>
-                      <h3 className="text-md font-bold text-on-surface mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                        {course.title}
-                      </h3>
-                      <p className="text-xs text-on-surface-variant leading-relaxed line-clamp-2 mb-6">
-                        Khóa học cung cấp lộ trình hướng dẫn chi tiết được xây
-                        dựng bởi các bác sĩ và chuyên gia giàu kinh nghiệm.
-                      </p>
-                      <div className="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/20">
-                        <span className="text-xs text-on-surface-variant font-medium">
-                          Giảng viên:{" "}
-                          <strong className="font-bold text-on-surface">
-                            {course.instructor_name}
-                          </strong>
-                        </span>
-                        <span className="text-xs font-bold text-primary flex items-center gap-1">
-                          {course.total_lessons} bài học
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
+                    course={course}
+                    forcedAudience={activeTab}
+                  />
                 ))
               )}
             </div>
@@ -594,47 +570,71 @@ export default function HomePage() {
                     className="p-8 bg-white/80 backdrop-blur-md rounded-3xl border border-white/50 shadow-sm hover-shadow transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-                          <span className="material-symbols-outlined text-[20px]">
-                            person_outline
-                          </span>
+                      <div className="flex items-center justify-between gap-3 mb-5">
+                        <div className="flex items-center gap-3">
+                          {post.is_anonymous ? (
+                            <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
+                              <span className="material-symbols-outlined text-[20px]">
+                                person_off
+                              </span>
+                            </div>
+                          ) : post.author_avatar ? (
+                            <img
+                              src={post.author_avatar}
+                              alt={post.author_name}
+                              className="w-10 h-10 rounded-full object-cover border border-outline-variant/30 shadow-xs flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
+                              {post.author_name ? post.author_name.charAt(0).toUpperCase() : "U"}
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-sm font-bold text-on-surface">
+                              {post.author_name || "Thành viên ẩn danh"}
+                            </p>
+                            <p className="text-[10px] text-on-surface-variant">
+                              {new Date(post.created_at).toLocaleDateString(
+                                "vi-VN",
+                              )}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-on-surface">
-                            {post.author_name || "Thành viên ẩn danh"}
-                          </p>
-                          <p className="text-[10px] text-on-surface-variant">
-                            {new Date(post.created_at).toLocaleDateString(
-                              "vi-VN",
-                            )}
-                          </p>
-                        </div>
+
+                        <span className="px-2.5 py-0.5 rounded-full bg-surface-container-low text-[10px] font-semibold text-on-surface-variant border border-outline-variant/20 flex-shrink-0">
+                          {post.category_name}
+                        </span>
                       </div>
-                      <h4 className="text-sm font-bold text-on-surface mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+
+                      <h4 className="text-sm font-bold text-on-surface mb-2.5 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
                         {post.title}
                       </h4>
                       <p className="text-xs text-on-surface-variant leading-relaxed mb-6 line-clamp-3">
-                        Mọi người thảo luận và đưa ra lời khuyên thiết thực dưới
-                        sự kiểm duyệt chuyên môn y văn.
+                        {post.short_content || "Bấm vào để xem nội dung thảo luận và các ý kiến đóng góp từ cộng đồng."}
                       </p>
                     </div>
+
                     <div className="flex items-center justify-between text-on-surface-variant pt-4 border-t border-outline-variant/20 mt-auto">
-                      <div className="flex items-center gap-1 text-xs">
-                        <span className="material-symbols-outlined text-[16px]">
-                          chat_bubble_outline
-                        </span>
-                        {post.comment_count} bình luận
+                      <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[16px]">
+                            chat_bubble_outline
+                          </span>
+                          {post.comment_count} bình luận
+                        </div>
+                        {post.likes_count !== undefined && post.likes_count > 0 && (
+                          <div className="flex items-center gap-1 text-red-500">
+                            <span className="material-symbols-outlined text-[16px]">
+                              favorite
+                            </span>
+                            {post.likes_count}
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-primary font-bold">
-                        <span
-                          className="material-symbols-outlined text-[16px]"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          verified
-                        </span>
-                        Đã kiểm duyệt
-                      </div>
+
+                      <span className="text-xs text-primary font-bold group-hover:translate-x-0.5 transition-transform">
+                        Xem chi tiết →
+                      </span>
                     </div>
                   </Link>
                 ))

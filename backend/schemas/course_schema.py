@@ -7,6 +7,7 @@ class InstructorInfo(BaseModel):
     id: UUID
     full_name: str
     avatar_url: Optional[str] = None
+    bio: Optional[str] = None
 
 class SyllabusLesson(BaseModel):
     id: UUID
@@ -22,6 +23,7 @@ class CourseIntroData(BaseModel):
     description: Optional[str] = None
     thumbnail_url: Optional[str] = None
     target_audience: str
+    learning_objectives: Optional[str] = None
     instructor: InstructorInfo
     total_lessons: int
     is_enrolled: bool
@@ -39,6 +41,7 @@ class CourseCreate(BaseModel):
     description: Optional[str] = None
     thumbnail_url: Optional[str] = Field(None, max_length=500)
     target_audience: str = Field("BOTH", pattern="^(PARENT|CHILD|BOTH)$")
+    learning_objectives: Optional[str] = None
     outro_content: Optional[str] = None
 
 class CourseCreateResponseData(BaseModel):
@@ -96,7 +99,10 @@ class CourseLearningResponse(BaseModel):
 class CourseOutroData(BaseModel):
     course_id: UUID
     course_title: str
+    student_name: str
+    instructor_name: str
     completed_at: datetime
+    certificate_code: str
     outro_content: Optional[str] = None
     research_survey_url: Optional[str] = None
 

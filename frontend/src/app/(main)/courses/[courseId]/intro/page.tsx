@@ -38,13 +38,18 @@ export default function CourseIntroPage() {
                     setCourseData(res.data);
                 }
             } catch (err: any) {
-                setError(err.message || 'Lỗi khi tải chi tiết khóa học');
+                const msg = err.message || 'Lỗi khi tải chi tiết khóa học';
+                if (msg.includes('quyền') || msg.includes('dành riêng') || msg.includes('không thể xem')) {
+                    router.replace(`/invalid?reason=${encodeURIComponent(msg)}`);
+                    return;
+                }
+                setError(msg);
             } finally {
                 setLoading(false);
             }
         };
         fetchCourseDetail();
-    }, [courseId]);
+    }, [courseId, router]);
 
     const handleAction = async () => {
         if (!user) {
@@ -65,7 +70,12 @@ export default function CourseIntroPage() {
                 router.push(`/courses/${courseId}/learn`);
             }
         } catch (err: any) {
-            showToast(err.message || "Lỗi khi đăng ký khóa học", "error");
+            const msg = err.message || "Lỗi khi đăng ký khóa học";
+            if (msg.includes('quyền') || msg.includes('dành riêng') || msg.includes('không thể')) {
+                router.replace(`/invalid?reason=${encodeURIComponent(msg)}`);
+                return;
+            }
+            showToast(msg, "error");
         } finally {
             setEnrolling(false);
         }
@@ -112,27 +122,42 @@ export default function CourseIntroPage() {
                     </p>
 
                     {/* Learning Objectives */}
-                    <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-white/50 mt-8">
-                        <h2 className="text-lg font-bold text-on-surface mb-6">Mục tiêu học tập</h2>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <li className="flex items-start gap-3">
-                                <span className="material-symbols-outlined text-primary mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                <span className="text-sm text-on-surface-variant font-medium">Tiếp cận các kiến thức giáo dục giới tính chuẩn y văn và tâm lý.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="material-symbols-outlined text-primary mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                <span className="text-sm text-on-surface-variant font-medium">Sở hữu phương pháp và ngôn từ nhẹ nhàng, tự nhiên khi chia sẻ.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="material-symbols-outlined text-primary mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                <span className="text-sm text-on-surface-variant font-medium">Biết cách định hướng và trả lời những thắc mắc tế nhị của trẻ.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="material-symbols-outlined text-primary mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                <span className="text-sm text-on-surface-variant font-medium">Hỗ trợ xây dựng kỹ năng tự bảo vệ cơ thể và phòng vệ xâm hại.</span>
-                            </li>
-                        </ul>
-                    </div>
+                    {courseData.learning_objectives ? (
+                        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-white/50 mt-8">
+                            <h2 className="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                    stars
+                                </span>
+                                Mục tiêu học tập
+                            </h2>
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {courseData.learning_objectives
+                                    .split('\n')
+                                    .map((line: string) => line.trim().replace(/^[-*•]\s*/, ''))
+                                    .filter((line: string) => line.length > 0)
+                                    .map((obj: string, idx: number) => (
+                                        <li key={idx} className="flex items-start gap-3 bg-surface-container-low/50 p-4 rounded-2xl border border-outline-variant/10">
+                                            <span className="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                                check_circle
+                                            </span>
+                                            <span className="text-sm text-on-surface font-medium leading-relaxed">{obj}</span>
+                                        </li>
+                                    ))}
+                            </ul>
+                        </div>
+                    ) : (
+                        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-white/50 mt-8">
+                            <h2 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                    stars
+                                </span>
+                                Mục tiêu học tập
+                            </h2>
+                            <p className="text-sm text-on-surface-variant font-light">
+                                Khóa học giúp người học trang bị kiến thức giáo dục giới tính toàn diện, an toàn và phát triển kỹ năng tự bảo vệ cơ thể theo đúng lộ trình khoa học.
+                            </p>
+                        </div>
+                    )}
                 </section>
 
                 {/* Syllabus Accordion */}
@@ -173,18 +198,17 @@ export default function CourseIntroPage() {
 
                 {/* Instructor Card */}
                 <section className="pt-4">
-                    <h2 className="text-lg font-bold text-on-surface mb-6">Giảng viên của bạn</h2>
+                    <h2 className="text-lg font-bold text-on-surface mb-6">Giảng viên phụ trách</h2>
                     <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-white/50 flex flex-col sm:flex-row items-center sm:items-start gap-8">
                         <img 
-                            className="w-20 h-20 rounded-full object-cover shadow-sm bg-primary-fixed" 
+                            className="w-20 h-20 rounded-full object-cover shadow-sm bg-primary-fixed border-2 border-primary/20" 
                             alt={courseData.instructor.full_name} 
                             src={courseData.instructor.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDLgNlt8oxrJXRkbLEhGWQB1WaLOqf9Zm7fBANEhyCLI3WBvhBT1fFopS25w1iSYvOj7ChfPef3vVnlOy4-2IfSJh9cSEEDdOHVz1f0RxGNFvC6S9pytVBlevtz6tEDiHNgYyDr2GmyZE3sjiypqLWOCkhf2du7uRwTKYADj9nXtFS3CrbKEQUi9agqpKyN-LZtQr9-UkMUYQ-Z1npuTPGg-Zb0iumqS2vauThTOXStUxw7mMeHr-dUXw'}
                         />
                         <div className="text-center sm:text-left space-y-2">
                             <h3 className="text-base font-bold text-on-surface">{courseData.instructor.full_name}</h3>
-                            <p className="text-xs font-semibold text-primary">Bác sĩ chuyên khoa Tâm lý - Nhi khoa</p>
-                            <p className="text-xs text-on-surface-variant font-light leading-relaxed pt-2">
-                                {courseData.instructor.bio || 'Chuyên gia giàu kinh nghiệm trong lĩnh vực tư vấn tâm lý trẻ em và giáo dục giới tính học đường tại các bệnh viện nhi uy tín.'}
+                            <p className="text-xs text-on-surface-variant font-light leading-relaxed pt-1">
+                                {courseData.instructor.bio || 'Chuyên gia phụ trách biên soạn và điều phối nội dung khóa học trên nền tảng SexED.'}
                             </p>
                         </div>
                     </div>
@@ -209,43 +233,38 @@ export default function CourseIntroPage() {
                     </div>
 
                     <div className="p-8 space-y-6">
-                        {/* Status */}
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-extrabold text-on-surface">Miễn phí</span>
-                        </div>
-
                         {/* Course Meta */}
                         <div className="space-y-4 text-sm">
                             <div className="flex items-center justify-between text-on-surface-variant border-b border-outline-variant/20 pb-3">
                                 <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px]">menu_book</span>
-                                    <span>Thời lượng</span>
+                                    <span className="material-symbols-outlined text-[18px] text-primary">menu_book</span>
+                                    <span>Quy mô</span>
                                 </div>
                                 <span className="font-bold text-on-surface">{courseData.total_lessons} bài học</span>
                             </div>
                             <div className="flex items-center justify-between text-on-surface-variant border-b border-outline-variant/20 pb-3">
                                 <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px]">schedule</span>
-                                    <span>Học liệu</span>
+                                    <span className="material-symbols-outlined text-[18px] text-secondary-container">groups</span>
+                                    <span>Đối tượng</span>
                                 </div>
-                                <span className="font-bold text-on-surface">Chuẩn Y văn</span>
+                                <span className="font-bold text-on-surface">{audienceText}</span>
                             </div>
                             <div className="flex items-center justify-between text-on-surface-variant pb-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px]">workspace_premium</span>
-                                    <span>Đạt được</span>
+                                    <span className="material-symbols-outlined text-[18px] text-primary">all_inclusive</span>
+                                    <span>Thời hạn truy cập</span>
                                 </div>
-                                <span className="font-bold text-on-surface">Chứng nhận</span>
+                                <span className="font-bold text-on-surface">Không giới hạn</span>
                             </div>
                         </div>
 
-                        {/* Action Button (Orange Secondary Accent) */}
+                        {/* Action Button */}
                         <button 
                             onClick={handleAction}
                             disabled={enrolling}
                             className="w-full bg-gradient-to-r from-secondary-container to-secondary text-white text-xs font-bold py-4 px-6 rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                         >
-                            {enrolling ? 'Đang xử lý...' : courseData.is_enrolled ? 'Vào học ngay' : 'Đăng ký khóa học'}
+                            {enrolling ? 'Đang xử lý...' : courseData.is_enrolled ? 'Vào học ngay' : 'Bắt đầu học'}
                             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                         </button>
                     </div>

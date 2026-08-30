@@ -32,6 +32,7 @@ interface CourseDetails {
   description: string | null;
   thumbnail_url: string | null;
   target_audience: "PARENT" | "CHILD" | "BOTH";
+  learning_objectives: string | null;
   outro_content: string | null;
   syllabus: SyllabusLesson[];
 }
@@ -61,6 +62,7 @@ export default function DashboardOverviewPage() {
   const [newThumb, setNewThumb] = useState("");
   const [newShortDesc, setNewShortDesc] = useState("");
   const [newDesc, setNewDesc] = useState("");
+  const [newObjectives, setNewObjectives] = useState("");
   const [newOutroContent, setNewOutroContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -72,6 +74,7 @@ export default function DashboardOverviewPage() {
   const [editThumb, setEditThumb] = useState("");
   const [editShortDesc, setEditShortDesc] = useState("");
   const [editDesc, setEditDesc] = useState("");
+  const [editObjectives, setEditObjectives] = useState("");
   const [editOutroContent, setEditOutroContent] = useState("");
 
   // Lesson Modal states
@@ -93,9 +96,11 @@ export default function DashboardOverviewPage() {
   const [isDraggingAllowed, setIsDraggingAllowed] = useState(false);
 
   const editDescRef = useRef<HTMLTextAreaElement>(null);
+  const editObjectivesRef = useRef<HTMLTextAreaElement>(null);
   const editOutroRef = useRef<HTMLTextAreaElement>(null);
   const lessonBodyRef = useRef<HTMLTextAreaElement>(null);
   const cDescRef = useRef<HTMLTextAreaElement>(null);
+  const cObjectivesRef = useRef<HTMLTextAreaElement>(null);
   const cOutroRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -106,6 +111,15 @@ export default function DashboardOverviewPage() {
       }
     }
   }, [editDesc]);
+
+  useEffect(() => {
+    if (editObjectivesRef.current) {
+      editObjectivesRef.current.style.height = "auto";
+      if (editObjectives) {
+        editObjectivesRef.current.style.height = `${editObjectivesRef.current.scrollHeight}px`;
+      }
+    }
+  }, [editObjectives]);
 
   useEffect(() => {
     if (editOutroRef.current) {
@@ -133,6 +147,15 @@ export default function DashboardOverviewPage() {
       }
     }
   }, [newDesc]);
+
+  useEffect(() => {
+    if (cObjectivesRef.current) {
+      cObjectivesRef.current.style.height = "auto";
+      if (newObjectives) {
+        cObjectivesRef.current.style.height = `${cObjectivesRef.current.scrollHeight}px`;
+      }
+    }
+  }, [newObjectives]);
 
   useEffect(() => {
     if (cOutroRef.current) {
@@ -186,6 +209,7 @@ export default function DashboardOverviewPage() {
         setEditThumb(data.thumbnail_url || "");
         setEditShortDesc(data.short_description || "");
         setEditDesc(data.description || "");
+        setEditObjectives(data.learning_objectives || "");
         setEditOutroContent(data.outro_content || "");
       }
     } catch (err: any) {
@@ -232,6 +256,7 @@ export default function DashboardOverviewPage() {
         thumbnail_url: newThumb || null,
         short_description: newShortDesc || null,
         description: newDesc || null,
+        learning_objectives: newObjectives || null,
         outro_content: newOutroContent || null,
       });
 
@@ -244,6 +269,7 @@ export default function DashboardOverviewPage() {
         setNewThumb("");
         setNewShortDesc("");
         setNewDesc("");
+        setNewObjectives("");
         setNewOutroContent("");
 
         fetchStats();
@@ -279,6 +305,7 @@ export default function DashboardOverviewPage() {
         thumbnail_url: editThumb || null,
         short_description: editShortDesc || null,
         description: editDesc || null,
+        learning_objectives: editObjectives || null,
         outro_content: editOutroContent || null,
       });
 
@@ -416,15 +443,30 @@ export default function DashboardOverviewPage() {
     }
   };
 
+  const extractVideoIdentifier = (input: string | null | undefined): string | null => {
+    if (!input) return null;
+    const trimmed = input.trim();
+    if (!trimmed) return null;
+    const ytMatch = trimmed.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i,
+    );
+    if (ytMatch && ytMatch[1]) return ytMatch[1];
+    const vimeoMatch = trimmed.match(/vimeo\.com\/(\d+)/i);
+    if (vimeoMatch && vimeoMatch[1]) return vimeoMatch[1];
+    return trimmed;
+  };
+
   const handleSaveLesson = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!lessonTitle || !selectedCourseId) return;
 
     setLessonSubmitting(true);
+    const cleanedVideo = extractVideoIdentifier(lessonVideoUrl);
+
     const payload = {
       title: lessonTitle,
       content_type: lessonContentType,
-      video_url: lessonVideoUrl || null,
+      video_url: cleanedVideo,
       content_body: lessonContentBody || null,
       order_index: Number(lessonOrderIndex),
       duration_minutes: lessonDuration ? Number(lessonDuration) : null,
@@ -637,6 +679,24 @@ export default function DashboardOverviewPage() {
                       className="w-full bg-white border border-outline-variant/30 rounded-2xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none overflow-hidden"
                       value={editDesc}
                       onChange={(e) => setEditDesc(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      className="text-xs font-semibold text-on-surface ml-1"
+                      htmlFor="editObjectives"
+                    >
+                      Mục tiêu học tập (mỗi mục tiêu 1 dòng)
+                    </label>
+                    <textarea
+                      ref={editObjectivesRef}
+                      id="editObjectives"
+                      rows={4}
+                      className="w-full bg-white border border-outline-variant/30 rounded-2xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none overflow-hidden"
+                      placeholder={"- Tiếp cận các kiến thức giáo dục giới tính chuẩn y khoa\n- Rèn luyện kỹ năng tự bảo vệ bản thân và phòng chống xâm hại\n- Nắm vững kiến thức sinh lý và tâm lý theo độ tuổi"}
+                      value={editObjectives}
+                      onChange={(e) => setEditObjectives(e.target.value)}
                     />
                   </div>
 
@@ -862,15 +922,23 @@ export default function DashboardOverviewPage() {
                       className="text-xs font-semibold text-on-surface ml-1"
                       htmlFor="lVideo"
                     >
-                      Đường dẫn Video URL
+                      Đường dẫn Video
                     </label>
                     <input
                       id="lVideo"
                       type="text"
-                      placeholder="https://www.youtube.com/watch?v=..."
+                      placeholder="Dán link youtube hoặc video"
                       className="w-full bg-white border border-outline-variant/30 rounded-2xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       value={lessonVideoUrl}
-                      onChange={(e) => setLessonVideoUrl(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const cleaned = extractVideoIdentifier(val);
+                        if (cleaned && cleaned !== val && val.includes("http")) {
+                          setLessonVideoUrl(cleaned);
+                        } else {
+                          setLessonVideoUrl(val);
+                        }
+                      }}
                     />
                   </div>
                 )}
@@ -1291,6 +1359,24 @@ export default function DashboardOverviewPage() {
                   placeholder="Nhập chi tiết về bài học, mục tiêu..."
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label
+                  className="text-xs font-semibold text-on-surface ml-1"
+                  htmlFor="cObjectives"
+                >
+                  Mục tiêu học tập (mỗi mục tiêu 1 dòng)
+                </label>
+                <textarea
+                  ref={cObjectivesRef}
+                  id="cObjectives"
+                  rows={3}
+                  className="w-full bg-white border border-outline-variant/30 rounded-2xl px-4 py-3 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none overflow-hidden"
+                  placeholder={"- Tiếp cận các kiến thức giáo dục giới tính chuẩn y khoa\n- Rèn luyện kỹ năng tự bảo vệ bản thân và phòng chống xâm hại"}
+                  value={newObjectives}
+                  onChange={(e) => setNewObjectives(e.target.value)}
                 />
               </div>
 

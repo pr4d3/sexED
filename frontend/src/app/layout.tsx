@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Mea_Culpa, WindSong } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
@@ -7,6 +7,18 @@ import { ToastProvider } from "@/context/ToastContext";
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
   variable: "--font-inter",
+});
+
+const meaCulpa = Mea_Culpa({
+  weight: "400",
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-mea-culpa",
+});
+
+const windSong = WindSong({
+  weight: ["400", "500"],
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-windsong",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${inter.variable} h-full`}>
+    <html lang="vi" className={`${inter.variable} ${meaCulpa.variable} ${windSong.variable} h-full`}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

@@ -18,7 +18,25 @@ from sqlalchemy import select
 router = APIRouter(prefix="/api/v1/courses", tags=["Courses & Content"])
 
 @router.get("", response_model=CourseListResponse, status_code=status.HTTP_200_OK)
-async def get_courses(target_audience: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def get_courses(
+    target_audience: Optional[str] = None,
+    current_user: Optional[User] = Depends(get_optional_user),
+    db: AsyncSession = Depends(get_db)
+):
+    if current_user:
+        role_result = await db.execute(select(Role).where(Role.id == current_user.role_id))
+        user_role = role_result.scalars().first()
+        if user_role and user_role.role_code == "STUDENT_PARENT":
+            if target_audience == "CHILD":
+                return CourseListResponse(success=True, data=[])
+            if not target_audience:
+                target_audience = "PARENT"
+        elif user_role and (user_role.role_code == "STUDENT_CHILD" or user_role.role_code == "STUDENT"):
+            if target_audience == "PARENT":
+                return CourseListResponse(success=True, data=[])
+            if not target_audience:
+                target_audience = "CHILD"
+
     courses = await course_service.get_public_courses(db, target_audience)
     return CourseListResponse(success=True, data=courses)
 
@@ -29,15 +47,28 @@ async def get_course_intro(course_id: UUID, current_user: Optional[User] = Depen
     if current_user:
         role_result = await db.execute(select(Role).where(Role.id == current_user.role_id))
         user_role = role_result.scalars().first()
+        # Phụ huynh không xem được khóa học của Trẻ em
         if user_role and user_role.role_code == "STUDENT_PARENT" and intro_data["target_audience"] == "CHILD":
-            raise HTTPException(status_code=403, detail="Không đủ quyền truy cập khóa học này.")
-        if user_role and user_role.role_code == "STUDENT_CHILD" and intro_data["target_audience"] == "PARENT":
-            raise HTTPException(status_code=403, detail="Không đủ quyền truy cập khóa học này.")
+            raise HTTPException(status_code=403, detail="Khóa học này chỉ dành riêng cho học sinh / trẻ em, phụ huynh không thể xem hoặc tham gia.")
+        # Trẻ em không xem được khóa học của Người lớn / Phụ huynh
+        if user_role and (user_role.role_code == "STUDENT_CHILD" or user_role.role_code == "STUDENT") and intro_data["target_audience"] == "PARENT":
+            raise HTTPException(status_code=403, detail="Khóa học này chỉ dành riêng cho phụ huynh / người lớn, học sinh không thể xem hoặc tham gia.")
             
     return CourseIntroResponse(success=True, data=intro_data)
 
 @router.post("/{course_id}/enroll", response_model=CourseEnrollResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(RoleGuard(["STUDENT_PARENT", "STUDENT_CHILD"]))])
 async def enroll_course(course_id: UUID, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    role_result = await db.execute(select(Role).where(Role.id == current_user.role_id))
+    user_role = role_result.scalars().first()
+    course = await course_repository.get_course_by_id(db, course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Khóa học không tồn tại.")
+        
+    if user_role and user_role.role_code == "STUDENT_PARENT" and course.target_audience == "CHILD":
+        raise HTTPException(status_code=403, detail="Khóa học này chỉ dành riêng cho học sinh / trẻ em, phụ huynh không thể đăng ký.")
+    if user_role and (user_role.role_code == "STUDENT_CHILD" or user_role.role_code == "STUDENT") and course.target_audience == "PARENT":
+        raise HTTPException(status_code=403, detail="Khóa học này chỉ dành riêng cho phụ huynh / người lớn, học sinh không thể đăng ký.")
+
     result = await course_service.enroll_course(db, current_user.id, course_id)
     return CourseEnrollResponse(
         success=True,
@@ -47,6 +78,17 @@ async def enroll_course(course_id: UUID, current_user: User = Depends(get_curren
 
 @router.get("/{course_id}/learn", response_model=CourseLearningResponse, status_code=status.HTTP_200_OK)
 async def get_course_learning(course_id: UUID, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    role_result = await db.execute(select(Role).where(Role.id == current_user.role_id))
+    user_role = role_result.scalars().first()
+    course = await course_repository.get_course_by_id(db, course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Khóa học không tồn tại.")
+        
+    if user_role and user_role.role_code == "STUDENT_PARENT" and course.target_audience == "CHILD":
+        raise HTTPException(status_code=403, detail="Khóa học này chỉ dành riêng cho học sinh / trẻ em, phụ huynh không thể truy cập phòng học.")
+    if user_role and (user_role.role_code == "STUDENT_CHILD" or user_role.role_code == "STUDENT") and course.target_audience == "PARENT":
+        raise HTTPException(status_code=403, detail="Khóa học này chỉ dành riêng cho phụ huynh / người lớn, học sinh không thể truy cập phòng học.")
+
     result = await course_service.get_course_learning_room(db, current_user.id, course_id)
     return CourseLearningResponse(success=True, data=result)
 
