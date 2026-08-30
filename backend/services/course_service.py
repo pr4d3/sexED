@@ -1,3 +1,4 @@
+import re
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from repositories import course_repository, user_repository
@@ -7,6 +8,24 @@ from models.course_enrollment import CourseEnrollment
 from schemas.course_schema import CourseCreate, LessonCreate
 from uuid import UUID
 from datetime import datetime, timezone
+
+def normalize_video_identifier(url: str | None) -> str | None:
+    if not url:
+        return None
+    trimmed = url.strip()
+    if not trimmed:
+        return None
+    # YouTube ID extraction (watch?v=..., youtu.be/..., shorts/..., embed/...)
+    yt_match = re.search(r'(?:youtu\.be/|youtube\.com/(?:embed/|v/|watch\?v=|watch\?.+&v=|shorts/))([\w-]{11})', trimmed, re.IGNORECASE)
+    if yt_match:
+        return yt_match.group(1)
+    
+    # Vimeo ID extraction
+    vimeo_match = re.search(r'vimeo\.com/(\d+)', trimmed, re.IGNORECASE)
+    if vimeo_match:
+        return vimeo_match.group(1)
+        
+    return trimmed
 
 async def get_public_courses(db: AsyncSession, target_audience: str = None):
     courses = await course_repository.get_courses(db, target_audience)
@@ -53,10 +72,12 @@ async def get_course_intro(db: AsyncSession, course_id: UUID, current_user = Non
         "description": course.description,
         "thumbnail_url": course.thumbnail_url,
         "target_audience": course.target_audience,
+        "learning_objectives": course.learning_objectives,
         "instructor": {
             "id": course.instructor_id,
             "full_name": course.instructor.full_name if course.instructor else "Unknown",
-            "avatar_url": course.instructor.profile.avatar_url if course.instructor and course.instructor.profile else None
+            "avatar_url": course.instructor.profile.avatar_url if course.instructor and course.instructor.profile else None,
+            "bio": course.instructor.profile.bio if course.instructor and course.instructor.profile else None
         },
         "total_lessons": len(course.lessons),
         "is_enrolled": is_enrolled,
@@ -124,10 +145,19 @@ async def get_course_outro(db: AsyncSession, user_id: UUID, course_id: UUID):
         raise HTTPException(status_code=403, detail="Bạn chưa hoàn thành tất cả các bài học trong khóa học này.")
         
     course = await course_repository.get_course_by_id(db, course_id)
+    student = await user_repository.get_user_by_id(db, str(user_id))
+
+    # Format unique certificate code: e.g. SEXED-ABC123XY
+    cert_hash = str(enrollment.id).replace("-", "")[:8].upper()
+    cert_code = f"SEXED-{cert_hash}"
+
     return {
         "course_id": course.id,
         "course_title": course.title,
+        "student_name": student.full_name if student else "Học viên SexED",
+        "instructor_name": course.instructor.full_name if course.instructor else "Ban Chuyên Môn SexED",
         "completed_at": enrollment.completed_at,
+        "certificate_code": cert_code,
         "outro_content": course.outro_content or "Chúc mừng bạn đã hoàn thành khóa học!",
         "research_survey_url": "https://forms.gle/research_feedback_sexed"
     }
@@ -142,6 +172,7 @@ async def create_new_course(db: AsyncSession, instructor_id: UUID, course_data: 
         description=course_data.description,
         thumbnail_url=course_data.thumbnail_url,
         target_audience=course_data.target_audience,
+        learning_objectives=course_data.learning_objectives,
         outro_content=course_data.outro_content,
         is_published=False
     )
@@ -165,6 +196,7 @@ async def update_existing_course(db: AsyncSession, instructor_id: UUID, course_i
     course.description = course_data.description
     course.thumbnail_url = course_data.thumbnail_url
     course.target_audience = course_data.target_audience
+    course.learning_objectives = course_data.learning_objectives
     course.outro_content = course_data.outro_content
     
     updated = await course_repository.update_course(db, course)
@@ -196,7 +228,7 @@ async def add_lesson_to_course(db: AsyncSession, instructor_id: UUID, course_id:
         course_id=course_id,
         title=lesson_data.title,
         content_type=lesson_data.content_type,
-        video_url=lesson_data.video_url,
+        video_url=normalize_video_identifier(lesson_data.video_url),
         content_body=lesson_data.content_body,
         order_index=lesson_data.order_index,
         duration_minutes=lesson_data.duration_minutes
@@ -222,7 +254,7 @@ async def update_lesson_in_course(db: AsyncSession, instructor_id: UUID, course_
         
     lesson.title = lesson_data.title
     lesson.content_type = lesson_data.content_type
-    lesson.video_url = lesson_data.video_url
+    lesson.video_url = normalize_video_identifier(lesson_data.video_url)
     lesson.content_body = lesson_data.content_body
     lesson.order_index = lesson_data.order_index
     lesson.duration_minutes = lesson_data.duration_minutes

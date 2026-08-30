@@ -15,9 +15,16 @@ async def register_user(db: AsyncSession, user_data: UserRegister):
     if not role:
         raise HTTPException(status_code=400, detail="Invalid role code.")
 
-    existing_user = await user_repository.get_user_by_email_or_username(db, user_data.email)
+    if " " in user_data.password or "\t" in user_data.password or "\n" in user_data.password:
+        raise HTTPException(status_code=400, detail="Mật khẩu không được chứa khoảng trắng.")
+
+    clean_email = user_data.email.strip()
+    clean_username = user_data.username.strip()
+    clean_full_name = user_data.full_name.strip()
+
+    existing_user = await user_repository.get_user_by_email_or_username(db, clean_email)
     if not existing_user:
-        existing_user = await user_repository.get_user_by_email_or_username(db, user_data.username)
+        existing_user = await user_repository.get_user_by_email_or_username(db, clean_username)
 
     if existing_user:
         raise HTTPException(status_code=400, detail="Email or Username already exists.")
@@ -26,10 +33,10 @@ async def register_user(db: AsyncSession, user_data: UserRegister):
     
     new_user = User(
         role_id=role.id,
-        username=user_data.username,
-        email=user_data.email,
+        username=clean_username,
+        email=clean_email,
         password_hash=hashed_password,
-        full_name=user_data.full_name
+        full_name=clean_full_name
     )
     
     created_user = await user_repository.create_user(db, new_user)
@@ -42,7 +49,8 @@ async def register_user(db: AsyncSession, user_data: UserRegister):
     }
 
 async def authenticate_user(db: AsyncSession, login_data: UserLogin, user_agent: str = None, ip_address: str = None):
-    user = await user_repository.get_user_by_email_or_username(db, login_data.username_or_email)
+    clean_identifier = login_data.username_or_email.strip() if login_data.username_or_email else ""
+    user = await user_repository.get_user_by_email_or_username(db, clean_identifier)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials.")
     
@@ -50,7 +58,10 @@ async def authenticate_user(db: AsyncSession, login_data: UserLogin, user_agent:
         raise HTTPException(status_code=401, detail="Invalid credentials.")
         
     if user.status == "BANNED":
-        raise HTTPException(status_code=403, detail="Account is banned.")
+        raise HTTPException(status_code=403, detail="Tài khoản của bạn đã bị khóa.")
+        
+    if user.status == "INACTIVE":
+        raise HTTPException(status_code=403, detail="Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.")
 
     # Load role
     role_result = await db.execute(select(Role).where(Role.id == user.role_id))

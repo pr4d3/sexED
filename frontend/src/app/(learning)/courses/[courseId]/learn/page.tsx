@@ -6,6 +6,9 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { LearnPageSkeleton } from '@/components/Skeleton';
 import { useToast } from '@/context/ToastContext';
+import { VideoPlayer } from '@/components/VideoPlayer';
+
+import confetti from 'canvas-confetti';
 
 interface Lesson {
     lesson_id: string;
@@ -15,6 +18,12 @@ interface Lesson {
     video_url: string | null;
     content_body: string | null;
     is_completed: boolean;
+}
+
+function getCleanLessonTitle(title: string): string {
+    if (!title) return '';
+    const cleaned = title.replace(/^(bài\s*\d+[\s:.-]*|\d+[\s:.-]+)/i, '').trim();
+    return cleaned || title;
 }
 
 export default function CourseLearnPage() {
@@ -29,12 +38,33 @@ export default function CourseLearnPage() {
     const [error, setError] = useState<string | null>(null);
     const [activeIdx, setActiveIdx] = useState(0);
     const [completing, setCompleting] = useState(false);
+    const [completionModalOpen, setCompletionModalOpen] = useState(false);
+    const [outroInfo, setOutroInfo] = useState<any>(null);
     const { showToast } = useToast();
 
     useEffect(() => {
         if (!courseId) return;
         fetchLearningRoom();
     }, [courseId]);
+
+    const triggerConfetti = () => {
+        const duration = 3 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+        function randomInRange(min: number, max: number) {
+            return Math.random() * (max - min) + min;
+        }
+
+        const interval: any = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+
+            const particleCount = 50 * (timeLeft / duration);
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+        }, 250);
+    };
 
     const fetchLearningRoom = async () => {
         try {
@@ -72,7 +102,17 @@ export default function CourseLearnPage() {
 
                 if (res.data.is_course_just_completed) {
                     showToast("Chúc mừng bạn đã hoàn thành khóa học!", "success");
-                    router.push(`/courses/${courseId}/outro`);
+                    // Fetch outro/cert data and show in-room celebration modal
+                    try {
+                        const outroRes = await api.get(`/courses/${courseId}/outro`);
+                        if (outroRes.success) {
+                            setOutroInfo(outroRes.data);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                    setCompletionModalOpen(true);
+                    triggerConfetti();
                 } else {
                     showToast("Đã hoàn thành bài học!", "success");
                     if (activeIdx < learnData.lessons.length - 1) {
@@ -125,7 +165,7 @@ export default function CourseLearnPage() {
                         <span className="text-xs font-bold hidden sm:inline">Quay lại</span>
                     </button>
                     <h1 className="text-sm md:text-base font-extrabold text-on-surface truncate flex-grow text-center px-4">
-                        Bài {currentLesson.order_index}: {currentLesson.title}
+                        Bài {currentLesson.order_index}: {getCleanLessonTitle(currentLesson.title)}
                     </h1>
                     <div className="w-16 sm:w-24 flex justify-end">
                         <span className="text-xs font-bold text-primary">{progress}%</span>
@@ -144,11 +184,12 @@ export default function CourseLearnPage() {
                     <div className="p-6 md:p-10 flex-grow">
                         {/* Video Player Container (16:9) */}
                         {currentLesson.content_type !== 'TEXT' && currentLesson.video_url ? (
-                            <div className="w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-sm mb-8 border border-white/80">
-                                <video
-                                    src={currentLesson.video_url}
-                                    controls
-                                    className="h-full w-full object-contain"
+                            <div className="mb-8">
+                                <VideoPlayer
+                                    key={currentLesson.lesson_id + currentLesson.video_url}
+                                    url={currentLesson.video_url}
+                                    title={currentLesson.title}
+                                    autoPlay={true}
                                 />
                             </div>
                         ) : (
@@ -169,13 +210,13 @@ export default function CourseLearnPage() {
                         {/* Lesson Info */}
                         <div className="max-w-4xl mx-auto space-y-6">
                             <div className="flex items-center gap-2 mb-4">
-                                <span className="bg-primary/10 text-primary px-3.5 py-1 rounded-full text-[10px] font-bold uppercase">Y khoa</span>
-                                <span className="bg-surface-container-highest text-on-surface-variant px-3.5 py-1 rounded-full text-[10px] font-bold uppercase flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-[12px]">schedule</span> 15 phút
+                                <span className="bg-primary/10 text-primary px-3.5 py-1 rounded-full text-[10px] font-bold uppercase flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[12px]">{currentLesson.content_type === 'VIDEO' ? 'ondemand_video' : 'article'}</span>
+                                    {currentLesson.content_type === 'VIDEO' ? 'Video bài giảng' : 'Tài liệu đọc'}
                                 </span>
                             </div>
                             <h2 className="text-xl md:text-2xl font-extrabold text-on-surface">
-                                {currentLesson.title}
+                                Bài {currentLesson.order_index}: {getCleanLessonTitle(currentLesson.title)}
                             </h2>
                             
                             {/* Content Body (Render raw HTML or markdown text) */}
@@ -261,7 +302,7 @@ export default function CourseLearnPage() {
                                     </div>
                                     <div className="flex-1">
                                         <p className={`text-xs font-bold ${isActive ? 'text-primary' : 'text-on-surface'}`}>
-                                            {lesson.order_index}. {lesson.title}
+                                            Bài {lesson.order_index}: {getCleanLessonTitle(lesson.title)}
                                         </p>
                                         <p className="text-[10px] text-on-surface-variant mt-1 flex items-center gap-1 font-medium">
                                             <span className="material-symbols-outlined text-[12px]">{lesson.content_type === 'VIDEO' ? 'ondemand_video' : 'article'}</span>
@@ -274,6 +315,64 @@ export default function CourseLearnPage() {
                     </div>
                 </aside>
             </main>
+
+            {/* In-Room Course Graduation Modal */}
+            {completionModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+                    <div className="bg-white rounded-3xl p-8 sm:p-10 max-w-lg w-full shadow-2xl border border-white/80 relative text-center flex flex-col items-center gap-6 animate-scale-up">
+                        {/* Trophy Glow Icon */}
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg relative">
+                            <div className="absolute inset-0 rounded-full bg-amber-400 blur-xl opacity-60 animate-pulse"></div>
+                            <span className="material-symbols-outlined text-white relative z-10 text-[42px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                workspace_premium
+                            </span>
+                        </div>
+
+                        <div className="space-y-2">
+                            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider">
+                                Khóa học hoàn tất
+                            </span>
+                            <h2 className="text-2xl font-extrabold text-on-surface">
+                                Chúc mừng bạn đã tốt nghiệp!
+                            </h2>
+                            <p className="text-sm font-bold text-primary">
+                                {learnData?.course_title}
+                            </p>
+                            <p className="text-xs text-on-surface-variant font-light leading-relaxed pt-1 max-w-sm mx-auto">
+                                {outroInfo?.outro_content || 'Bạn đã xuất sắc hoàn thành toàn bộ lộ trình bài giảng và tích lũy trọn vẹn kiến thức chuẩn y khoa.'}
+                            </p>
+                        </div>
+
+                        {/* CTAs */}
+                        <div className="w-full space-y-3 pt-2">
+                            <button
+                                onClick={() => router.push(`/courses/${courseId}/certificate`)}
+                                className="w-full bg-gradient-to-r from-secondary-container to-secondary text-white py-3.5 px-6 rounded-full font-bold text-xs shadow-md hover:shadow-lg hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">verified</span>
+                                <span>Nhận &amp; In Chứng Chỉ Điện Tử</span>
+                                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                            </button>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={() => router.push('/game')}
+                                    className="w-full bg-primary/10 border border-primary/20 text-primary py-3 px-4 rounded-full font-bold text-xs hover:bg-primary/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                >
+                                    <span className="material-symbols-outlined text-[16px]">smart_toy</span>
+                                    <span>AI Roleplay</span>
+                                </button>
+                                <button
+                                    onClick={() => setCompletionModalOpen(false)}
+                                    className="w-full bg-surface-container text-on-surface-variant py-3 px-4 rounded-full font-bold text-xs hover:bg-surface-container-high transition-all flex items-center justify-center cursor-pointer"
+                                >
+                                    <span>Xem lại bài học</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

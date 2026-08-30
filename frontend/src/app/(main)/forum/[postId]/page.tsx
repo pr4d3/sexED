@@ -361,11 +361,17 @@ export default function PostDetailPage() {
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
                 {post.is_anonymous ? (
-                  <div className="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
                     <UserX className="w-5 h-5" />
                   </div>
+                ) : post.author.avatar_url ? (
+                  <img
+                    src={post.author.avatar_url}
+                    alt={post.author.full_name}
+                    className="w-10 h-10 rounded-full object-cover border border-outline-variant/30 shadow-xs flex-shrink-0"
+                  />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-base shadow-xs flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-base shadow-xs flex-shrink-0">
                     {post.author.full_name.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -530,11 +536,17 @@ export default function PostDetailPage() {
               >
                 <div className="flex-shrink-0">
                   {mainAnonymous ? (
-                    <div className="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs">
+                    <div className="w-9 h-9 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs">
                       <UserX className="w-4 h-4" />
                     </div>
+                  ) : (user as any).avatar_url ? (
+                    <img
+                      src={(user as any).avatar_url}
+                      alt={user.full_name}
+                      className="w-9 h-9 rounded-full object-cover border border-outline-variant/30 shadow-xs flex-shrink-0"
+                    />
                   ) : (
-                    <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs">
+                    <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs">
                       {user.full_name
                         ? user.full_name.charAt(0).toUpperCase()
                         : "U"}
@@ -731,11 +743,17 @@ const CommentItem: React.FC<CommentItemProps> = ({
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2.5">
           {comment.is_anonymous ? (
-            <div className="w-8 h-8 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
               <UserX className="w-4 h-4" />
             </div>
+          ) : comment.author.avatar_url ? (
+            <img
+              src={comment.author.avatar_url}
+              alt={comment.author.full_name}
+              className="w-8 h-8 rounded-full object-cover border border-outline-variant/30 shadow-xs flex-shrink-0"
+            />
           ) : (
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs flex-shrink-0">
               {comment.author.full_name.charAt(0).toUpperCase()}
             </div>
           )}

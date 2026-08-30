@@ -352,11 +352,17 @@ export default function ForumPage() {
                                 {/* Author Avatar or Anonymous Indicator */}
                                 <div className="flex-shrink-0">
                                     {isAnonymous ? (
-                                        <div className="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant/40 flex items-center justify-center text-primary shadow-xs">
+                                        <div className="w-9 h-9 rounded-full bg-surface-container border border-outline-variant/40 flex items-center justify-center text-primary shadow-xs">
                                             <UserX className="w-4 h-4" />
                                         </div>
+                                    ) : (user as any).avatar_url ? (
+                                        <img
+                                            src={(user as any).avatar_url}
+                                            alt={user.full_name}
+                                            className="w-9 h-9 rounded-full object-cover border border-outline-variant/30 shadow-xs flex-shrink-0"
+                                        />
                                     ) : (
-                                        <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs">
+                                        <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs">
                                             {user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
                                         </div>
                                     )}
@@ -575,11 +581,17 @@ export default function ForumPage() {
                                             {/* Avatar Column */}
                                             <div className="flex flex-col items-center">
                                                 {post.is_anonymous ? (
-                                                    <div className="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
+                                                    <div className="w-9 h-9 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
                                                         <UserX className="w-4 h-4" />
                                                     </div>
+                                                ) : post.author.avatar_url ? (
+                                                    <img
+                                                        src={post.author.avatar_url}
+                                                        alt={post.author.full_name}
+                                                        className="w-9 h-9 rounded-full object-cover border border-outline-variant/30 shadow-xs flex-shrink-0"
+                                                    />
                                                 ) : (
-                                                    <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs flex-shrink-0">
+                                                    <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shadow-xs flex-shrink-0">
                                                         {post.author.full_name.charAt(0).toUpperCase()}
                                                     </div>
                                                 )}

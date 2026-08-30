@@ -59,6 +59,7 @@ export default function RegisterPage() {
 
     const validatePassword = (val: string) => {
         if (!val) return "Mật khẩu không được để trống";
+        if (/\s/.test(val)) return "Mật khẩu không được chứa khoảng trắng";
         if (val.length < 6) return "Mật khẩu phải có ít nhất 6 ký tự";
         const hasLetter = /[a-zA-Z]/.test(val);
         const hasNumber = /\d/.test(val);
@@ -340,6 +341,17 @@ export default function RegisterPage() {
                             )}
                             <span className={/\d/.test(password) ? "text-green-600 font-semibold" : "text-on-surface-variant/50"}>
                                 Chứa ít nhất 1 chữ số
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[11px] font-medium transition-all">
+                            {password && !/\s/.test(password) ? (
+                                <span className="material-symbols-outlined text-green-500 text-xs font-bold select-none">check</span>
+                            ) : (
+                                <span className="h-1.5 w-1.5 rounded-full bg-on-surface-variant/40 ml-1.5 mr-1" />
+                            )}
+                            <span className={password && !/\s/.test(password) ? "text-green-600 font-semibold" : "text-on-surface-variant/50"}>
+                                Không chứa khoảng trắng
                             </span>
                         </div>
                     </div>

@@ -10,13 +10,33 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
+
+    React.useEffect(() => {
+        if (!loading) {
+            if (!user) {
+                router.replace('/login');
+            } else if (user.role !== 'ADMIN' && user.role !== 'INSTRUCTOR') {
+                router.replace('/invalid?reason=' + encodeURIComponent('Trang quản trị hệ thống chỉ dành cho Quản trị viên và Chuyên gia giảng dạy.'));
+            } else if (pathname.startsWith('/dashboard/users') && user.role !== 'ADMIN') {
+                router.replace('/invalid?reason=' + encodeURIComponent('Chức năng Quản lý người dùng chỉ dành riêng cho Quản trị viên cấp cao.'));
+            }
+        }
+    }, [user, loading, pathname, router]);
 
     const isLinkActive = (path: string) => {
         return pathname === path;
     };
+
+    if (loading || (!user || (user.role !== 'ADMIN' && user.role !== 'INSTRUCTOR'))) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="flex min-h-screen w-full bg-background text-on-background antialiased font-sans">
@@ -48,6 +68,20 @@ export default function DashboardLayout({
                             <span className="material-symbols-outlined text-[18px]">analytics</span>
                             Tổng quan số liệu
                         </Link>
+
+                        {user?.role === 'ADMIN' && (
+                            <Link
+                                href="/dashboard/users"
+                                className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition-all ${
+                                    isLinkActive('/dashboard/users') 
+                                        ? 'bg-primary text-white shadow-sm' 
+                                        : 'text-on-surface-variant hover:text-on-surface hover:bg-white/50'
+                                }`}
+                            >
+                                <span className="material-symbols-outlined text-[18px]">manage_accounts</span>
+                                Quản lý người dùng
+                            </Link>
+                        )}
 
                         <Link
                             href="/dashboard/students"

@@ -13,11 +13,30 @@ const FIELD_LABELS: Record<string, string> = {
     is_anonymous: 'Chế độ ẩn danh',
 };
 
-function formatUserFriendlyError(data: any, status: number): string {
+function formatUserFriendlyError(data: any, status: number, endpoint: string = ''): string {
+    if (typeof data.detail === 'string') {
+        const d = data.detail.toLowerCase();
+        if (d.includes('incorrect password') || d.includes('invalid credentials') || d.includes('sai thông tin') || d.includes('không chính xác')) {
+            return 'Tên đăng nhập, email hoặc mật khẩu không chính xác.';
+        }
+        if (d.includes('user already exists') || d.includes('email already registered')) {
+            return 'Email này đã được đăng ký tài khoản.';
+        }
+        if (d.includes('banned') || d.includes('account is banned')) {
+            return 'Tài khoản của bạn đã bị khóa hoặc vô hiệu hóa.';
+        }
+    }
+
     if (status === 401) {
+        if (endpoint.includes('/auth/login')) {
+            return 'Tên đăng nhập, email hoặc mật khẩu không chính xác.';
+        }
         return 'Phiên đăng nhập đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.';
     }
     if (status === 403) {
+        if (typeof data.detail === 'string' && data.detail) {
+            return data.detail;
+        }
         return 'Bạn không có quyền thực hiện hành động này.';
     }
     if (status === 404) {
@@ -29,12 +48,6 @@ function formatUserFriendlyError(data: any, status: number): string {
 
     if (typeof data.detail === 'string') {
         const d = data.detail.toLowerCase();
-        if (d.includes('incorrect password') || d.includes('invalid credentials')) {
-            return 'Email hoặc mật khẩu không chính xác.';
-        }
-        if (d.includes('user already exists') || d.includes('email already registered')) {
-            return 'Email này đã được đăng ký tài khoản.';
-        }
         if (d.includes('not authenticated') || d.includes('credentials')) {
             return 'Vui lòng đăng nhập để tiếp tục.';
         }
@@ -152,7 +165,15 @@ export const api = {
                 window.location.href = '/login';
             }
 
-            const friendlyMessage = formatUserFriendlyError(data, response.status);
+            if (response.status === 403 && typeof window !== 'undefined' && endpoint !== '/auth/login') {
+                const detailStr = typeof data.detail === 'string' ? data.detail.toLowerCase() : '';
+                if (detailStr.includes('vô hiệu hóa') || detailStr.includes('khóa') || detailStr.includes('banned') || detailStr.includes('inactive')) {
+                    api.clearAuth();
+                    window.location.href = '/login';
+                }
+            }
+
+            const friendlyMessage = formatUserFriendlyError(data, response.status, endpoint);
             throw new Error(friendlyMessage);
         }
         
