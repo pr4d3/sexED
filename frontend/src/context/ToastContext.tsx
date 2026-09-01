@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { CheckCircle, XCircle, Warning, Info, X } from "@phosphor-icons/react";
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -11,13 +12,17 @@ export interface Toast {
 }
 
 interface ToastContextType {
-    showToast: (message: string, type?: ToastType) => void;
+    showToast: (message: string | any, type?: ToastType) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [toasts, setToasts] = useState<Toast[]>([]);
+
+    const removeToast = useCallback((id: string) => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, []);
 
     const showToast = useCallback((message: any, type: ToastType = 'info') => {
         let text = 'Thông báo';
@@ -39,27 +44,23 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }, 4000);
     }, []);
 
-    const removeToast = (id: string) => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-    };
-
     return (
         <ToastContext.Provider value={{ showToast }}>
             {children}
             {/* Toast Container */}
             <div className="fixed top-5 right-5 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0">
                 {toasts.map((toast) => {
-                    let iconName = 'info';
+                    let IconComponent = Info;
                     let iconColorClass = 'text-primary';
 
                     if (toast.type === 'success') {
-                        iconName = 'check_circle';
-                        iconColorClass = 'text-green-600';
+                        IconComponent = CheckCircle;
+                        iconColorClass = 'text-emerald-600';
                     } else if (toast.type === 'error') {
-                        iconName = 'cancel';
+                        IconComponent = XCircle;
                         iconColorClass = 'text-red-600';
                     } else if (toast.type === 'warning') {
-                        iconName = 'warning';
+                        IconComponent = Warning;
                         iconColorClass = 'text-amber-600';
                     }
 
@@ -68,9 +69,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                             key={toast.id}
                             className="pointer-events-auto flex items-center gap-3 bg-white text-on-surface px-5 py-4 rounded-2xl border border-outline-variant/30 shadow-2xl backdrop-blur-md transition-all duration-300 animate-slide-in"
                         >
-                            <span className={`material-symbols-outlined ${iconColorClass} text-xl flex-shrink-0`}>
-                                {iconName}
-                            </span>
+                            <IconComponent size={22} weight="fill" className={`${iconColorClass} shrink-0`} />
                             <div className="flex-grow text-xs font-bold text-on-surface leading-relaxed">
                                 {toast.message}
                             </div>
@@ -78,7 +77,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                                 onClick={() => removeToast(toast.id)}
                                 className="text-outline hover:text-on-surface transition-colors cursor-pointer flex-shrink-0"
                             >
-                                <span className="material-symbols-outlined text-[16px]">close</span>
+                                <X size={16} weight="bold" />
                             </button>
                         </div>
                     );

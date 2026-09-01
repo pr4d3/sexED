@@ -22,8 +22,9 @@ const windSong = WindSong({
 });
 
 export const metadata: Metadata = {
-  title: "ChiChan SexEd - Nền tảng Giáo dục Giới tính Trực tuyến",
-  description: "Nền tảng e-learning chuẩn y khoa giúp phụ huynh và thanh thiếu niên thấu hiểu giới tính, tâm lý dậy thì và kỹ năng bảo vệ bản thân.",
+  title: "ChiChan - Nền tảng Giáo dục Giới tính Trực tuyến",
+  description:
+    "Nền tảng e-learning chuẩn y khoa giúp phụ huynh và thanh thiếu niên thấu hiểu giới tính, tâm lý dậy thì và kỹ năng bảo vệ bản thân.",
 };
 
 export default function RootLayout({
@@ -32,10 +33,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${inter.variable} ${meaCulpa.variable} ${windSong.variable} h-full`}>
+    <html
+      lang="vi"
+      className={`${inter.variable} ${meaCulpa.variable} ${windSong.variable} h-full`}
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
@@ -43,12 +51,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full bg-background text-on-background font-sans antialiased flex flex-col">
         <ToastProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </ToastProvider>
       </body>
     </html>
   );
 }
-

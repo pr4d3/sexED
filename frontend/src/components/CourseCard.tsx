@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 
 export interface CourseItem {
   id: string;
@@ -53,9 +54,7 @@ export function CourseCard({ course }: CourseCardProps) {
           </span>
           <span className="text-xs font-bold text-primary flex items-center gap-1.5 shrink-0 group-hover:text-primary-container transition-colors">
             <span>{course.total_lessons} bài học</span>
-            <span className="material-symbols-outlined text-[15px] group-hover:translate-x-1 transition-transform">
-              arrow_forward
-            </span>
+            <ArrowRight size={15} weight="bold" className="group-hover:translate-x-1 transition-transform" />
           </span>
         </div>
       </div>

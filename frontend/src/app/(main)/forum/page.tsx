@@ -7,23 +7,21 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { ForumPostSkeleton } from '@/components/Skeleton';
 import { useToast } from '@/context/ToastContext';
-import { 
-    MessageCircle, 
-    Heart, 
-    Share2, 
-    Search, 
-    Sparkles, 
-    Send, 
-    UserX, 
-    X,
-    Filter,
-    Flame,
-    BarChart2,
-    ChevronDown,
-    Check,
-    Trash2,
-    Loader2
-} from 'lucide-react';
+import {
+  MagnifyingGlass,
+  X,
+  UserCircle,
+  Funnel,
+  CaretDown,
+  Check,
+  PaperPlaneTilt,
+  ChatCircleDots,
+  Heart,
+  ChartBar,
+  ShareNetwork,
+  Trash,
+  CircleNotch
+} from "@phosphor-icons/react";
 
 interface Category {
     id: number;
@@ -316,7 +314,7 @@ export default function ForumPage() {
 
                     {/* Search Input */}
                     <div className="relative flex-1 max-w-xs">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
+                        <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
                         <input 
                             type="text"
                             value={search}
@@ -329,7 +327,7 @@ export default function ForumPage() {
                                 onClick={() => { setSearch(''); fetchPosts(''); }}
                                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface cursor-pointer"
                             >
-                                <X className="w-3.5 h-3.5" />
+                                <X size={14} />
                             </button>
                         )}
                     </div>
@@ -353,7 +351,7 @@ export default function ForumPage() {
                                 <div className="flex-shrink-0">
                                     {isAnonymous ? (
                                         <div className="w-9 h-9 rounded-full bg-surface-container border border-outline-variant/40 flex items-center justify-center text-primary shadow-xs">
-                                            <UserX className="w-4 h-4" />
+                                            <UserCircle size={18} weight="duotone" />
                                         </div>
                                     ) : (user as any).avatar_url ? (
                                         <img
@@ -374,7 +372,7 @@ export default function ForumPage() {
                                         <span className="text-xs font-bold text-on-surface">
                                             {isAnonymous ? (
                                                 <span className="text-primary flex items-center gap-1">
-                                                    <UserX className="w-3.5 h-3.5" />
+                                                    <UserCircle size={14} weight="duotone" />
                                                     Người dùng ẩn danh (Bạn)
                                                 </span>
                                             ) : (
@@ -392,7 +390,7 @@ export default function ForumPage() {
                                                     : 'bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-outline-variant/30'
                                             }`}
                                         >
-                                            <UserX className="w-3 h-3" />
+                                            <UserCircle size={14} weight="duotone" />
                                             {isAnonymous ? 'Đang ẩn danh' : 'Đăng ẩn danh'}
                                         </button>
                                     </div>
@@ -425,7 +423,7 @@ export default function ForumPage() {
                                             <div ref={catDropdownRef} className="relative">
                                                 <div className="flex items-center gap-1.5">
                                                     <label className="text-[11px] font-semibold text-on-surface-variant flex items-center gap-1">
-                                                        <Filter className="w-3 h-3" /> Chủ đề:
+                                                        <Funnel size={13} weight="bold" /> Chủ đề:
                                                     </label>
                                                     <button
                                                         type="button"
@@ -435,7 +433,7 @@ export default function ForumPage() {
                                                         <span className="truncate max-w-[150px] sm:max-w-[200px]">
                                                             {selectedCatObject ? selectedCatObject.name : "Chọn chủ đề"}
                                                         </span>
-                                                        <ChevronDown className={`w-3.5 h-3.5 text-on-surface-variant/70 transition-transform duration-200 ${catDropdownOpen ? 'rotate-180' : ''}`} />
+                                                        <CaretDown size={14} weight="bold" className={`text-on-surface-variant/70 transition-transform duration-200 ${catDropdownOpen ? 'rotate-180' : ''}`} />
                                                     </button>
                                                 </div>
 
@@ -463,7 +461,7 @@ export default function ForumPage() {
                                                                         }`}
                                                                     >
                                                                         <span className="truncate pr-2">{c.name}</span>
-                                                                        {isSelected && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
+                                                                        {isSelected && <Check size={14} weight="bold" className="text-primary flex-shrink-0" />}
                                                                     </button>
                                                                 );
                                                             })}
@@ -491,7 +489,7 @@ export default function ForumPage() {
                                                     disabled={submitting}
                                                     className="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                                                 >
-                                                    <Send className="w-3.5 h-3.5" />
+                                                    <PaperPlaneTilt size={14} weight="fill" />
                                                     {submitting ? 'Đang đăng...' : 'Đăng bài'}
                                                 </button>
                                             </div>
@@ -561,7 +559,7 @@ export default function ForumPage() {
                         </div>
                     ) : posts.length === 0 ? (
                         <div className="text-center py-20 px-4 space-y-2">
-                            <UserX className="w-8 h-8 text-on-surface-variant/40 mx-auto" />
+                            <UserCircle size={32} weight="duotone" className="text-on-surface-variant/40 mx-auto" />
                             <p className="text-sm font-bold text-on-surface">Chưa có bài thảo luận nào</p>
                             <p className="text-xs text-on-surface-variant/70">Hãy là người đầu tiên mở đầu chuỗi thảo luận trong mục này!</p>
                         </div>
@@ -582,7 +580,7 @@ export default function ForumPage() {
                                             <div className="flex flex-col items-center">
                                                 {post.is_anonymous ? (
                                                     <div className="w-9 h-9 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
-                                                        <UserX className="w-4 h-4" />
+                                                        <UserCircle size={18} weight="duotone" />
                                                     </div>
                                                 ) : post.author.avatar_url ? (
                                                     <img
@@ -655,11 +653,11 @@ export default function ForumPage() {
                                                     <div className="flex items-center gap-5 sm:gap-7">
                                                         {/* Reply / Comments */}
                                                         <Link 
-                                                            href={`/forum/${post.id}`}
+                                                             href={`/forum/${post.id}`}
                                                             className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"
                                                             title="Bình luận"
                                                         >
-                                                            <MessageCircle className="w-4 h-4" />
+                                                            <ChatCircleDots size={16} weight="duotone" />
                                                             <span>{formatCompactNumber(post.comment_count)}</span>
                                                         </Link>
 
@@ -671,7 +669,7 @@ export default function ForumPage() {
                                                             }`}
                                                             title={isLiked ? "Bỏ thích" : "Thích"}
                                                         >
-                                                            <Heart className={`w-4 h-4 transition-transform active:scale-125 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+                                                            <Heart size={16} weight={isLiked ? "fill" : "regular"} className={`transition-transform active:scale-125 ${isLiked ? 'text-red-500' : ''}`} />
                                                             <span className={isLiked ? 'font-bold text-red-500' : ''}>{formatCompactNumber(post.likes_count)}</span>
                                                         </button>
 
@@ -680,7 +678,7 @@ export default function ForumPage() {
                                                             className="flex items-center gap-1.5 text-on-surface-variant/60 select-none"
                                                             title={`${post.views_count || 0} lượt xem`}
                                                         >
-                                                            <BarChart2 className="w-4 h-4" />
+                                                            <ChartBar size={16} weight="duotone" />
                                                             <span>{formatCompactNumber(post.views_count || 0)}</span>
                                                         </div>
 
@@ -690,7 +688,7 @@ export default function ForumPage() {
                                                             className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"
                                                             title="Sao chép liên kết"
                                                         >
-                                                            <Share2 className="w-4 h-4" />
+                                                            <ShareNetwork size={16} weight="duotone" />
                                                         </button>
 
                                                         {/* Delete Post Button for Owner or Admin */}
@@ -700,7 +698,7 @@ export default function ForumPage() {
                                                                 className="flex items-center gap-1.5 hover:text-red-500 text-red-400 transition-colors cursor-pointer"
                                                                 title="Xóa bài viết"
                                                             >
-                                                                <Trash2 className="w-4 h-4" />
+                                                                <Trash size={16} weight="duotone" />
                                                             </button>
                                                         )}
                                                     </div>

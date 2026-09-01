@@ -4,15 +4,26 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import Link from "next/link";
+import { BRAND_CONFIG } from "@/config/branding";
+import {
+  Certificate,
+  ArrowLeft,
+  DownloadSimple,
+  ArrowRight,
+  GraduationCap,
+  SealCheck,
+  ClipboardText,
+  ArrowSquareOut,
+} from "@phosphor-icons/react";
+import { toPng } from "html-to-image";
+import jsPDF from "jspdf";
 
 function getSignatureName(str: string): string {
   if (!str) return "";
-  // Strip all academic prefixes
   let cleaned = str.replace(/^(GS|PGS|TS|ThS|BS|Dr|Prof)(\.|\s)+/gi, "");
   cleaned = cleaned.replace(/^(GS|PGS|TS|ThS|BS|Dr|Prof)(\.|\s)+/gi, "");
   cleaned = cleaned.replace(/^(GS|PGS|TS|ThS|BS|Dr|Prof)(\.|\s)+/gi, "");
 
-  // Convert tones
   const noTones = cleaned
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -20,16 +31,11 @@ function getSignatureName(str: string): string {
     .replace(/Đ/g, "D")
     .trim();
 
-  // Extract last word (e.g. "Nguyen Lan Anh" -> "Anh")
   const parts = noTones.split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "";
   const lastName = parts[parts.length - 1];
-  // Capitalize properly
   return lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
 }
-
-import { toPng } from "html-to-image";
-import jsPDF from "jspdf";
 
 export default function CourseCertificatePage() {
   const params = useParams();
@@ -77,7 +83,10 @@ export default function CourseCertificatePage() {
         fontEmbedCSS: "", // Do not read external stylesheets into SVG to avoid browser CORS SecurityError
         skipFonts: true,
         filter: (node) => {
-          if (node.tagName === 'LINK' && (node as HTMLLinkElement).rel === 'stylesheet') {
+          if (
+            node.tagName === "LINK" &&
+            (node as HTMLLinkElement).rel === "stylesheet"
+          ) {
             return false;
           }
           return true;
@@ -135,9 +144,7 @@ export default function CourseCertificatePage() {
       <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4">
         <div className="text-center py-16 max-w-md mx-auto space-y-6 bg-white/80 backdrop-blur-md p-10 rounded-3xl border border-white/60 shadow-sm">
           <div className="w-16 h-16 mx-auto bg-red-50 text-error rounded-2xl flex items-center justify-center shadow-sm">
-            <span className="material-symbols-outlined text-3xl">
-              workspace_premium
-            </span>
+            <Certificate size={32} weight="duotone" />
           </div>
           <h2 className="text-lg font-bold text-on-surface">
             Chưa hoàn thành khóa học
@@ -185,9 +192,7 @@ export default function CourseCertificatePage() {
           href={`/courses/${courseId}/learn`}
           className="inline-flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-primary transition-colors bg-white/70 backdrop-blur-md px-4 py-2 rounded-full border border-white/60 shadow-xs"
         >
-          <span className="material-symbols-outlined text-[16px]">
-            arrow_back
-          </span>
+          <ArrowLeft size={16} weight="bold" />
           Quay lại khóa học
         </Link>
 
@@ -204,9 +209,7 @@ export default function CourseCertificatePage() {
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[18px]">
-                  download
-                </span>
+                <DownloadSimple size={18} weight="bold" />
                 <span>Tải Chứng Chỉ (PDF)</span>
               </>
             )}
@@ -216,9 +219,7 @@ export default function CourseCertificatePage() {
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 border border-white/60 text-on-surface text-xs font-bold shadow-xs hover:bg-white transition-all"
           >
             <span>Khám phá khóa khác</span>
-            <span className="material-symbols-outlined text-[16px]">
-              arrow_forward
-            </span>
+            <ArrowRight size={16} weight="bold" />
           </Link>
         </div>
       </div>
@@ -240,19 +241,13 @@ export default function CourseCertificatePage() {
 
         {/* Certificate Watermark Logo */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-          <span className="material-symbols-outlined text-[360px]">school</span>
+          <GraduationCap size={360} weight="fill" />
         </div>
 
         {/* Top Header */}
         <div className="space-y-1">
           <div className="flex items-center justify-center gap-2 text-primary font-black tracking-widest text-xs uppercase mb-1">
-            <span
-              className="material-symbols-outlined text-base"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              verified
-            </span>
-            Nền Tảng Giáo Dục Giới Tính SexED
+            Nền Tảng Giáo Dục Giới Tính {BRAND_CONFIG.name}
           </div>
           <h1 className="text-2xl sm:text-4xl font-serif font-black tracking-wider uppercase text-amber-900 drop-shadow-xs">
             Chứng Nhận Hoàn Thành
@@ -319,9 +314,7 @@ export default function CourseCertificatePage() {
         <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/60 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2 text-primary font-bold text-xs">
-              <span className="material-symbols-outlined text-[18px]">
-                assignment
-              </span>
+              <ClipboardText size={18} weight="bold" />
               Phiếu khảo sát đóng góp nghiên cứu
             </div>
             <p className="text-xs text-on-surface-variant leading-relaxed font-light max-w-xl">
@@ -339,9 +332,7 @@ export default function CourseCertificatePage() {
             className="flex-shrink-0 inline-flex h-11 px-8 items-center justify-center gap-2 rounded-full bg-primary text-xs font-bold text-white shadow-sm hover:shadow-md hover:opacity-95 transition-all"
           >
             <span>Làm khảo sát ẩn danh (2 phút)</span>
-            <span className="material-symbols-outlined text-[16px]">
-              open_in_new
-            </span>
+            <ArrowSquareOut size={16} weight="bold" />
           </a>
         </div>
       </div>

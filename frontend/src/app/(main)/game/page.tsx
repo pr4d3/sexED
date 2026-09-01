@@ -4,6 +4,16 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
+import {
+  Robot,
+  ShieldWarning,
+  FirstAid,
+  UsersThree,
+  HeartStraight,
+  ArrowRight,
+  Warning,
+  Sparkle,
+} from "@phosphor-icons/react";
 
 interface Scenario {
   id: number;
@@ -21,7 +31,7 @@ interface ScenarioTheme {
   borderColor: string;
   badgeStyle: string;
   categoryTitle: string;
-  iconName: string;
+  IconComponent: any;
   iconColor: string;
   description: string;
 }
@@ -32,7 +42,7 @@ const scenarioThemeMap: Record<string, ScenarioTheme> = {
     borderColor: "border-red-200/60 hover:border-red-400/80",
     badgeStyle: "bg-red-50 text-red-600 border border-red-200/80",
     categoryTitle: "An toàn mạng",
-    iconName: "security",
+    IconComponent: ShieldWarning,
     iconColor: "text-red-600 bg-red-100/60",
     description:
       "Luyện kỹ năng nhận diện nguy cơ dụ dỗ, bảo vệ ranh giới cá nhân khi kẻ ẩn danh trên mạng xã hội yêu cầu hình ảnh nhạy cảm.",
@@ -43,7 +53,7 @@ const scenarioThemeMap: Record<string, ScenarioTheme> = {
     badgeStyle:
       "bg-primary-fixed text-on-primary-fixed-variant border border-primary/20",
     categoryTitle: "Y khoa tuổi dậy thì",
-    iconName: "medical_services",
+    IconComponent: FirstAid,
     iconColor: "text-primary bg-primary-fixed/50",
     description:
       "Bác sĩ chuyên khoa tâm lý trực tuyến giải đáp 100% thắc mắc sinh lý thầm kín, tuổi dậy thì bằng ngôn ngữ chuẩn y khoa, cởi mở.",
@@ -54,7 +64,7 @@ const scenarioThemeMap: Record<string, ScenarioTheme> = {
     badgeStyle:
       "bg-tertiary-fixed text-on-tertiary-fixed-variant border border-tertiary/20",
     categoryTitle: "Tâm lý & Thấu cảm",
-    iconName: "family_restroom",
+    IconComponent: UsersThree,
     iconColor: "text-tertiary bg-tertiary-fixed/50",
     description:
       "Dành riêng cho phụ huynh đóng vai trò cha/mẹ, rèn luyện cách mở lòng đối thoại bình tĩnh, thấu cảm cùng con khi con có biểu hiện cảm nắng.",
@@ -66,7 +76,7 @@ const scenarioThemeMap: Record<string, ScenarioTheme> = {
     badgeStyle:
       "bg-secondary-fixed text-on-secondary-fixed-variant border border-secondary-container/20",
     categoryTitle: "Phòng chống quấy rối",
-    iconName: "favorite",
+    IconComponent: HeartStraight,
     iconColor: "text-secondary-container bg-secondary-fixed/50",
     description:
       "Đóng vai bạn tốt giúp đỡ, an ủi Linh Chi khi bạn bị trêu chọc ác ý về sự phát triển cơ thể sớm, tìm kiếm sự can thiệp từ người lớn.",
@@ -119,12 +129,7 @@ export default function GameLandingPage() {
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-16 bg-gradient-to-br from-surface via-surface-container-low/40 to-surface-container-high/30">
         <div className="bg-white/85 backdrop-blur-xl p-10 md:p-14 rounded-3xl border border-white/80 shadow-sm max-w-xl text-center space-y-6">
           <div className="w-16 h-16 bg-primary-fixed text-primary rounded-3xl mx-auto flex items-center justify-center shadow-sm">
-            <span
-              className="material-symbols-outlined text-[36px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              smart_toy
-            </span>
+            <Robot size={36} weight="duotone" />
           </div>
           <div className="space-y-2">
             <h2 className="text-2xl font-extrabold text-on-surface">
@@ -159,12 +164,7 @@ export default function GameLandingPage() {
       {/* Header Section */}
       <div className="text-center max-w-3xl mx-auto mb-14 space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-xs font-bold uppercase tracking-wider shadow-xs">
-          <span
-            className="material-symbols-outlined text-[16px]"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            smart_toy
-          </span>
+          <Robot size={18} weight="duotone" />
           Mô Phỏng Phản Xạ AI
         </div>
         <h1 className="text-3xl md:text-5xl font-extrabold text-on-surface tracking-tight leading-tight">
@@ -186,9 +186,7 @@ export default function GameLandingPage() {
         </div>
       ) : error ? (
         <div className="bg-white/80 backdrop-blur-md border border-red-200 p-8 rounded-3xl text-center max-w-md mx-auto my-10 shadow-sm space-y-4">
-          <span className="material-symbols-outlined text-4xl text-error">
-            warning
-          </span>
+          <Warning size={40} weight="duotone" className="text-error mx-auto" />
           <p className="text-sm text-error font-semibold">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -206,7 +204,7 @@ export default function GameLandingPage() {
               badgeStyle:
                 "bg-surface-container text-on-surface-variant border border-outline-variant/30",
               categoryTitle: "Kịch bản AI",
-              iconName: "shield",
+              IconComponent: Robot,
               iconColor: "text-primary bg-primary-fixed/50",
               description: "Phòng chơi nhập vai tương tác thông minh với AI.",
             };
@@ -216,6 +214,8 @@ export default function GameLandingPage() {
                 user.role === "STUDENT_CHILD") ||
               (sc.target_audience === "PARENT" &&
                 user.role === "STUDENT_PARENT");
+
+            const ScenarioIcon = theme.IconComponent;
 
             return (
               <div
@@ -229,12 +229,7 @@ export default function GameLandingPage() {
                       <div
                         className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-xs ${theme.iconColor}`}
                       >
-                        <span
-                          className="material-symbols-outlined text-[24px]"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          {theme.iconName}
-                        </span>
+                        <ScenarioIcon size={24} weight="duotone" />
                       </div>
                       <span
                         className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${theme.badgeStyle}`}
@@ -296,9 +291,7 @@ export default function GameLandingPage() {
                     ) : (
                       <>
                         <span>Vào chơi</span>
-                        <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
-                          arrow_forward
-                        </span>
+                        <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
                   </button>

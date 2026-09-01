@@ -9,20 +9,20 @@ import { ForumPostDetailSkeleton } from "@/components/Skeleton";
 import { useToast } from "@/context/ToastContext";
 import {
   ArrowLeft,
-  MessageCircle,
-  ShieldAlert,
-  Reply,
-  Trash2,
-  EyeOff,
+  ChatCircleDots,
+  ShieldWarning,
+  ArrowBendUpLeft,
+  Trash,
+  EyeSlash,
   Eye,
   Heart,
-  Share2,
-  UserX,
-  Send,
-  CornerDownRight,
-  Sparkles,
-  BarChart2,
-} from "lucide-react";
+  ShareNetwork,
+  UserCircle,
+  PaperPlaneTilt,
+  ArrowElbowDownRight,
+  Sparkle,
+  ChartBar,
+} from "@phosphor-icons/react";
 
 interface CommentAuthor {
   id: string | null;
@@ -310,7 +310,7 @@ export default function PostDetailPage() {
             href="/forum"
             className="inline-flex items-center gap-2 px-5 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary/90 transition-colors shadow-xs"
           >
-            <ArrowLeft className="h-4 w-4" /> Quay lại Diễn đàn
+            <ArrowLeft size={16} weight="bold" /> Quay lại Diễn đàn
           </Link>
         </div>
       </div>
@@ -334,7 +334,7 @@ export default function PostDetailPage() {
             href="/forum"
             className="inline-flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft size={16} weight="bold" />
             <span>Diễn đàn</span>
           </Link>
 
@@ -347,7 +347,7 @@ export default function PostDetailPage() {
             className="p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant transition-colors cursor-pointer"
             title="Chia sẻ"
           >
-            <Share2 className="h-4 w-4" />
+            <ShareNetwork size={16} weight="duotone" />
           </button>
         </div>
       </div>
@@ -362,7 +362,7 @@ export default function PostDetailPage() {
               <div className="flex items-center gap-3">
                 {post.is_anonymous ? (
                   <div className="w-10 h-10 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
-                    <UserX className="w-5 h-5" />
+                    <UserCircle size={22} weight="duotone" />
                   </div>
                 ) : post.author.avatar_url ? (
                   <img
@@ -441,7 +441,7 @@ export default function PostDetailPage() {
             {isAdmin && (
               <div className="flex items-center gap-3 pt-2 text-xs font-semibold text-red-500 border-t border-outline-variant/15">
                 <span className="flex items-center gap-1 font-bold uppercase text-[10px] text-on-surface-variant">
-                  <ShieldAlert className="h-3.5 w-3.5" />
+                  <ShieldWarning size={14} weight="duotone" />
                   Kiểm duyệt:
                 </span>
                 {post.status !== "HIDDEN" ? (
@@ -449,14 +449,14 @@ export default function PostDetailPage() {
                     onClick={() => handleModeratePost("HIDE")}
                     className="hover:underline cursor-pointer flex items-center gap-1"
                   >
-                    <EyeOff className="w-3.5 h-3.5" /> Ẩn bài
+                    <EyeSlash size={14} weight="duotone" /> Ẩn bài
                   </button>
                 ) : (
                   <button
                     onClick={() => handleModeratePost("UNHIDE")}
                     className="hover:underline cursor-pointer text-green-500 flex items-center gap-1"
                   >
-                    <Eye className="w-3.5 h-3.5" /> Hiện bài
+                    <Eye size={14} weight="duotone" /> Hiện bài
                   </button>
                 )}
                 <span>•</span>
@@ -464,7 +464,7 @@ export default function PostDetailPage() {
                   onClick={() => handleModeratePost("DELETE")}
                   className="hover:underline cursor-pointer flex items-center gap-1"
                 >
-                  <Trash2 className="w-3.5 h-3.5" /> Xóa bài
+                  <Trash size={14} weight="duotone" /> Xóa bài
                 </button>
               </div>
             )}
@@ -474,7 +474,7 @@ export default function PostDetailPage() {
               <div className="flex items-center gap-6">
                 {/* Replies count */}
                 <span className="flex items-center gap-1.5 font-semibold text-on-surface">
-                  <MessageCircle className="w-4 h-4 text-primary" />
+                  <ChatCircleDots size={16} weight="duotone" className="text-primary" />
                   <span>{countComments(post.comments)} phản hồi</span>
                 </span>
 
@@ -487,7 +487,9 @@ export default function PostDetailPage() {
                   title={isLiked ? "Bỏ thích" : "Thích"}
                 >
                   <Heart
-                    className={`w-4 h-4 transition-transform active:scale-125 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+                    size={16}
+                    weight={isLiked ? "fill" : "regular"}
+                    className={`transition-transform active:scale-125 ${isLiked ? "text-red-500" : ""}`}
                   />
                   <span className={isLiked ? "font-bold text-red-500" : ""}>
                     {formatCompactNumber(likesCount)}
@@ -499,7 +501,7 @@ export default function PostDetailPage() {
                   className="flex items-center gap-1.5 text-on-surface-variant/60 select-none"
                   title={`${post.views_count || 0} lượt xem`}
                 >
-                  <BarChart2 className="w-4 h-4" />
+                  <ChartBar size={16} weight="duotone" />
                   <span>{formatCompactNumber(post.views_count || 0)}</span>
                 </div>
 
@@ -509,7 +511,7 @@ export default function PostDetailPage() {
                   className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"
                   title="Sao chép liên kết"
                 >
-                  <Share2 className="w-4 h-4" />
+                  <ShareNetwork size={16} weight="duotone" />
                 </button>
 
                 {/* Delete Post for Author */}
@@ -519,7 +521,7 @@ export default function PostDetailPage() {
                     className="flex items-center gap-1.5 text-red-500 hover:text-red-600 transition-colors cursor-pointer font-semibold"
                     title="Xóa bài viết của bạn"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash size={16} weight="duotone" />
                     <span>Xóa bài</span>
                   </button>
                 )}
@@ -537,7 +539,7 @@ export default function PostDetailPage() {
                 <div className="flex-shrink-0">
                   {mainAnonymous ? (
                     <div className="w-9 h-9 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs">
-                      <UserX className="w-4 h-4" />
+                      <UserCircle size={18} weight="duotone" />
                     </div>
                   ) : (user as any).avatar_url ? (
                     <img
@@ -559,7 +561,7 @@ export default function PostDetailPage() {
                     <span className="text-xs font-bold text-on-surface">
                       {mainAnonymous ? (
                         <span className="text-primary flex items-center gap-1">
-                          <UserX className="w-3 h-3" />
+                          <UserCircle size={14} weight="duotone" />
                           Người dùng ẩn danh (Bạn)
                         </span>
                       ) : (
@@ -577,7 +579,7 @@ export default function PostDetailPage() {
                           : "bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-outline-variant/30"
                       }`}
                     >
-                      <UserX className="w-3 h-3" />
+                      <UserCircle size={14} weight="duotone" />
                       {mainAnonymous ? "Ẩn danh" : "Bình luận ẩn danh"}
                     </button>
                   </div>
@@ -598,7 +600,7 @@ export default function PostDetailPage() {
                       disabled={submittingComment || !mainComment.trim()}
                       className="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
                     >
-                      <Send className="w-3 h-3" />
+                      <PaperPlaneTilt size={14} weight="fill" />
                       {submittingComment ? "Đang gửi..." : "Gửi phản hồi"}
                     </button>
                   </div>
@@ -623,7 +625,7 @@ export default function PostDetailPage() {
           <div className="divide-y divide-outline-variant/15">
             {post.comments.length === 0 ? (
               <div className="text-center py-12 px-4 space-y-1">
-                <MessageCircle className="w-7 h-7 text-on-surface-variant/40 mx-auto" />
+                <ChatCircleDots size={28} weight="duotone" className="text-on-surface-variant/40 mx-auto" />
                 <p className="text-xs font-bold text-on-surface">
                   Chưa có bình luận nào
                 </p>
@@ -744,7 +746,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         <div className="flex items-center gap-2.5">
           {comment.is_anonymous ? (
             <div className="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-primary shadow-xs flex-shrink-0">
-              <UserX className="w-4 h-4" />
+              <UserCircle size={16} weight="duotone" />
             </div>
           ) : comment.author.avatar_url ? (
             <img
@@ -827,7 +829,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               }}
               className="flex items-center gap-1 font-semibold hover:text-primary transition-colors cursor-pointer text-[11px]"
             >
-              <Reply className="w-3.5 h-3.5" />
+              <ArrowBendUpLeft size={14} weight="bold" />
               <span>Trả lời</span>
             </button>
           )}
@@ -839,7 +841,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               className="flex items-center gap-1 font-semibold text-red-400 hover:text-red-500 transition-colors cursor-pointer text-[11px]"
               title="Xóa bình luận của bạn"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash size={14} weight="duotone" />
               <span>Xóa</span>
             </button>
           )}
@@ -853,7 +855,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 onClick={() => handleModerateComment(comment.id, "HIDE")}
                 className="flex items-center gap-1 hover:underline cursor-pointer"
               >
-                <EyeOff className="w-3.5 h-3.5" />
+                <EyeSlash size={14} weight="duotone" />
                 <span>Ẩn</span>
               </button>
             ) : (
@@ -861,7 +863,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 onClick={() => handleModerateComment(comment.id, "UNHIDE")}
                 className="flex items-center gap-1 hover:underline cursor-pointer text-green-500"
               >
-                <Eye className="w-3.5 h-3.5" />
+                <Eye size={14} weight="duotone" />
                 <span>Hiện</span>
               </button>
             )}
@@ -869,7 +871,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               onClick={() => handleDeleteComment(comment.id)}
               className="flex items-center gap-1 hover:underline cursor-pointer text-red-500"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash size={14} weight="duotone" />
               <span>Xóa</span>
             </button>
           </div>
@@ -884,7 +886,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold text-on-surface-variant flex items-center gap-1">
-              <CornerDownRight className="w-3.5 h-3.5 text-primary" />
+              <ArrowElbowDownRight size={14} weight="bold" className="text-primary" />
               Trả lời {comment.author.full_name}:
             </span>
 
@@ -897,7 +899,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   : "bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-outline-variant/30"
               }`}
             >
-              <UserX className="w-3 h-3" />
+              <UserCircle size={14} weight="duotone" />
               {replyAnonymous ? "Ẩn danh" : "Trả lời ẩn danh"}
             </button>
           </div>

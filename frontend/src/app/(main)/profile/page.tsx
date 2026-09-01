@@ -4,6 +4,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import {
+  GraduationCap,
+  Gear,
+  Certificate,
+  Robot,
+} from "@phosphor-icons/react";
 
 interface EnrolledCourse {
     course_id: string;
@@ -165,7 +171,7 @@ export default function ProfilePage() {
                                         : 'text-on-surface-variant hover:text-on-surface hover:bg-white/40'
                                 }`}
                             >
-                                <span className="material-symbols-outlined text-[18px]">school</span>
+                                <GraduationCap size={18} weight="duotone" />
                                 Tiến độ học tập
                             </button>
                         )}
@@ -173,11 +179,11 @@ export default function ProfilePage() {
                             onClick={() => setActiveTab('settings')}
                             className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                                 activeTab === 'settings' 
-                                    ? 'bg-primary text-white shadow-sm' 
-                                    : 'text-on-surface-variant hover:text-on-surface hover:bg-white/40'
+                                        ? 'bg-primary text-white shadow-sm' 
+                                        : 'text-on-surface-variant hover:text-on-surface hover:bg-white/40'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-[18px]">settings</span>
+                            <Gear size={18} weight="duotone" />
                             Thông tin tài khoản
                         </button>
                     </div>
@@ -236,7 +242,7 @@ export default function ProfilePage() {
                                                         href={`/courses/${c.course_id}/certificate`}
                                                         className="flex-1 sm:flex-initial inline-flex h-10 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary px-4 text-xs font-bold hover:bg-primary/20 transition-colors gap-1"
                                                     >
-                                                        <span className="material-symbols-outlined text-[16px]">workspace_premium</span>
+                                                        <Certificate size={16} weight="duotone" />
                                                         Xem chứng chỉ
                                                     </Link>
                                                 )}
@@ -250,7 +256,7 @@ export default function ProfilePage() {
                             <div className="bg-gradient-to-br from-primary-fixed/30 via-secondary-fixed/20 to-tertiary-fixed/30 rounded-3xl p-6 border border-primary/20 flex flex-col sm:flex-row items-center gap-6 justify-between shadow-sm">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-white text-primary flex items-center justify-center shadow-sm flex-shrink-0">
-                                        <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>smart_toy</span>
+                                        <Robot size={28} weight="duotone" />
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">

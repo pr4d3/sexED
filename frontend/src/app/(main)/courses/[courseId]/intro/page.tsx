@@ -6,6 +6,20 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { CourseIntroSkeleton } from '@/components/Skeleton';
 import { useToast } from '@/context/ToastContext';
+import { BRAND_CONFIG } from '@/config/branding';
+import {
+  WarningCircle,
+  ShieldCheck,
+  Sparkle,
+  CheckCircle,
+  CaretDown,
+  Clock,
+  Play,
+  BookOpen,
+  UsersThree,
+  Infinity as InfinityIcon,
+  ArrowRight,
+} from "@phosphor-icons/react";
 
 interface SyllabusItem {
     id: string;
@@ -89,7 +103,7 @@ export default function CourseIntroPage() {
         return (
             <div className="text-center py-16 max-w-md mx-auto space-y-6">
                 <div className="w-16 h-16 mx-auto bg-red-50 text-error rounded-2xl flex items-center justify-center shadow-sm">
-                    <span className="material-symbols-outlined text-3xl">error</span>
+                    <WarningCircle size={32} weight="duotone" />
                 </div>
                 <h2 className="text-lg font-bold text-on-surface">Không tìm thấy khóa học này</h2>
                 <p className="text-sm text-on-surface-variant leading-relaxed">{error}</p>
@@ -111,7 +125,7 @@ export default function CourseIntroPage() {
                 {/* Hero section */}
                 <section className="space-y-6">
                     <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-xs font-semibold">
-                        <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+                        <ShieldCheck size={16} weight="fill" />
                         Dành cho {audienceText}
                     </div>
                     <h1 className="text-2xl md:text-4xl font-extrabold text-on-surface leading-tight">
@@ -125,9 +139,7 @@ export default function CourseIntroPage() {
                     {courseData.learning_objectives ? (
                         <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-white/50 mt-8">
                             <h2 className="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
-                                <span className="material-symbols-outlined text-primary text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                    stars
-                                </span>
+                                <Sparkle size={22} weight="fill" className="text-primary" />
                                 Mục tiêu học tập
                             </h2>
                             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -137,9 +149,7 @@ export default function CourseIntroPage() {
                                     .filter((line: string) => line.length > 0)
                                     .map((obj: string, idx: number) => (
                                         <li key={idx} className="flex items-start gap-3 bg-surface-container-low/50 p-4 rounded-2xl border border-outline-variant/10">
-                                            <span className="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                                check_circle
-                                            </span>
+                                            <CheckCircle size={20} weight="fill" className="text-primary mt-0.5 flex-shrink-0" />
                                             <span className="text-sm text-on-surface font-medium leading-relaxed">{obj}</span>
                                         </li>
                                     ))}
@@ -148,9 +158,7 @@ export default function CourseIntroPage() {
                     ) : (
                         <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-white/50 mt-8">
                             <h2 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-                                <span className="material-symbols-outlined text-primary text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                    stars
-                                </span>
+                                <Sparkle size={22} weight="fill" className="text-primary" />
                                 Mục tiêu học tập
                             </h2>
                             <p className="text-sm text-on-surface-variant font-light">
@@ -167,7 +175,7 @@ export default function CourseIntroPage() {
                         className="w-full flex items-center justify-between border-b border-outline-variant/30 pb-3 text-left cursor-pointer select-none"
                     >
                         <h2 className="text-lg font-bold text-on-surface">Đề cương bài học</h2>
-                        <span className={`material-symbols-outlined text-on-surface-variant transition-transform ${expandedSyllabus ? 'rotate-180' : ''}`}>expand_more</span>
+                        <CaretDown size={20} weight="bold" className={`text-on-surface-variant transition-transform ${expandedSyllabus ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {expandedSyllabus && (
@@ -185,7 +193,7 @@ export default function CourseIntroPage() {
                                         </div>
                                         {lesson.duration_minutes && (
                                             <span className="text-xs text-on-surface-variant flex items-center gap-1 font-medium">
-                                                <span className="material-symbols-outlined text-[16px]">schedule</span>
+                                                <Clock size={16} weight="bold" />
                                                 {lesson.duration_minutes} phút
                                             </span>
                                         )}
@@ -208,7 +216,7 @@ export default function CourseIntroPage() {
                         <div className="text-center sm:text-left space-y-2">
                             <h3 className="text-base font-bold text-on-surface">{courseData.instructor.full_name}</h3>
                             <p className="text-xs text-on-surface-variant font-light leading-relaxed pt-1">
-                                {courseData.instructor.bio || 'Chuyên gia phụ trách biên soạn và điều phối nội dung khóa học trên nền tảng SexED.'}
+                                {courseData.instructor.bio || `Chuyên gia phụ trách biên soạn và điều phối nội dung khóa học trên nền tảng ${BRAND_CONFIG.name}.`}
                             </p>
                         </div>
                     </div>
@@ -227,7 +235,7 @@ export default function CourseIntroPage() {
                         />
                         <div onClick={handleAction} className="absolute inset-0 flex items-center justify-center bg-black/15 hover:bg-black/25 transition-all cursor-pointer">
                             <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md">
-                                <span className="material-symbols-outlined text-primary text-3xl ml-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+                                <Play size={26} weight="fill" className="text-primary ml-0.5" />
                             </div>
                         </div>
                     </div>
@@ -237,21 +245,21 @@ export default function CourseIntroPage() {
                         <div className="space-y-4 text-sm">
                             <div className="flex items-center justify-between text-on-surface-variant border-b border-outline-variant/20 pb-3">
                                 <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px] text-primary">menu_book</span>
+                                    <BookOpen size={18} weight="duotone" className="text-primary" />
                                     <span>Quy mô</span>
                                 </div>
                                 <span className="font-bold text-on-surface">{courseData.total_lessons} bài học</span>
                             </div>
                             <div className="flex items-center justify-between text-on-surface-variant border-b border-outline-variant/20 pb-3">
                                 <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px] text-secondary-container">groups</span>
+                                    <UsersThree size={18} weight="duotone" className="text-secondary-container" />
                                     <span>Đối tượng</span>
                                 </div>
                                 <span className="font-bold text-on-surface">{audienceText}</span>
                             </div>
                             <div className="flex items-center justify-between text-on-surface-variant pb-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px] text-primary">all_inclusive</span>
+                                    <InfinityIcon size={18} weight="bold" className="text-primary" />
                                     <span>Thời hạn truy cập</span>
                                 </div>
                                 <span className="font-bold text-on-surface">Không giới hạn</span>
@@ -265,7 +273,7 @@ export default function CourseIntroPage() {
                             className="w-full bg-gradient-to-r from-secondary-container to-secondary text-white text-xs font-bold py-4 px-6 rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                         >
                             {enrolling ? 'Đang xử lý...' : courseData.is_enrolled ? 'Vào học ngay' : 'Bắt đầu học'}
-                            <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                            <ArrowRight size={18} weight="bold" />
                         </button>
                     </div>
                 </div>

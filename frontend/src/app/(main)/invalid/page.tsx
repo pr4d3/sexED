@@ -3,7 +3,7 @@
 import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ShieldAlert, ArrowLeft } from "lucide-react";
+import { ShieldWarning, ArrowLeft } from "@phosphor-icons/react";
 
 function InvalidContent() {
   const searchParams = useSearchParams();
@@ -17,7 +17,7 @@ function InvalidContent() {
       <div className="max-w-md w-full text-center space-y-6 bg-white/80 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-outline-variant/30 shadow-lg">
         {/* Icon */}
         <div className="w-16 h-16 mx-auto bg-red-50 text-red-600 rounded-2xl flex items-center justify-center border border-red-100 shadow-xs">
-          <ShieldAlert className="w-8 h-8 stroke-[2.2]" />
+          <ShieldWarning size={36} weight="duotone" />
         </div>
 
         {/* Text */}
@@ -36,7 +36,7 @@ function InvalidContent() {
             href="/"
             className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft size={16} weight="bold" />
             <span>Quay về trang chủ</span>
           </Link>
         </div>

@@ -4,6 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { BRAND_CONFIG } from '@/config/branding';
+import { ShieldCheck, Heart, Robot } from '@phosphor-icons/react';
 
 export default function Header() {
     const { user, logout } = useAuth();
@@ -18,12 +20,12 @@ export default function Header() {
         <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-surface/80 border-b border-outline-variant/30">
             <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
                 {/* Brand */}
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative flex items-center justify-center w-8 h-8 bg-primary rounded-lg group-hover:scale-105 transition-transform shadow-sm">
-                        <span className="material-symbols-outlined text-white text-[18px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 600" }}>shield</span>
-                        <span className="material-symbols-outlined text-white absolute bottom-[2px] right-[2px] text-[8px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                <Link href="/" className="flex items-center gap-2.5 group">
+                    <div className="relative flex items-center justify-center w-9 h-9 bg-gradient-to-tr from-primary to-emerald-600 rounded-xl group-hover:scale-105 transition-transform shadow-sm">
+                        <ShieldCheck size={20} weight="fill" className="text-white" />
+                        <Heart size={10} weight="fill" className="text-amber-300 absolute bottom-[3px] right-[3px]" />
                     </div>
-                    <span className="text-lg font-extrabold tracking-tight text-primary">EduSex VN</span>
+                    <span className="text-lg font-extrabold tracking-tight text-primary">{BRAND_CONFIG.name}</span>
                 </Link>
                 
                 {/* Desktop Nav Links */}
@@ -35,7 +37,7 @@ export default function Header() {
                         Khóa Học
                     </Link>
                     <Link href="/game" className={`text-sm transition-all flex items-center gap-1.5 ${isLinkActive('/game') ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary font-medium'}`}>
-                        <span className="material-symbols-outlined text-[18px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>smart_toy</span>
+                        <Robot size={18} weight="duotone" className="text-primary" />
                         Phòng Chơi AI
                         <span className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-black tracking-wide border border-primary/20">MỚI</span>
                     </Link>

@@ -47,14 +47,17 @@ export function VideoPlayer({
     async function initPlayer() {
       if (!containerRef.current) return;
 
-      // Destroy existing instance if any
+      // Safe destroy existing instance if any
       if (playerRef.current) {
         try {
-          playerRef.current.destroy();
+          const prev = playerRef.current;
+          playerRef.current = null;
+          if (prev && typeof prev.destroy === "function") {
+            prev.destroy();
+          }
         } catch (e) {
-          // ignore
+          // ignore cleanup race conditions
         }
-        playerRef.current = null;
       }
 
       const targetElement = containerRef.current.querySelector(
@@ -97,6 +100,8 @@ export function VideoPlayer({
             modestbranding: 1,
             playsinline: 1,
             cc_load_policy: 0,
+            cc_lang_pref: "off",
+            hl: "vi",
           },
           vimeo: {
             byline: false,
@@ -146,6 +151,46 @@ export function VideoPlayer({
           },
         });
 
+        // Patch player instance against Plyr's unmount destructuring bug
+        if (player) {
+          const originalDestroy = player.destroy.bind(player);
+          player.destroy = () => {
+            try {
+              if (player.elements && player.elements.container) {
+                originalDestroy();
+              }
+            } catch (e) {
+              // Suppress internal Plyr unmount race condition
+            }
+          };
+        }
+
+        // Forcefully ensure YouTube native captions and subtitles are unloaded and disabled
+        const disableCaptions = () => {
+          try {
+            if (player.captions) {
+              player.captions.active = false;
+            }
+            if (typeof player.toggleCaptions === "function") {
+              player.toggleCaptions(false);
+            }
+            if (player.embed) {
+              if (typeof player.embed.unloadModule === "function") {
+                player.embed.unloadModule("captions");
+                player.embed.unloadModule("cc");
+              }
+              if (typeof player.embed.setOption === "function") {
+                player.embed.setOption("captions", "track", {});
+                player.embed.setOption("cc", "track", {});
+              }
+            }
+          } catch (e) {}
+        };
+
+        player.on("ready", disableCaptions);
+        player.on("play", disableCaptions);
+        player.on("playing", disableCaptions);
+
         playerRef.current = player;
 
         let maxWatchedTime = 0;
@@ -177,11 +222,14 @@ export function VideoPlayer({
       isMounted = false;
       if (playerRef.current) {
         try {
-          playerRef.current.destroy();
+          const p = playerRef.current;
+          playerRef.current = null;
+          if (p && typeof p.destroy === "function") {
+            p.destroy();
+          }
         } catch (e) {
           // ignore
         }
-        playerRef.current = null;
       }
     };
   }, [trimmedUrl, autoPlay]);
