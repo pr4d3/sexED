@@ -4,6 +4,14 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { BRAND_CONFIG } from '@/config/branding';
+import {
+  ChartLineUp,
+  UserGear,
+  UsersThree,
+  Robot,
+  ArrowLeft,
+} from "@phosphor-icons/react";
 
 export default function DashboardLayout({
     children,
@@ -45,7 +53,7 @@ export default function DashboardLayout({
                 <div className="p-6 space-y-8">
                     <div className="flex items-center justify-between">
                         <Link href="/" className="text-lg font-extrabold text-primary">
-                            EduSex VN
+                            {BRAND_CONFIG.name}
                         </Link>
                         <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant uppercase">
                             Admin
@@ -65,7 +73,7 @@ export default function DashboardLayout({
                                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/50'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-[18px]">analytics</span>
+                            <ChartLineUp size={18} weight="bold" />
                             Tổng quan số liệu
                         </Link>
 
@@ -78,7 +86,7 @@ export default function DashboardLayout({
                                         : 'text-on-surface-variant hover:text-on-surface hover:bg-white/50'
                                 }`}
                             >
-                                <span className="material-symbols-outlined text-[18px]">manage_accounts</span>
+                                <UserGear size={18} weight="bold" />
                                 Quản lý người dùng
                             </Link>
                         )}
@@ -91,7 +99,7 @@ export default function DashboardLayout({
                                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/50'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-[18px]">group</span>
+                            <UsersThree size={18} weight="bold" />
                             Theo dõi học viên
                         </Link>
 
@@ -103,7 +111,7 @@ export default function DashboardLayout({
                                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/50'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-[18px]">smart_toy</span>
+                            <Robot size={18} weight="duotone" />
                             Phòng Chơi AI Roleplay
                         </Link>
                     </div>
@@ -125,7 +133,7 @@ export default function DashboardLayout({
                         onClick={() => router.push('/')}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/50 transition-all cursor-pointer"
                     >
-                        <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                        <ArrowLeft size={18} weight="bold" />
                         Về trang chủ
                     </button>
                 </div>

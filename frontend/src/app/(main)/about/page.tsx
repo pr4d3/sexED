@@ -1,6 +1,16 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { BRAND_CONFIG } from "@/config/branding";
+import {
+  Flask,
+  Warning,
+  Brain,
+  EnvelopeSimple,
+  PhoneCall,
+  MapPin,
+  CheckCircle,
+} from "@phosphor-icons/react";
 
 interface Author {
   name: string;
@@ -126,16 +136,11 @@ export default function AboutPage() {
       <section className="relative w-full py-16 px-4 md:px-16 flex items-center justify-center overflow-hidden">
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-4">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-bold mb-2">
-            <span
-              className="material-symbols-outlined text-[16px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              science
-            </span>
+            <Flask size={16} weight="fill" />
             Đề tài Nghiên cứu Khoa học
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary-container mb-4 leading-tight">
-            Giáo dục giới tính &amp; Dự Án SexED
+            Giáo dục giới tính &amp; {BRAND_CONFIG.fullName}
           </h1>
           <p className="text-base md:text-lg font-medium text-on-surface-variant max-w-3xl mx-auto leading-relaxed">
             {title}
@@ -150,12 +155,7 @@ export default function AboutPage() {
           <div className="bg-white/80 backdrop-blur-md rounded-3xl p-10 shadow-sm hover-shadow transition-all duration-300 border border-white/50 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-error-container/40 to-transparent rounded-bl-[100px] -z-10 transition-transform group-hover:scale-105 duration-500"></div>
             <div className="w-14 h-14 bg-gradient-to-br from-error-container to-white text-error rounded-2xl flex items-center justify-center mb-8 shadow-sm border border-error-container/50">
-              <span
-                className="material-symbols-outlined text-[28px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                warning
-              </span>
+              <Warning size={28} weight="duotone" />
             </div>
             <h2 className="text-xl font-bold text-on-surface mb-4">
               Tính cấp thiết của Đề tài
@@ -169,12 +169,7 @@ export default function AboutPage() {
           <div className="bg-white/80 backdrop-blur-md rounded-3xl p-10 shadow-sm hover-shadow transition-all duration-300 border border-white/50 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-tertiary-fixed/40 to-transparent rounded-bl-[100px] -z-10 transition-transform group-hover:scale-105 duration-500"></div>
             <div className="w-14 h-14 bg-gradient-to-br from-tertiary-fixed to-white text-tertiary-container rounded-2xl flex items-center justify-center mb-8 shadow-sm border border-tertiary-fixed/50">
-              <span
-                className="material-symbols-outlined text-[28px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                psychology
-              </span>
+              <Brain size={28} weight="duotone" />
             </div>
             <h2 className="text-xl font-bold text-on-surface mb-4">
               Phương pháp tiếp cận theo lứa tuổi
@@ -251,39 +246,33 @@ export default function AboutPage() {
               <div className="space-y-6 pt-4">
                 <div className="flex items-center space-x-4 group">
                   <div className="w-12 h-12 bg-surface-container rounded-2xl flex items-center justify-center text-primary group-hover:scale-105 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
-                    <span className="material-symbols-outlined text-[20px]">
-                      mail
-                    </span>
+                    <EnvelopeSimple size={22} weight="duotone" />
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
                       Email
                     </p>
                     <p className="text-sm font-semibold text-on-surface">
-                      contact@sexed.edu.vn
+                      {BRAND_CONFIG.email}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4 group">
                   <div className="w-12 h-12 bg-surface-container rounded-2xl flex items-center justify-center text-primary group-hover:scale-105 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
-                    <span className="material-symbols-outlined text-[20px]">
-                      call
-                    </span>
+                    <PhoneCall size={22} weight="duotone" />
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
                       Hotline
                     </p>
                     <p className="text-sm font-semibold text-on-surface">
-                      1900 8888 (Miễn phí)
+                      {BRAND_CONFIG.phone}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4 group">
                   <div className="w-12 h-12 bg-surface-container rounded-2xl flex items-center justify-center text-primary group-hover:scale-105 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
-                    <span className="material-symbols-outlined text-[20px]">
-                      location_on
-                    </span>
+                    <MapPin size={22} weight="duotone" />
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
@@ -308,9 +297,7 @@ export default function AboutPage() {
             >
               {feedbackSent && (
                 <div className="rounded-2xl bg-primary/10 border border-primary/20 p-3 text-xs font-semibold text-primary flex items-center gap-2">
-                  <span className="material-symbols-outlined text-sm">
-                    check_circle
-                  </span>
+                  <CheckCircle size={18} weight="fill" />
                   Cảm ơn bạn đã đóng góp ý kiến cho đội ngũ nghiên cứu!
                 </div>
               )}

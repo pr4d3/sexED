@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
+import { HouseLine, Backpack, Check } from "@phosphor-icons/react";
 
 export default function RegisterPage() {
     const { register, loading } = useAuth();
@@ -168,7 +169,7 @@ export default function RegisterPage() {
                                     : 'border-white/60 bg-white/40 hover:bg-white/60'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-primary mb-1.5 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>family_home</span>
+                            <HouseLine size={24} weight="duotone" className="text-primary mb-1.5" />
                             <span className="text-xs font-bold text-on-surface">Phụ huynh</span>
                         </div>
                         <div
@@ -179,7 +180,7 @@ export default function RegisterPage() {
                                     : 'border-white/60 bg-white/40 hover:bg-white/60'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-primary mb-1.5 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>backpack</span>
+                            <Backpack size={24} weight="duotone" className="text-primary mb-1.5" />
                             <span className="text-xs font-bold text-on-surface">Học sinh</span>
                         </div>
                     </div>
@@ -313,44 +314,44 @@ export default function RegisterPage() {
                     <div className="flex flex-col gap-1 mt-2 px-1">
                         <div className="flex items-center gap-2 text-[11px] font-medium transition-all">
                             {password.length >= 6 ? (
-                                <span className="material-symbols-outlined text-green-500 text-xs font-bold select-none">check</span>
+                                <Check size={14} weight="bold" className="text-emerald-500 shrink-0" />
                             ) : (
                                 <span className="h-1.5 w-1.5 rounded-full bg-on-surface-variant/40 ml-1.5 mr-1" />
                             )}
-                            <span className={password.length >= 6 ? "text-green-600 font-semibold" : "text-on-surface-variant/50"}>
+                            <span className={password.length >= 6 ? "text-emerald-600 font-semibold" : "text-on-surface-variant/50"}>
                                 Tối thiểu 6 ký tự
                             </span>
                         </div>
 
                         <div className="flex items-center gap-2 text-[11px] font-medium transition-all">
                             {/[a-zA-Z]/.test(password) ? (
-                                <span className="material-symbols-outlined text-green-500 text-xs font-bold select-none">check</span>
+                                <Check size={14} weight="bold" className="text-emerald-500 shrink-0" />
                             ) : (
                                 <span className="h-1.5 w-1.5 rounded-full bg-on-surface-variant/40 ml-1.5 mr-1" />
                             )}
-                            <span className={/[a-zA-Z]/.test(password) ? "text-green-600 font-semibold" : "text-on-surface-variant/50"}>
+                            <span className={/[a-zA-Z]/.test(password) ? "text-emerald-600 font-semibold" : "text-on-surface-variant/50"}>
                                 Chứa ít nhất 1 chữ cái
                             </span>
                         </div>
 
                         <div className="flex items-center gap-2 text-[11px] font-medium transition-all">
                             {/\d/.test(password) ? (
-                                <span className="material-symbols-outlined text-green-500 text-xs font-bold select-none">check</span>
+                                <Check size={14} weight="bold" className="text-emerald-500 shrink-0" />
                             ) : (
                                 <span className="h-1.5 w-1.5 rounded-full bg-on-surface-variant/40 ml-1.5 mr-1" />
                             )}
-                            <span className={/\d/.test(password) ? "text-green-600 font-semibold" : "text-on-surface-variant/50"}>
+                            <span className={/\d/.test(password) ? "text-emerald-600 font-semibold" : "text-on-surface-variant/50"}>
                                 Chứa ít nhất 1 chữ số
                             </span>
                         </div>
 
                         <div className="flex items-center gap-2 text-[11px] font-medium transition-all">
                             {password && !/\s/.test(password) ? (
-                                <span className="material-symbols-outlined text-green-500 text-xs font-bold select-none">check</span>
+                                <Check size={14} weight="bold" className="text-emerald-500 shrink-0" />
                             ) : (
                                 <span className="h-1.5 w-1.5 rounded-full bg-on-surface-variant/40 ml-1.5 mr-1" />
                             )}
-                            <span className={password && !/\s/.test(password) ? "text-green-600 font-semibold" : "text-on-surface-variant/50"}>
+                            <span className={password && !/\s/.test(password) ? "text-emerald-600 font-semibold" : "text-on-surface-variant/50"}>
                                 Không chứa khoảng trắng
                             </span>
                         </div>

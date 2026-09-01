@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import { WarningCircle } from "@phosphor-icons/react";
 
 export default function LoginPage() {
   const { login, loading } = useAuth();
@@ -39,7 +40,7 @@ export default function LoginPage() {
     <>
       {error && (
         <div className="rounded-2xl bg-red-50 border border-red-200/60 p-4 text-xs font-semibold text-red-600 flex items-center gap-2.5 shadow-xs">
-          <span className="material-symbols-outlined text-[18px] text-red-500 shrink-0">error</span>
+          <WarningCircle size={18} weight="fill" className="text-red-500 shrink-0" />
           <span>{error}</span>
         </div>
       )}

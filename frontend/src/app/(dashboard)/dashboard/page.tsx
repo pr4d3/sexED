@@ -4,6 +4,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import {
+  ArrowLeft,
+  Plus,
+  BookOpen,
+  DotsSixVertical,
+  PencilSimple,
+  Trash,
+  X,
+  UsersThree,
+  Certificate,
+  Percent,
+  Article,
+} from "@phosphor-icons/react";
 
 interface ManagedCourse {
   course_id: string;
@@ -531,9 +544,7 @@ export default function DashboardOverviewPage() {
             onClick={handleBackToOverview}
             className="flex items-center gap-2 text-xs font-bold text-primary hover:opacity-80 transition-all w-fit cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              arrow_back
-            </span>
+            <ArrowLeft size={16} weight="bold" />
             Quay lại Tổng quan
           </button>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -750,18 +761,14 @@ export default function DashboardOverviewPage() {
                     onClick={handleOpenAddLesson}
                     className="bg-primary text-white px-4 py-2.5 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity shadow-sm cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[16px]">
-                      add
-                    </span>
+                    <Plus size={16} weight="bold" />
                     Thêm bài học
                   </button>
                 </div>
 
                 {!courseDetails || courseDetails.syllabus.length === 0 ? (
                   <div className="text-center py-10 space-y-3">
-                    <span className="material-symbols-outlined text-[48px] text-on-surface-variant/40">
-                      menu_book
-                    </span>
+                    <BookOpen size={48} weight="duotone" className="mx-auto text-on-surface-variant/40" />
                     <p className="text-xs text-on-surface-variant font-light">
                       Khóa học này chưa có bài học nào. Hãy thiết kế bài học đầu
                       tiên!
@@ -790,9 +797,7 @@ export default function DashboardOverviewPage() {
                             className="flex items-center gap-2 cursor-grab active:cursor-grabbing p-1 hover:bg-primary/5 rounded-2xl transition-all"
                             title="Kéo thả để sắp xếp"
                           >
-                            <span className="material-symbols-outlined text-[18px] text-on-surface-variant/35 group-hover:text-primary transition-colors">
-                              drag_indicator
-                            </span>
+                            <DotsSixVertical size={18} weight="bold" className="text-on-surface-variant/35 group-hover:text-primary transition-colors" />
                             <div className="h-8 w-8 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs">
                               {lesson.order_index}
                             </div>
@@ -812,18 +817,14 @@ export default function DashboardOverviewPage() {
                             className="h-8 w-8 rounded-full hover:bg-surface-container flex items-center justify-center text-primary transition-colors cursor-pointer"
                             title="Sửa bài giảng"
                           >
-                            <span className="material-symbols-outlined text-[18px]">
-                              edit
-                            </span>
+                            <PencilSimple size={18} weight="bold" />
                           </button>
                           <button
                             onClick={() => handleDeleteLesson(lesson.id)}
                             className="h-8 w-8 rounded-full hover:bg-red-50 flex items-center justify-center text-red-500 transition-colors cursor-pointer"
                             title="Xóa bài giảng"
                           >
-                            <span className="material-symbols-outlined text-[18px]">
-                              delete
-                            </span>
+                            <Trash size={18} weight="bold" />
                           </button>
                         </div>
                       </div>
@@ -843,9 +844,7 @@ export default function DashboardOverviewPage() {
                 onClick={() => setLessonModalOpen(false)}
                 className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  close
-                </span>
+                <X size={20} weight="bold" />
               </button>
 
               <h3 className="text-base font-extrabold text-on-surface mb-6">
@@ -996,7 +995,7 @@ export default function DashboardOverviewPage() {
           onClick={() => setModalOpen(true)}
           className="bg-primary text-white px-6 py-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[18px]">add</span>
+          <Plus size={18} weight="bold" />
           Tạo khóa học mới
         </button>
       </div>
@@ -1005,12 +1004,7 @@ export default function DashboardOverviewPage() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl text-center border border-white/60 shadow-sm space-y-2">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <span
-              className="material-symbols-outlined text-[20px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              menu_book
-            </span>
+            <BookOpen size={20} weight="duotone" />
           </div>
           <div className="text-xl font-extrabold text-on-surface">
             {loading || !stats ? (
@@ -1026,12 +1020,7 @@ export default function DashboardOverviewPage() {
 
         <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl text-center border border-white/60 shadow-sm space-y-2">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <span
-              className="material-symbols-outlined text-[20px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              group
-            </span>
+            <UsersThree size={20} weight="duotone" />
           </div>
           <div className="text-xl font-extrabold text-on-surface">
             {loading || !stats ? (
@@ -1047,12 +1036,7 @@ export default function DashboardOverviewPage() {
 
         <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl text-center border border-white/60 shadow-sm space-y-2">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary-container/10 text-secondary">
-            <span
-              className="material-symbols-outlined text-[20px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              workspace_premium
-            </span>
+            <Certificate size={20} weight="duotone" />
           </div>
           <div className="text-xl font-extrabold text-on-surface">
             {loading || !stats ? (
@@ -1068,12 +1052,7 @@ export default function DashboardOverviewPage() {
 
         <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl text-center border border-white/60 shadow-sm space-y-2">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-tertiary-container/10 text-tertiary">
-            <span
-              className="material-symbols-outlined text-[20px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              percent
-            </span>
+            <Percent size={20} weight="bold" />
           </div>
           <div className="text-xl font-extrabold text-on-surface">
             {loading || !stats ? (
@@ -1089,12 +1068,7 @@ export default function DashboardOverviewPage() {
 
         <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl text-center border border-white/60 shadow-sm space-y-2">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <span
-              className="material-symbols-outlined text-[20px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              description
-            </span>
+            <Article size={20} weight="duotone" />
           </div>
           <div className="text-xl font-extrabold text-on-surface">
             {loading || !stats ? (
@@ -1263,9 +1237,7 @@ export default function DashboardOverviewPage() {
               onClick={() => setModalOpen(false)}
               className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[20px]">
-                close
-              </span>
+              <X size={20} weight="bold" />
             </button>
 
             <h3 className="text-base font-extrabold text-on-surface mb-6">

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { Funnel } from '@phosphor-icons/react';
 
 interface ManagedCourse {
     course_id: string;
@@ -77,7 +78,7 @@ export default function DashboardStudentsPage() {
 
                 {/* Course Selector Dropdown */}
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">filter_list</span>
+                    <Funnel size={20} weight="bold" className="text-on-surface-variant" />
                     {coursesLoading ? (
                         <span className="text-xs text-on-surface-variant animate-pulse">Đang tải danh sách...</span>
                     ) : (

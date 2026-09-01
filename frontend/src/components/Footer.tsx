@@ -1,5 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
+import { BRAND_CONFIG } from '@/config/branding';
+import { ShieldCheck } from '@phosphor-icons/react/dist/ssr';
 
 export default function Footer() {
     return (
@@ -7,14 +9,14 @@ export default function Footer() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 {/* Brand Column */}
                 <div className="flex flex-col gap-4">
-                    <Link href="/" className="flex items-center gap-2 group hover:opacity-80 transition-all duration-300 w-fit">
-                        <div className="relative flex items-center justify-center w-8 h-8 bg-primary rounded-full shadow-sm">
-                            <span className="material-symbols-outlined text-white text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>shield</span>
+                    <Link href="/" className="flex items-center gap-2.5 group hover:opacity-80 transition-all duration-300 w-fit">
+                        <div className="relative flex items-center justify-center w-8 h-8 bg-gradient-to-tr from-primary to-emerald-600 rounded-xl shadow-sm">
+                            <ShieldCheck size={18} weight="fill" className="text-white" />
                         </div>
-                        <span className="text-md font-bold text-primary">EduSex VN</span>
+                        <span className="text-md font-bold text-primary">{BRAND_CONFIG.fullName}</span>
                     </Link>
                     <p className="text-xs text-on-surface-variant/80">
-                        © 2026 EduSex VN. Nền tảng Giáo dục Giới tính Chuẩn Khoa học.
+                        {BRAND_CONFIG.copyright}
                     </p>
                 </div>
                 
